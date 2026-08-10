@@ -1,0 +1,620 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "config_version": "2.5.0",
+  "automation": {
+    "name": "VideoExpress Consistent Character Multiple Clips",
+    "enabled": true,
+    "run_mode": "manual",
+    "trigger_phrase": "Generate consistent character clips",
+    "timezone": "Asia/Dhaka",
+    "browser": {
+      "preferred_browser": "chrome",
+      "use_existing_authenticated_session": true,
+      "start_url": "https://app.videoexpress.ai/",
+      "stop_if_sign_in_is_required": true
+    },
+    "inputs": {
+      "reference_portrait_prompt": "{{REFERENCE_PORTRAIT_PROMPT}}",
+      "audio": {
+        "theme_description": "{{AUDIO_THEME_DESCRIPTION}}",
+        "lyrics_prompt": "{{CLONEVOICE_LYRICS_PROMPT}}",
+        "style": "{{CLONEVOICE_MUSIC_STYLE}}",
+        "language": "English",
+        "music_name": "{{MUSIC_NAME}}"
+      },
+      "export": {
+        "file_name": "{{EXPORT_FILE_NAME}}",
+        "quality": "High",
+        "resolution": "FullHD",
+        "format": "mp4"
+      },
+      "clips": [
+        {
+          "id": "shot_1",
+          "image_prompt": "{{SHOT_1_IMAGE_PROMPT}}",
+          "video_prompt": "{{SHOT_1_VIDEO_PROMPT}}",
+          "duration_seconds": 7,
+          "preview_selection": "first_acceptable"
+        },
+        {
+          "id": "shot_2",
+          "image_prompt": "{{SHOT_2_IMAGE_PROMPT}}",
+          "video_prompt": "{{SHOT_2_VIDEO_PROMPT}}",
+          "duration_seconds": 7,
+          "preview_selection": "first_acceptable"
+        }
+      ]
+    },
+    "input_requirements": {
+      "reference_portrait_prompt": {
+        "required": true,
+        "recommended_framing": "close-up portrait",
+        "recommended_content": [
+          "face shape",
+          "skin tone",
+          "eye color",
+          "hair style and color",
+          "age and body type",
+          "clothing",
+          "expression",
+          "lighting",
+          "camera angle",
+          "aspect ratio"
+        ]
+      },
+      "clips": {
+        "required": true,
+        "minimum_items": 1,
+        "required_fields": [
+          "id",
+          "image_prompt",
+          "video_prompt",
+          "duration_seconds"
+        ],
+        "duration_seconds": {
+          "minimum": 3,
+          "maximum": 10
+        }
+      }
+    },
+    "videoexpress": {
+      "generator": "Create Video From Prompt",
+      "aspect_ratio": "Landscape 16:9",
+      "image_type": "Human",
+      "automatically_enhance_image_prompt": false,
+      "use_consistent_character": true,
+      "reference_control": "Reference Photo",
+      "reference_library_folder": "My AI Images",
+      "forbidden_reference_control": "Use from Library",
+      "advanced_mode": {
+        "enabled": true,
+        "manual_video_length": true,
+        "automatically_enhance_video_prompt": false,
+        "duration_source": "current_clip.duration_seconds"
+      }
+    },
+    "reference_image": {
+      "create_once": true,
+      "image_prompt_source": "inputs.reference_portrait_prompt",
+      "generation_button": "Create Image",
+      "wait_until": "completed_preview_replaces_loading_placeholder",
+      "save_method": {
+        "hover_preview": true,
+        "button": "Save Image",
+        "expected_confirmation_contains": "saved in your Media Library",
+        "expected_folder": "My AI Images"
+      },
+      "selection_method": {
+        "check_consistent_character": true,
+        "open_with": "Reference Photo",
+        "folder": "My AI Images",
+        "file_rule": "select_the_saved_reference_portrait",
+        "confirm_with": "Choose"
+      },
+      "reuse_policy": "Attach the reference only for the first clip. Keep the generator modal open so the same reference remains attached for every later clip."
+    },
+    "timeline_assembly": {
+      "enabled": true,
+      "close_generator_modal_after_all_clips": true,
+      "media_library_section": "Media Library",
+      "generated_video_folder": "My AI Videos",
+      "add_method": "right_click_then_add_to_timeline",
+      "context_menu_action": "Add to Timeline",
+      "ordering_source": "inputs.clips",
+      "ordering_rule": "Add clips in ascending input-array order, regardless of the library's Newest sorting.",
+      "wait_until_ready": true,
+      "verification": "The timeline contains exactly one new clip for every input clip in the same sequential order."
+    },
+    "audio_generation": {
+      "enabled": true,
+      "provider": "CloneVoice",
+      "create_url": "https://app.clonevoice.ai/music/create",
+      "lyrics_mode": "AI-Generated",
+      "lyrics_prompt_source": "inputs.audio.lyrics_prompt",
+      "style_source": "inputs.audio.style",
+      "language_source": "inputs.audio.language",
+      "music_name_source": "inputs.audio.music_name",
+      "accept_terms_before_lyrics": true,
+      "accept_terms_before_music": true,
+      "download_music": false,
+      "videoexpress_import_method": "clonevoice_import_dialog",
+      "videoexpress_import_tab": "Import Media Text to Speech",
+      "videoexpress_import_action": "Import from CloneVoice.ai",
+      "videoexpress_import_type": "Music",
+      "videoexpress_import_button": "Import Selected",
+      "expected_import_confirmation": "The audios have been successfully saved in the My CloneVoice.ai Audio folder.",
+      "videoexpress_folder": "My CloneVoice.ai Audio",
+      "timeline_method": "right_click_then_add_to_timeline",
+      "timeline_context_menu_action": "Add to Timeline",
+      "timeline_target_track": "lower_audio_track",
+      "timeline_start_time": "00:00:00",
+      "trim_to_video_length": true,
+      "trim_boundary_source": "end_of_last_video_clip",
+      "trim_action": "Cut",
+      "delete_action": "right_click_post_cut_segment_then_delete"
+    },
+    "export": {
+      "enabled": true,
+      "open_button": "Export Video",
+      "file_name_source": "inputs.export.file_name",
+      "default_file_name_fallback": "inputs.audio.music_name",
+      "quality_source": "inputs.export.quality",
+      "resolution_source": "inputs.export.resolution",
+      "format_source": "inputs.export.format",
+      "submit_button": "Create",
+      "expected_confirmation_contains": "Your movie creation is currently number",
+      "render_mode": "background_queue"
+    },
+    "preview_selection_rules": {
+      "first_acceptable": {
+        "requirements": [
+          "face closely matches the reference portrait",
+          "correct age and clothing",
+          "clear unobstructed face",
+          "correct location and scene props",
+          "no malformed hands or facial features",
+          "no visible brands, watermarks, or unwanted text"
+        ],
+        "fallback": "select_the_other_generated_preview",
+        "stop_if_neither_is_acceptable": true
+      },
+      "first_preview": {
+        "index": 0
+      },
+      "second_preview": {
+        "index": 1
+      }
+    },
+    "workflow": [
+      {
+        "step": 1,
+        "action": "validate_inputs",
+        "details": "Require a non-empty reference portrait prompt and at least one clip. Every clip must contain an image prompt, video prompt, and duration between 3 and 10 seconds."
+      },
+      {
+        "step": 2,
+        "action": "open_videoexpress",
+        "details": "Open videoexpress.browser.start_url in the existing authenticated Chrome session and wait for the editor to load."
+      },
+      {
+        "step": 3,
+        "action": "open_prompt_generator",
+        "details": "Open Create with AI and select Create Video From Prompt. Choose the configured Landscape 16:9 aspect ratio."
+      },
+      {
+        "step": 4,
+        "action": "create_reference_portrait",
+        "details": "Fill Image Prompt with inputs.reference_portrait_prompt, uncheck automatic image-prompt enhancement, click Create Image, and wait for the completed portrait preview."
+      },
+      {
+        "step": 5,
+        "action": "save_reference_portrait",
+        "details": "Hover over the completed portrait, click Save Image, and verify that VideoExpress reports it was saved under My AI Images."
+      },
+      {
+        "step": 6,
+        "action": "initialize_clip_loop",
+        "details": "Set current_clip_index to 0 and keep the Create Video From Prompt modal open until every clip has been submitted."
+      },
+      {
+        "step": 7,
+        "action": "replace_image_prompt",
+        "details": "Replace the existing Image Prompt with inputs.clips[current_clip_index].image_prompt. Keep automatic image-prompt enhancement unchecked."
+      },
+      {
+        "step": 8,
+        "action": "attach_reference_for_first_clip",
+        "condition": "current_clip_index == 0",
+        "details": "Check Use Consistent Character, click Reference Photo, open My AI Images, select the saved close-up reference portrait, and click Choose. Never use the separate Use from Library button for this attachment."
+      },
+      {
+        "step": 9,
+        "action": "generate_clip_images",
+        "details": "Click Create Image and wait until both consistent-character preview images have replaced their loading placeholders."
+      },
+      {
+        "step": 10,
+        "action": "select_clip_preview",
+        "details": "Evaluate the generated previews using inputs.clips[current_clip_index].preview_selection and preview_selection_rules, then click one image and verify it is selected."
+      },
+      {
+        "step": 11,
+        "action": "replace_video_prompt",
+        "details": "After choosing the image, replace Video and Audio Prompt with inputs.clips[current_clip_index].video_prompt."
+      },
+      {
+        "step": 12,
+        "action": "set_manual_duration",
+        "details": "Check Advanced Mode and Manual Video Length, sec. Set the slider to inputs.clips[current_clip_index].duration_seconds. Reapply the duration for every clip."
+      },
+      {
+        "step": 13,
+        "action": "submit_clip",
+        "details": "Click Create Video and wait for the submission confirmation before continuing."
+      },
+      {
+        "step": 14,
+        "action": "verify_submission",
+        "details": "Require the message: Your video will appear in your Media Library under the My Media tab when it’s ready. Record the returned video ID when present."
+      },
+      {
+        "step": 15,
+        "action": "advance_clip_loop",
+        "details": "If another clip remains, increment current_clip_index and return to replace_image_prompt. Do not close the modal, recreate the portrait, recheck Consistent Character, or reattach the reference."
+      },
+      {
+        "step": 16,
+        "action": "close_generator_modal",
+        "condition": "current_clip_index == inputs.clips.length - 1 and the final submission confirmation is visible",
+        "details": "After every clip has been submitted and the final confirmation is verified, close the Create Video From Prompt modal. Never close it while clip generation is still in progress."
+      },
+      {
+        "step": 17,
+        "action": "open_media_library",
+        "details": "Click Media Library in the editor sidebar and open the My Media section."
+      },
+      {
+        "step": 18,
+        "action": "open_my_ai_videos",
+        "details": "Open the My AI Videos folder. Wait until every video submitted during this run is present and has finished processing before modifying the timeline."
+      },
+      {
+        "step": 19,
+        "action": "map_generated_clips_to_input_order",
+        "details": "Identify each newly generated video by its recorded video ID, prompt-derived filename, thumbnail, or creation order. Build an ordered list matching inputs.clips from the first requested shot to the last. Do not use the folder's Newest display order as the timeline order because it normally lists the last-generated clip first."
+      },
+      {
+        "step": 20,
+        "action": "add_clips_to_timeline_sequentially",
+        "details": "For each clip in the ordered list, right-click the clip in My AI Videos and select Add to Timeline. Complete this one clip at a time from inputs.clips[0] through inputs.clips[last], allowing VideoExpress to append each clip after the previous one."
+      },
+      {
+        "step": 21,
+        "action": "verify_timeline_sequence",
+        "details": "Confirm the timeline contains all newly generated clips exactly once and in the same order as inputs.clips. Compare the timeline thumbnails and scene content from left to right, and stop if a clip is missing, duplicated, or out of order."
+      },
+      {
+        "step": 22,
+        "action": "prepare_audio_theme",
+        "details": "Define a concise audio theme that matches the completed video, then prepare a short CloneVoice-compatible lyrics prompt and a comma-separated music style. Store them in inputs.audio.theme_description, inputs.audio.lyrics_prompt, and inputs.audio.style."
+      },
+      {
+        "step": 23,
+        "action": "open_clonevoice_music_creator",
+        "details": "Open audio_generation.create_url in the existing authenticated browser session and wait for Create Music to load."
+      },
+      {
+        "step": 24,
+        "action": "select_ai_generated_lyrics",
+        "details": "Select AI-Generated in the Lyrics section. Do not select Your Lyrics unless the input explicitly supplies finished lyrics."
+      },
+      {
+        "step": 25,
+        "action": "fill_music_generation_inputs",
+        "details": "Enter inputs.audio.lyrics_prompt in the song-description field, enter inputs.audio.style in the Style field, and select inputs.audio.language from the Language menu."
+      },
+      {
+        "step": 26,
+        "action": "accept_lyrics_terms",
+        "details": "Check I have read and agreed to the terms of service for the lyric-generation stage."
+      },
+      {
+        "step": 27,
+        "action": "generate_lyrics",
+        "details": "Click Generate Lyrics and wait until the Lyric Preview page appears with completed verse or chorus content."
+      },
+      {
+        "step": 28,
+        "action": "name_music",
+        "details": "Enter inputs.audio.music_name in Music Name on the Lyric Preview page."
+      },
+      {
+        "step": 29,
+        "action": "accept_music_terms",
+        "details": "Check I have read and agreed to the terms of service for the final music-generation stage."
+      },
+      {
+        "step": 30,
+        "action": "generate_music",
+        "details": "Click Generate Music and wait until My Audio shows the named item with Status completed. Record the CloneVoice audio ID."
+      },
+      {
+        "step": 31,
+        "action": "skip_music_download",
+        "details": "Do not click Download and do not save a local copy. The completed track must be imported through VideoExpress's synchronized CloneVoice library folder."
+      },
+      {
+        "step": 32,
+        "action": "open_videoexpress_clonevoice_importer",
+        "details": "Return to the existing VideoExpress project, click Import Media Text to Speech in the editor sidebar, and select Import from CloneVoice.ai."
+      },
+      {
+        "step": 33,
+        "action": "select_clonevoice_music_type",
+        "details": "In the Import from CloneVoice.ai panel, select Music from the media-type dropdown and wait for the completed CloneVoice music list to load."
+      },
+      {
+        "step": 34,
+        "action": "select_generated_music",
+        "details": "Select the music item whose title exactly matches inputs.audio.music_name. Verify that the item displays the selected state before continuing."
+      },
+      {
+        "step": 35,
+        "action": "import_selected_music",
+        "details": "Click Import Selected and wait for the confirmation that the audio was successfully saved in the My CloneVoice.ai Audio folder."
+      },
+      {
+        "step": 36,
+        "action": "open_imported_clonevoice_folder",
+        "details": "Click Media Library, navigate to My Media, and open My CloneVoice.ai Audio. Confirm inputs.audio.music_name appears as an imported audio item."
+      },
+      {
+        "step": 37,
+        "action": "add_music_to_timeline",
+        "details": "Right-click the imported track matching inputs.audio.music_name and select Add to Timeline."
+      },
+      {
+        "step": 38,
+        "action": "position_music_on_lower_timeline",
+        "details": "If VideoExpress appends the music after the video clips on the upper track, drag the complete audio clip onto the lower timeline track and align its left edge with 00:00:00. Do not move or reorder the five video clips."
+      },
+      {
+        "step": 39,
+        "action": "position_playhead_at_video_endpoint",
+        "details": "Navigate the timeline ruler to the exact end of the final video clip. Verify the editor time display equals the sum of all inputs.clips duration_seconds before cutting the audio."
+      },
+      {
+        "step": 40,
+        "action": "focus_audio_track",
+        "details": "Select the Tiny Traveler Adventure audio clip on the lower timeline track. If selecting it changes the playhead, reposition the playhead at the verified final-video endpoint."
+      },
+      {
+        "step": 41,
+        "action": "cut_audio_at_video_endpoint",
+        "details": "With the lower audio clip focused and the playhead at the final-video endpoint, click the timeline Cut button. Verify the operation creates exactly two audio segments at that boundary."
+      },
+      {
+        "step": 42,
+        "action": "delete_excess_audio_segment",
+        "details": "Select only the audio segment to the right of the cut, right-click it, and choose Delete. Never delete the first audio segment, the whole audio track, or any video clip."
+      },
+      {
+        "step": 43,
+        "action": "verify_audio_timeline",
+        "details": "Confirm one Tiny Traveler Adventure audio segment remains on the lower track, begins at 00:00:00, and ends exactly at the right edge of the final video clip. Verify the five video clips remain unchanged and in order."
+      },
+      {
+        "step": 44,
+        "action": "open_export_video",
+        "details": "After all video and audio timeline checks pass, click Export Video in the top toolbar and wait for the export form to appear."
+      },
+      {
+        "step": 45,
+        "action": "configure_export",
+        "details": "Enter inputs.export.file_name in File name. If it is empty, use inputs.audio.music_name. Select the configured quality, resolution, and format without changing the verified timeline."
+      },
+      {
+        "step": 46,
+        "action": "create_export",
+        "details": "Click Create once to submit the final movie for background rendering."
+      },
+      {
+        "step": 47,
+        "action": "verify_export_queue",
+        "details": "Require the message that the movie creation is currently numbered in the queue and will take place in the background. Record the export file name and queue position when available."
+      }
+    ],
+    "clip_loop": {
+      "collection": "inputs.clips",
+      "index_variable": "current_clip_index",
+      "keep_generator_modal_open": true,
+      "preserve_between_iterations": [
+        "Use Consistent Character checked state",
+        "attached Reference Photo",
+        "Landscape 16:9 aspect ratio",
+        "automatic image-prompt enhancement disabled",
+        "Advanced Mode enabled"
+      ],
+      "replace_each_iteration": [
+        "Image Prompt",
+        "generated preview selection",
+        "Video and Audio Prompt",
+        "Manual Video Length, sec"
+      ],
+      "iteration_order": [
+        "replace Image Prompt",
+        "create images",
+        "wait for image generation",
+        "select one preview",
+        "replace Video and Audio Prompt",
+        "set manual duration",
+        "create video",
+        "wait for submission confirmation"
+      ],
+      "after_loop": [
+        "close the Create Video From Prompt modal",
+        "open Media Library",
+        "open My AI Videos",
+        "wait for every generated clip to finish processing",
+        "map generated clips to inputs.clips order",
+        "right-click each clip and choose Add to Timeline",
+        "verify the final left-to-right timeline sequence"
+      ]
+    },
+    "audio_workflow_summary": [
+      "prepare the audio theme, short lyrics prompt, style, language, and music name",
+      "open CloneVoice Create Music",
+      "select AI-Generated",
+      "enter the lyrics prompt and style",
+      "select the language",
+      "accept the lyric-generation terms",
+      "generate lyrics and wait for Lyric Preview",
+      "enter the music name",
+      "accept the music-generation terms",
+      "generate music and wait for completed status",
+      "do not download the music",
+      "open VideoExpress Import Media Text to Speech",
+      "open Import from CloneVoice.ai and select Music",
+      "select the named track and click Import Selected",
+      "verify the import confirmation",
+      "open Media Library and My CloneVoice.ai Audio",
+      "right-click the track and select Add to Timeline",
+      "move the music to the lower timeline track at 00:00:00",
+      "place the playhead at the end of the final video clip",
+      "focus the lower audio clip and click Cut",
+      "right-click the post-cut audio segment and choose Delete",
+      "verify the remaining audio ends exactly with the video"
+    ],
+    "export_workflow_summary": [
+      "click Export Video after the video and audio timeline are verified",
+      "enter the configured export file name",
+      "confirm the quality, resolution, and format settings",
+      "click Create once",
+      "verify that the movie was added to the background rendering queue"
+    ],
+    "waits": {
+      "page_load_timeout_seconds": 30,
+      "image_generation_timeout_seconds": 180,
+      "submission_confirmation_timeout_seconds": 60,
+      "lyrics_generation_timeout_seconds": 180,
+      "music_generation_timeout_seconds": 600,
+      "clonevoice_import_timeout_seconds": 120,
+      "export_form_timeout_seconds": 30,
+      "export_queue_confirmation_timeout_seconds": 60,
+      "poll_interval_seconds": 2,
+      "loading_image_contains": "loading-paint",
+      "completed_image_contains": "user-assets/preview/"
+    },
+    "verification": {
+      "reference_saved": {
+        "required": true,
+        "expected_folder": "My AI Images"
+      },
+      "reference_attached": {
+        "required": true,
+        "expected_ui_state": "Reference Photo thumbnail is visible"
+      },
+      "preview_selected": {
+        "required": true,
+        "expected_ui_state": "selected"
+      },
+      "manual_duration_matches_clip": true,
+      "timeline_clip_count_matches_inputs": true,
+      "timeline_sequence_matches_inputs": true,
+      "clonevoice_music_completed": true,
+      "music_download_skipped": true,
+      "imported_music_name_matches_input": true,
+      "clonevoice_import_confirmation_visible": true,
+      "music_is_on_lower_timeline_track": true,
+      "music_starts_at_zero": true,
+      "playhead_time_matches_video_endpoint": true,
+      "audio_segment_count_after_cut": 2,
+      "audio_segment_count_after_delete": 1,
+      "music_covers_video_duration": true,
+      "music_does_not_exceed_final_duration": true,
+      "export_file_name_matches_input": true,
+      "export_queue_confirmation_visible": true,
+      "submission_confirmation": "Your video will appear in your Media Library under the My Media tab when it’s ready."
+    },
+    "recovery": {
+      "image_generation_timeout": "Keep the modal open, wait one additional timeout period, and stop with the current clip ID if loading still does not finish.",
+      "unacceptable_previews": "Do not submit the clip. Regenerate images or stop for manual preview selection.",
+      "reference_missing": "Stop before creating the clip video and reattach the saved portrait through Reference Photo.",
+      "submission_confirmation_missing": "Do not advance the loop until the confirmation appears or the failure is reported.",
+      "generated_clip_still_processing": "Wait in My AI Videos and do not add that clip to the timeline until processing has completed.",
+      "timeline_order_uncertain": "Use recorded video IDs, prompt-derived filenames, thumbnails, and creation order to resolve the mapping before adding any uncertain clip.",
+      "timeline_verification_failed": "Stop and report the missing, duplicated, or out-of-order clip instead of exporting the project.",
+      "lyrics_generation_timeout": "Keep the CloneVoice page open, wait one additional timeout period, and stop if Lyric Preview still does not appear.",
+      "music_generation_timeout": "Keep My Audio open and continue polling the named track until completed or until the timeout is exhausted.",
+      "clonevoice_import_missing_music": "Return to CloneVoice My Audio and verify the named item is completed, then reopen the VideoExpress importer and select Music again.",
+      "clonevoice_import_timeout": "Keep the VideoExpress importer open, wait one additional timeout period, and stop if the successful-save confirmation does not appear.",
+      "audio_added_to_upper_track": "Drag the complete audio clip to the lower timeline track and align its left edge with 00:00:00 without moving the video clips.",
+      "audio_cut_did_not_split": "Verify the audio clip is focused and the playhead remains at the final-video endpoint, then click Cut once more. Do not cut a video clip.",
+      "post_cut_segment_uncertain": "Inspect the two audio segment positions and select only the segment whose left edge begins at the final-video endpoint.",
+      "audio_timeline_verification_failed": "Stop and report the missing, duplicated, misplaced, or overlong music clip instead of exporting.",
+      "export_form_missing": "Keep the editor open and retry Export Video once. Stop if the export form still does not appear.",
+      "export_confirmation_missing": "Do not click Create again. Wait one additional timeout period, then inspect the export queue before reporting a failure."
+    },
+    "safety": {
+      "never_store_credentials_in_this_file": true,
+      "never_close_modal_between_clips": true,
+      "close_modal_only_after_all_submissions_are_confirmed": true,
+      "never_use_use_from_library_for_reference_attachment": true,
+      "never_submit_without_selected_preview": true,
+      "never_submit_without_reference_attached": true,
+      "never_submit_with_duration_outside_supported_range": true,
+      "do_not_enable_public_gallery_sharing": true,
+      "never_add_processing_clips_to_timeline": true,
+      "never_use_newest_sort_order_as_scene_order": true,
+      "never_download_clonevoice_music": true,
+      "never_upload_a_local_music_copy": true,
+      "never_add_an_audio_item_with_a_different_name": true,
+      "never_cut_a_video_clip": true,
+      "never_delete_the_pre_cut_audio_segment": true,
+      "never_delete_the_entire_audio_track": true,
+      "never_export_before_audio_timeline_verification": true,
+      "never_click_export_create_more_than_once_without_checking_the_queue": true,
+      "stop_if_captcha_or_authentication_is_required": true
+    },
+    "result": {
+      "report_fields": [
+        "reference_image_saved",
+        "reference_image_folder",
+        "total_clips_requested",
+        "total_clips_submitted",
+        "clip_ids",
+        "video_ids",
+        "duration_seconds_by_clip",
+        "submission_confirmations",
+        "media_library_verification",
+        "generator_modal_closed",
+        "my_ai_videos_opened",
+        "timeline_clips_added",
+        "timeline_clip_ids_in_order",
+        "timeline_sequence_verified",
+        "audio_theme_description",
+        "clonevoice_music_name",
+        "clonevoice_audio_id",
+        "clonevoice_music_status",
+        "music_download_skipped",
+        "clonevoice_import_status",
+        "clonevoice_import_confirmation",
+        "audio_added_to_timeline",
+        "audio_start_time",
+        "audio_end_time",
+        "audio_cut_time",
+        "audio_segments_after_cut",
+        "audio_segments_after_delete",
+        "audio_timeline_verified",
+        "export_file_name",
+        "export_quality",
+        "export_resolution",
+        "export_format",
+        "export_queue_position",
+        "export_queue_confirmation",
+        "failed_clip_id",
+        "failure_reason"
+      ]
+    }
+  }
+}
