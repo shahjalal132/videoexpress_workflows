@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "config_version": "2.7.0",
+  "config_version": "2.8.0",
   "automation": {
     "name": "VideoExpress Consistent Character Multiple Clips",
     "enabled": true,
@@ -38,6 +38,7 @@
       ]
     },
     "inputs": {
+      "video_ratio": "{{VIDEO_RATIO}}",
       "reference_portrait_prompt": "{{REFERENCE_PORTRAIT_PROMPT}}",
       "audio": {
         "theme_description": "{{AUDIO_THEME_DESCRIPTION}}",
@@ -70,6 +71,17 @@
       ]
     },
     "input_requirements": {
+      "video_ratio": {
+        "required": true,
+        "allowed_values": [
+          "Landscape",
+          "Vertical"
+        ],
+        "mapping": {
+          "Landscape": "16:9",
+          "Vertical": "9:16"
+        }
+      },
       "reference_portrait_prompt": {
         "required": true,
         "recommended_framing": "close-up portrait",
@@ -103,7 +115,20 @@
     },
     "videoexpress": {
       "generator": "Create Video From Prompt",
-      "aspect_ratio": "Landscape 16:9",
+      "aspect_ratio_source": "inputs.video_ratio",
+      "aspect_ratio_mapping": {
+        "Landscape": "Landscape 16:9",
+        "Vertical": "Vertical 9:16"
+      },
+      "ratio_scope": [
+        "reference_portrait_prompt",
+        "scene_image_prompts",
+        "generated_images",
+        "generated_video_clips",
+        "project_canvas",
+        "timeline",
+        "export"
+      ],
       "image_type": "Human",
       "automatically_enhance_image_prompt": false,
       "use_consistent_character": true,
@@ -213,7 +238,7 @@
       {
         "step": 1,
         "action": "validate_inputs",
-        "details": "Require a non-empty reference portrait prompt and at least one clip. Every clip must contain an image prompt, video prompt, and duration between 3 and 10 seconds."
+        "details": "Require inputs.video_ratio to be exactly Landscape or Vertical, a non-empty reference portrait prompt, and at least one clip. Resolve Landscape to 16:9 and Vertical to 9:16. Every clip must contain an image prompt, video prompt, the resolved ratio, and a duration between 3 and 10 seconds."
       },
       {
         "step": 2,
@@ -223,7 +248,7 @@
       {
         "step": 3,
         "action": "open_prompt_generator",
-        "details": "Open Create with AI and select Create Video From Prompt. Choose the configured Landscape 16:9 aspect ratio."
+        "details": "Open Create with AI and select Create Video From Prompt. Resolve inputs.video_ratio through videoexpress.aspect_ratio_mapping and visibly select Landscape 16:9 or Vertical 9:16 before generating anything."
       },
       {
         "step": 4,
@@ -455,7 +480,7 @@
       "preserve_between_iterations": [
         "Use Consistent Character checked state",
         "attached Reference Photo",
-        "Landscape 16:9 aspect ratio",
+        "resolved aspect ratio from inputs.video_ratio",
         "automatic image-prompt enhancement disabled",
         "Advanced Mode enabled"
       ],
@@ -548,6 +573,12 @@
         "expected_ui_state": "selected"
       },
       "manual_duration_matches_clip": true,
+      "reference_prompt_ratio_matches_input": true,
+      "all_scene_prompt_ratios_match_input": true,
+      "all_scene_video_prompt_ratios_match_input": true,
+      "all_generated_clip_ratios_match_input": true,
+      "project_canvas_ratio_matches_input": true,
+      "export_ratio_matches_input": true,
       "timeline_clip_count_matches_inputs": true,
       "timeline_sequence_matches_inputs": true,
       "clonevoice_music_completed": true,
@@ -607,6 +638,9 @@
       "never_ask_user_to_reply_ready_for_active_generation": true,
       "never_send_final_response_while_generation_is_pending": true,
       "never_treat_additional_polling_period_as_terminal": true,
+      "never_guess_a_missing_video_ratio": true,
+      "never_mix_landscape_and_vertical_assets": true,
+      "never_change_ratio_after_generation_starts": true,
       "stop_if_captcha_or_authentication_is_required": true
     },
     "result": {
@@ -618,6 +652,8 @@
         "clip_ids",
         "video_ids",
         "duration_seconds_by_clip",
+        "video_ratio",
+        "resolved_aspect_ratio",
         "submission_confirmations",
         "media_library_verification",
         "generator_modal_closed",

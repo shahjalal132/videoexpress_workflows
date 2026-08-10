@@ -6,6 +6,8 @@ Source: [Understanding VideoExpress platform](https://docs.google.com/document/d
 
 A cute 4-year-old boy is traveling to the world's most popular tourist spots. It will be five places with five scenes. Each scene will be at least 5 seconds long.
 
+**Video ratio:** Landscape (16:9)
+
 ## Structural prompt
 
 # Actor Portrait Image Descriptions
