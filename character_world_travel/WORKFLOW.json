@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "config_version": "2.6.0",
+  "config_version": "2.7.0",
   "automation": {
     "name": "VideoExpress Consistent Character Multiple Clips",
     "enabled": true,
@@ -12,6 +12,30 @@
       "use_existing_authenticated_session": true,
       "start_url": "https://app.videoexpress.ai/",
       "stop_if_sign_in_is_required": true
+    },
+    "execution_contract": {
+      "terminal_condition": "final_export_background_queue_confirmation_visible",
+      "pending_generation_is_terminal": false,
+      "continue_without_user_wakeup": true,
+      "active_loading_has_no_hard_timeout": true,
+      "inspection_checkpoint_is_not_a_deadline": true,
+      "forbidden_while_job_is_pending": [
+        "send_final_answer",
+        "declare_blocked",
+        "declare_timeout",
+        "yield_to_user",
+        "ask_user_to_reply_ready",
+        "ask_user_to_reply_continue",
+        "ask_user_to_watch_the_tab"
+      ],
+      "true_blocking_conditions": [
+        "explicit_generation_failure_message",
+        "authentication_required",
+        "captcha_or_human_verification_required",
+        "payment_credits_or_account_access_required",
+        "browser_session_closed_disconnected_or_uncontrollable",
+        "loading_disappeared_without_result_after_one_safe_refresh_and_three_consecutive_inspections"
+      ]
     },
     "inputs": {
       "reference_portrait_prompt": "{{REFERENCE_PORTRAIT_PROMPT}}",
@@ -497,6 +521,8 @@
       "image_generation_soft_timeout_seconds": 180,
       "image_generation_stall_inspection_seconds": 1200,
       "continue_while_loading_ui_visible": true,
+      "active_generation_hard_timeout_seconds": null,
+      "inactive_checks_required_before_blocking": 3,
       "submission_confirmation_timeout_seconds": 60,
       "lyrics_generation_timeout_seconds": 180,
       "music_generation_timeout_seconds": 600,
@@ -540,7 +566,7 @@
       "submission_confirmation": "Your video will appear in your Media Library under the My Media tab when it’s ready."
     },
     "recovery": {
-      "image_generation_timeout": "Treat the timeout as a soft checkpoint. Keep the modal and tab open and poll every 10 to 30 seconds while loading remains visible. After 20 minutes inspect for an explicit error, lost authentication, disconnection, or a completed result elsewhere. If generation is visibly active and no error exists, continue waiting. Never ask the user to reply ready merely because previews are slow.",
+      "image_generation_timeout": "Treat the timeout as a soft checkpoint. Keep the modal and tab open and poll every 10 to 30 seconds while loading remains visible. After 20 minutes inspect for an explicit error, lost authentication, disconnection, or a completed result elsewhere; this checkpoint does not authorize stopping. If generation is visibly active and no error exists, continue waiting without a hard deadline. Never send a final response or ask the user to reply ready while the job is pending.",
       "unacceptable_previews": "Do not submit the clip. Regenerate images or stop for manual preview selection.",
       "reference_missing": "Stop before creating the clip video and reattach the saved portrait through Reference Photo.",
       "submission_confirmation_missing": "Do not advance the loop until the confirmation appears or the failure is reported.",
@@ -579,6 +605,8 @@
       "never_click_export_create_more_than_once_without_checking_the_queue": true,
       "never_stop_only_because_image_generation_is_slow": true,
       "never_ask_user_to_reply_ready_for_active_generation": true,
+      "never_send_final_response_while_generation_is_pending": true,
+      "never_treat_additional_polling_period_as_terminal": true,
       "stop_if_captcha_or_authentication_is_required": true
     },
     "result": {
