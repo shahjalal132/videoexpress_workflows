@@ -33,6 +33,7 @@ The workflow stops for authentication, CAPTCHA, payment, missing access, or anot
 
 - Attach the consistent character through **Reference Photo**. Never use **Use From Library**.
 - Keep the **Create Video From Prompt** modal open between clip submissions.
+- Treat visible image-generation loading as an active job: continue polling automatically and never ask the user to reply “ready” only because previews are slow.
 - Use **Advanced Mode** and **Manual Video Length** for every clip.
 - Add completed clips from **Media Library → My AI Videos** in planned scene order.
 - Generate music with CloneVoice but do not download it.

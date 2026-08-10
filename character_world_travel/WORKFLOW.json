@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "config_version": "2.5.0",
+  "config_version": "2.6.0",
   "automation": {
     "name": "VideoExpress Consistent Character Multiple Clips",
     "enabled": true,
@@ -230,7 +230,7 @@
       {
         "step": 9,
         "action": "generate_clip_images",
-        "details": "Click Create Image and wait until both consistent-character preview images have replaced their loading placeholders."
+        "details": "Click Create Image and wait until both consistent-character preview images have replaced their loading placeholders. Loading is an active job state, not a blocker: continue polling automatically and never ask the user to reply ready merely because generation is slow."
       },
       {
         "step": 10,
@@ -494,14 +494,17 @@
     ],
     "waits": {
       "page_load_timeout_seconds": 30,
-      "image_generation_timeout_seconds": 180,
+      "image_generation_soft_timeout_seconds": 180,
+      "image_generation_stall_inspection_seconds": 1200,
+      "continue_while_loading_ui_visible": true,
       "submission_confirmation_timeout_seconds": 60,
       "lyrics_generation_timeout_seconds": 180,
       "music_generation_timeout_seconds": 600,
       "clonevoice_import_timeout_seconds": 120,
       "export_form_timeout_seconds": 30,
       "export_queue_confirmation_timeout_seconds": 60,
-      "poll_interval_seconds": 2,
+      "poll_interval_seconds": 10,
+      "progress_update_interval_seconds": 60,
       "loading_image_contains": "loading-paint",
       "completed_image_contains": "user-assets/preview/"
     },
@@ -537,7 +540,7 @@
       "submission_confirmation": "Your video will appear in your Media Library under the My Media tab when it’s ready."
     },
     "recovery": {
-      "image_generation_timeout": "Keep the modal open, wait one additional timeout period, and stop with the current clip ID if loading still does not finish.",
+      "image_generation_timeout": "Treat the timeout as a soft checkpoint. Keep the modal and tab open and poll every 10 to 30 seconds while loading remains visible. After 20 minutes inspect for an explicit error, lost authentication, disconnection, or a completed result elsewhere. If generation is visibly active and no error exists, continue waiting. Never ask the user to reply ready merely because previews are slow.",
       "unacceptable_previews": "Do not submit the clip. Regenerate images or stop for manual preview selection.",
       "reference_missing": "Stop before creating the clip video and reattach the saved portrait through Reference Photo.",
       "submission_confirmation_missing": "Do not advance the loop until the confirmation appears or the failure is reported.",
@@ -574,6 +577,8 @@
       "never_delete_the_entire_audio_track": true,
       "never_export_before_audio_timeline_verification": true,
       "never_click_export_create_more_than_once_without_checking_the_queue": true,
+      "never_stop_only_because_image_generation_is_slow": true,
+      "never_ask_user_to_reply_ready_for_active_generation": true,
       "stop_if_captcha_or_authentication_is_required": true
     },
     "result": {

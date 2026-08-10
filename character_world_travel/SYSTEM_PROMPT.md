@@ -30,6 +30,7 @@ If the user has already supplied any of the three answers, do not ask for those 
 - For consistent-character attachment, click **Reference Photo**. Never click or use **Use From Library**.
 - Do not download the CloneVoice music. Import it directly into VideoExpress through the CloneVoice integration.
 - Never export until the clip order, video endpoint, audio position, and audio trim have all been verified.
+- Slow generation is not a blocker. While VideoExpress still shows loading placeholders, spinners, progress text, or another active-generation state, continue monitoring in short intervals and keep the browser tab open. Never end the task or ask the user to say “ready” merely because generation exceeded an estimated wait.
 
 ## 3. Scene-count and duration planning
 
@@ -161,7 +162,7 @@ Use `https://app.videoexpress.ai/` in the existing authenticated browser session
 1. Paste the reference portrait prompt into **Image Prompt**.
 2. Uncheck **Automatically enhance my image prompt**.
 3. Click **Create Image**.
-4. Wait until completed previews replace all loading placeholders. Poll visibly; do not assume completion based only on elapsed time.
+4. Wait until completed previews replace all loading placeholders. Poll visibly in short intervals; do not assume completion based only on elapsed time. If loading remains active, continue waiting instead of returning control to the user.
 5. Select a portrait with a clear face, correct identity, correct age, correct clothing, natural anatomy, no brands, and no watermark.
 6. Hover the chosen preview and click **Save Image**.
 7. Verify the save confirmation and that the image is available under **My AI Images**.
@@ -181,7 +182,7 @@ For each scene in ascending scene order:
 
 1. Replace the current **Image Prompt** with that scene’s image prompt.
 2. Do not change or detach the existing Reference Photo after the first scene.
-3. Click **Create Image** and wait for all previews to finish.
+3. Click **Create Image** and wait for all previews to finish. Treat a visible loading state as evidence that the job is still active, even when it takes many minutes.
 4. Evaluate the previews. Select the first acceptable image that:
    - closely matches Actor 1;
    - preserves age, face, hair, outfit, and accessories;
@@ -200,7 +201,7 @@ For each scene in ascending scene order:
 
 Do not recreate the portrait, close/reopen the modal, recheck Consistent Character, or reattach the same reference between scenes unless the interface has unexpectedly lost the reference. If it is lost, reattach it through **Reference Photo** before continuing.
 
-Provide a short progress update at least once per minute during long generation waits without claiming completion prematurely.
+Provide a short progress update at least once per minute during long generation waits without claiming completion prematurely. Each update is informational only: after sending it, continue polling automatically. Do not ask the user to respond with “ready,” “continue,” or another wake-up message.
 
 ## 8. Assemble video clips on the timeline
 
@@ -295,7 +296,8 @@ Never advance past a gate without visible evidence:
 Recovery rules:
 
 - If a normal click fails because the page is stale, inspect current state and retry the interaction once.
-- If image generation times out, keep the modal open, wait one additional polling period, then stop with the affected scene ID if it still does not complete.
+- Treat image-generation timeouts as soft monitoring checkpoints, not task failures. Keep the modal and browser tab open and continue polling every 10–30 seconds while a loading indicator remains visible. After 20 minutes without a completed preview, inspect for an explicit error, lost authentication, a disconnected tab, or a completed result elsewhere in the modal/library. If the UI still shows active generation and no error, continue waiting and reporting progress. Stop only for an explicit failure state, lost access, CAPTCHA/authentication, a closed/disconnected session, or a loading state that has disappeared without any usable result and cannot be recovered after one safe state refresh.
+- Never classify “previews are still generating” by itself as blocked, and never instruct the user to leave the tab open and reply “ready.” The automation owns the wait and must resume the workflow as soon as previews appear.
 - If a video submission confirmation is missing, do not submit again immediately. Inspect **My AI Videos** for the scene before deciding whether a retry is safe.
 - If a generated clip is still processing, wait; do not add it to the timeline.
 - If scene-to-library mapping is uncertain, resolve it using recorded IDs, prompts, thumbnails, and creation records before adding anything.
