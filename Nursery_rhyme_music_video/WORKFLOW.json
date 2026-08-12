@@ -1,7 +1,7 @@
 ﻿{
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "config_version": "2.0.0",
-  "config_changelog": "2.0.0: Hardened from a verified end-to-end successful run. Added device-agnostic execution_mechanics (DOM-selector + event dispatch, never screenshot pixels), dom_api_contract (exact selectors/APIs/durations/confirmation strings), validation_checkpoints and support_investigation blocks. Corrected add-to-timeline to jQuery-UI drag, delete to ctxmenu:delete, music-import to jQuery trigger, exact-trim to playhead-slider+cut+tail-delete, Nursery Rhymes agent specifics (no character field, 1:1 default), and booster math/clean-split placement.",
+  "config_version": "2.1.0",
+  "config_changelog": "2.1.0: Fixed a lyric-sync defect found on playback. The 2.0.0 'boost the last K scenes' placement kept endpoints equal but clustered short clips first, so the picture ran up to ~19s ahead of the lyrics through the first half. Replaced with EVEN distribution of boosted clips (running-total rule tracking k*(A/N)); added pacing_sync_gate and per-scene drift audit. | 2.0.0: Hardened from a verified end-to-end successful run. Added device-agnostic execution_mechanics (DOM-selector + event dispatch, never screenshot pixels), dom_api_contract (exact selectors/APIs/durations/confirmation strings), validation_checkpoints and support_investigation blocks. Corrected add-to-timeline to jQuery-UI drag, delete to ctxmenu:delete, music-import to jQuery trigger, exact-trim to playhead-slider+cut+tail-delete, Nursery Rhymes agent specifics.",
   "automation": {
     "name": "CloneVoice Artistly VideoExpress Nursery Rhymes Music Video",
     "enabled": true,
@@ -612,7 +612,9 @@
         "boosted_clip_ms": 8041.667,
         "boosted_adds_seconds": 4.0,
         "K_boosted_clips_formula": "K = ceil((audio_seconds - 4.0417*N) / 4.0)",
-        "placement_strategy": "boost the LAST K scenes so the timeline splits cleanly into normal (1..N-K) + boosted (N-K+1..N); delete already-placed trailing normal clips from the end and append boosted ones (append-only, no middle insertion)",
+        "placement_strategy": "DISTRIBUTE the K boosted clips EVENLY across scenes 1..N so each clip's cumulative end-time tracks k*(A/N); this keeps the picture synced to the lyrics. Plan the boost set up front (A and N are known before generation) with the running-total rule: walk scenes 1..N, if running_total is behind k*(A/N) make the next clip boosted else normal, until exactly K are boosted. Generate each scene with its planned booster flag and place all N in story order.",
+        "do_not": "Do NOT cluster boosted clips at the end ('boost the last K'). It keeps endpoints equal but DESYNCS the first half (short clips front-load, so visuals run seconds ahead of the lyrics until re-converging at the end). Verified failure: N=22,K=10 clustered => up to ~19s ahead mid-song.",
+        "per_scene_sync_audit": "after assembly require |clip_end_time - k*(A/N)| <= ~one normal clip length (~4s) for every scene k; larger drift means uneven schedule, re-plan",
         "overshoot": "exact-trim the last clip via playhead+cut to reach 0-pixel diff; never undershoot (video cannot be lengthened by resize)"
       }
     },
@@ -630,6 +632,7 @@
         { "gate": "timeline_gate", "verify": "N .brick.video, first_start_px 0, contiguous (ignoring <=1px recurring render rounding), order verified" },
         { "gate": "audio_gate", "verify": "one .brick.audio on track 2 at left 0; ve_audio_id + duration_ms recorded" },
         { "gate": "sync_gate", "verify": "video_end_px == audio_end_px (0 diff) via .brick geometry" },
+        { "gate": "pacing_sync_gate", "verify": "per-scene lyric sync: for every scene k, |clip_end_time - k*(audio_seconds/N)| <= ~4s; boosted clips distributed evenly, NOT clustered at the end" },
         { "gate": "ratio_gate", "verify": "canvas + every asset/clip + export orientation match selected ratio" },
         { "gate": "save_gate", "verify": "document.title == 'Video Express - <name>'" },
         { "gate": "export_gate", "verify": "on-page text 'Your movie creation is currently number <N> in the queue'" }
@@ -652,7 +655,8 @@
         "offscreen_drop_failed": "timeline drop dropped off-screen; zoomed out then re-dragged.",
         "stale_success_toast": "toast read 'success' from a prior job; verified real result via API/title instead.",
         "wrong_agent_or_ratio": "Nursery Rhymes used with default 1:1; corrected dimension to selected ratio before generating.",
-        "jquery_ui_resize_no_op": "clip resize-handle drag ignored; used playhead+cut exact-trim instead."
+        "jquery_ui_resize_no_op": "clip resize-handle drag ignored; used playhead+cut exact-trim instead.",
+        "first_half_out_of_sync_with_lyrics": "Root cause: boosted clips were clustered at the end ('boost the last K') so short clips front-loaded and the picture ran ahead of the lyrics through the first half (endpoints were still equal). Fix: distribute boosted clips evenly (booster_math.placement_strategy) so each clip's cumulative end tracks k*(A/N); re-plan and re-assemble if the pacing_sync_gate fails."
       }
     },
     "workflow": [
@@ -828,7 +832,7 @@
         "step": 29,
         "phase": "videoexpress_sync",
         "action": "plan_duration_booster_batch",
-        "details": "If video_end < audio_end, compute K = ceil((audio_seconds - 4.0417*N) / 4.0) boosted clips (dom_api_contract.booster_math). Choose K so total slightly EXCEEDS audio (then exact-trim); never undershoot. Prefer boosting the LAST K scenes so the timeline splits cleanly into normal (1..N-K) + boosted (N-K+1..N); this makes every edit an append plus a tail-delete of already-placed normal clips, avoiding middle-of-timeline insertion. Record selected scene IDs, slots, normal video IDs, and prompts. Never change the total above N."
+        "details": "If video_end < audio_end, compute K = ceil((audio_seconds - 4.0417*N) / 4.0) boosted clips (dom_api_contract.booster_math). Choose K so total slightly EXCEEDS audio (then exact-trim); never undershoot. DISTRIBUTE the K boosted scenes EVENLY across 1..N with the running-total rule so each clip's cumulative end tracks k*(A/N) and the picture stays synced to the lyrics; NEVER cluster them at the end. Prefer planning the boost set up front (A and N known before generation) and placing each scene normal-or-boosted directly in its slot. If replacing on an existing all-normal timeline, replace each boost-set scene in its OWN slot (not the end). Record selected scene IDs, slots, normal video IDs, and prompts. Never change the total above N."
       },
       {
         "step": 30,
@@ -858,7 +862,7 @@
         "step": 34,
         "phase": "videoexpress_sync",
         "action": "audit_exact_timeline_integrity",
-        "details": "Sort video bricks by timeline left position. Require exactly N video bricks, N distinct storyboard scene IDs, one version per scene, each boosted clip in its source slot, first start zero, no gaps or overlaps, one music brick on track 2 at zero, and video_end equal to audio_end with zero-pixel tolerance."
+        "details": "Sort video bricks by timeline left position. Require exactly N video bricks, N distinct storyboard scene IDs, one version per scene, each boosted clip in its source slot, first start zero, no gaps or overlaps, one music brick on track 2 at zero, and video_end equal to audio_end with zero-pixel tolerance. ALSO run the per-scene sync audit: for every scene k require |clip_end_time - k*(audio_seconds/N)| <= ~one normal clip length (~4s); if any scene drifts more, the boosted clips are unevenly distributed (clustered) and the picture will run ahead of the lyrics -- re-plan the boost distribution before saving."
       },
       {
         "step": 35,

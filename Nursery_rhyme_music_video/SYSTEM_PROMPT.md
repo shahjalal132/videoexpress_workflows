@@ -345,12 +345,14 @@ Use **Video Length Booster** as a replacement mechanism.
 
 **Booster math (verified durations):** a normal Old-Algorithm clip is **4041.667 ms (~4.04 s)**; a boosted clip is **8041.667 ms (~8.04 s)** — the booster adds ~4.0 s. To reach the audio length `A` with `N` clips, the number of boosted clips is `K = ceil((A − 4.0417·N) / 4.0)`. Choosing `K` so total slightly exceeds `A` (then trimming the last clip) is correct; never choose `K` that undershoots (you cannot lengthen video by resizing). Example from a prior run: `A=127.632 s, N=22 → K=10 → 128.917 s` (overshoot 1.285 s, trimmed).
 
-**Clean-split placement (avoids middle-of-timeline surgery):** boost the **last `K` scenes** (scenes `N−K+1 … N`). The timeline then splits cleanly into scenes `1…N−K` normal and `N−K+1…N` boosted. If some of those trailing scenes were already placed as normal clips, **delete them from the end** of the video track (via `$(brick).trigger('ctxmenu:delete')`, §0.1) and **append the boosted versions** in order. This turns every edit into an append plus a tail-delete — no clip is inserted between existing clips.
+**Even-distribution placement (REQUIRED for lyric sync — never cluster boosted clips):** the storyboard scenes are timed to the song, so each scene must occupy roughly its share `A/N` (~`A/N` seconds) of the timeline. The `K` boosted clips must be **spread evenly across the whole story**. Do **not** boost "the last `K` scenes" or otherwise cluster them: clustering keeps the endpoints equal but **desyncs the picture from the lyrics** — front-loading the short clips makes the visuals run seconds *ahead* of the words through the first half, only re-converging at the end. (Verified failure: `N=22, K=10`, boosted clustered at the end → the video ran up to ~19 s ahead of the lyrics around the midpoint.)
 
-1. Calculate the shortage and `K` with the formula above.
-2. Select the last `K` scenes (or, if fewer trailing scenes suffice, the minimum set whose boosting reaches the target).
-3. Generate boosted versions in batches of at most five via **Image To Video (Old Algorithm)** — same source image, `3D`, correct ratio, and `input[name="video_length_booster"]` **checked**. Submit ≤5, verify each in **My AI Videos** (API, `status`+`duration≈8041.667`).
-4. Delete the already-placed normal clips for those scenes from the timeline end; append the boosted clips in ascending order (§0.5 zoom + drag).
+Plan the boost schedule **up front** — both `A` (audio length) and `N` are known before any VideoExpress generation. Decide per scene, in ascending order, whether it is normal (4.04 s) or boosted (8.04 s) so each clip's **cumulative end-time tracks `k · A/N`** (its ideal position in the song). Simple correct rule: walk scenes `1…N` keeping a running total; if the running total is *behind* the ideal line `k·A/N`, make the next clip **boosted**, else **normal**, until exactly `K` are boosted. This interleaves the boosted clips ~every `N/K` scenes and bounds visual↔lyric drift to about one clip length. Then generate each scene with its planned booster flag and place all `N` clips directly in story order (no clustering, no delete-and-re-append). **Per-scene sync audit:** after assembly, for every scene `k` require `|clip_end_time − k·A/N|` to stay within ~one normal-clip length (≈4 s); larger drift means the schedule was uneven — re-plan before saving.
+
+1. Calculate `K` with the formula above **before** generating any clips (you know `A` and `N` already).
+2. Compute the **evenly-distributed boost set** with the running-total rule above — the `K` scene indices spread across `1…N`, never clustered.
+3. Generate each scene once via **Image To Video (Old Algorithm)** — `3D`, correct ratio — with `input[name="video_length_booster"]` **checked** for scenes in the boost set and **unchecked** otherwise. Batch ≤5; verify each in **My AI Videos** (API, `status` + `duration` ≈ `4041.667` normal / `8041.667` boosted).
+4. Place all `N` clips directly in ascending story order (§0.5 zoom + drag). If you had already assembled an all-normal timeline, replace only the boost-set scenes **in their own slots** (delete that scene's normal clip, drop its boosted clip into the same position) — do not move it to the end.
 5. Ensure the normal and boosted versions are never both on the timeline.
 6. Keep the clip count exactly `N` after every replacement.
 7. Re-measure `video_end` and `audio_end` after each batch.
@@ -513,7 +515,7 @@ Write `RUNTIME_STATE.json` beside the workflow after every verified side effect,
 4. Inject uploads via FilePond `DataTransfer`; never invoke an OS file dialog.
 5. Add clips by jQuery-UI drag; delete by `ctxmenu:delete`; trim by playhead-slider + Cut. jQuery-UI resize does not respond to synthetic events.
 6. Zoom out before assembling so drops stay on-screen.
-7. Boost the **last K** scenes (`K = ceil((A − 4.0417·N)/4.0)`) for a clean append-only split; overshoot then exact-trim to 0-pixel diff.
+7. Compute `K = ceil((A − 4.0417·N)/4.0)` and **distribute the boosted clips EVENLY** across the story (running-total rule) so the picture stays synced to the lyrics; never cluster them at the end (that keeps endpoints equal but desyncs the first half). Overshoot then exact-trim to 0-pixel diff. Audit per-scene drift `|clip_end − k·A/N| ≤ ~4 s`.
 8. Respect ≤5 concurrent generations; pipeline the next batch while assembling the current one.
 9. Guard against stacked dialogs; act once, verify, close duplicates.
 10. Persist a concrete, human-readable checkpoint after every side effect for resumability and support.
