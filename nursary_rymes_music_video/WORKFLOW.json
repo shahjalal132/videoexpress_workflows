@@ -1,0 +1,594 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "config_version": "1.0.0",
+  "automation": {
+    "name": "CloneVoice Artistly VideoExpress Nursery Rhymes Music Video",
+    "enabled": true,
+    "run_mode": "manual",
+    "trigger_phrase": "Generate nursery rhymes music video",
+    "timezone": "Asia/Dhaka",
+    "browser": {
+      "preferred_browser": "chrome",
+      "use_existing_authenticated_session": true,
+      "start_url": "https://app.clonevoice.ai/music/create",
+      "required_authenticated_apps": [
+        "https://app.clonevoice.ai/",
+        "https://app.artistly.ai/",
+        "https://app.videoexpress.ai/"
+      ],
+      "stop_if_sign_in_is_required": true
+    },
+    "execution_contract": {
+      "terminal_condition": "videoexpress_final_export_background_queue_confirmation_visible",
+      "pending_generation_is_terminal": false,
+      "continue_without_user_wakeup": true,
+      "active_loading_has_no_hard_timeout": true,
+      "inspection_checkpoint_is_not_a_deadline": true,
+      "forbidden_while_job_is_pending": [
+        "send_final_answer",
+        "declare_blocked",
+        "declare_timeout",
+        "yield_to_user",
+        "ask_user_to_reply_ready",
+        "ask_user_to_reply_continue",
+        "ask_user_to_watch_the_tab"
+      ],
+      "true_blocking_conditions": [
+        "explicit_generation_failure_message",
+        "authentication_required",
+        "captcha_or_human_verification_required",
+        "payment_credits_or_account_access_required",
+        "required_api_integration_is_missing",
+        "browser_session_closed_disconnected_or_uncontrollable",
+        "required_audio_download_or_upload_is_rejected_by_the_browser",
+        "loading_disappeared_without_result_after_one_safe_refresh_and_three_consecutive_inspections"
+      ]
+    },
+    "inputs": {
+      "project_name": "{{PROJECT_NAME}}",
+      "video_ratio": "Landscape",
+      "audio": {
+        "lyrics_mode": "AI-Generated",
+        "song_idea": "{{CLONEVOICE_SONG_IDEA}}",
+        "style": "{{CLONEVOICE_MUSIC_STYLE}}",
+        "language": "English",
+        "music_name": "{{MUSIC_NAME}}",
+        "download_directory": "{{LOCAL_DOWNLOAD_DIRECTORY}}"
+      },
+      "artistly": {
+        "agent": "Nursery Rhymes",
+        "image_dimension": "16:9",
+        "storyboard_selection": "all_completed_scenes"
+      },
+      "videoexpress": {
+        "animation_style": "3D",
+        "automatically_enhance_video_prompt": true,
+        "video_length_booster_policy": "only_when_required_to_match_audio",
+        "maximum_concurrent_generations": 5
+      },
+      "export": {
+        "file_name": "{{EXPORT_FILE_NAME}}",
+        "quality": "High",
+        "resolution": "FullHD",
+        "format": "mp4"
+      }
+    },
+    "input_requirements": {
+      "project_name": {
+        "required": true
+      },
+      "video_ratio": {
+        "required": true,
+        "allowed_values": [
+          "Landscape"
+        ],
+        "mapping": {
+          "Landscape": "16:9"
+        },
+        "reason": "The Artistly Nursery Rhymes storyboard and the VideoExpress project must use one consistent horizontal YouTube ratio."
+      },
+      "audio": {
+        "required_fields": [
+          "song_idea",
+          "style",
+          "language",
+          "music_name",
+          "download_directory"
+        ],
+        "allowed_languages": [
+          "English"
+        ],
+        "song_idea_maximum_characters": 3000,
+        "style_format": "comma-separated descriptive music tags"
+      },
+      "export": {
+        "required_fields": [
+          "file_name",
+          "quality",
+          "resolution",
+          "format"
+        ]
+      }
+    },
+    "prerequisites": {
+      "accounts_connected_before_run": true,
+      "skip_api_setup_steps": true,
+      "required_connections": [
+        "CloneVoice API key is saved in Artistly",
+        "CloneVoice API key is saved in VideoExpress",
+        "Artistly API key is saved in VideoExpress"
+      ],
+      "required_features": [
+        "CloneVoice New music workflow",
+        "Artistly AI Design Agents Nursery Rhymes",
+        "VideoExpress Import from Artistly",
+        "VideoExpress Import from CloneVoice.ai",
+        "VideoExpress Image to Video"
+      ],
+      "validation_rule": "Inspect the relevant integration fields or import dialogs only when an expected connected feature is missing. Never regenerate or replace an API key during this workflow."
+    },
+    "clonevoice": {
+      "create_url": "https://app.clonevoice.ai/music/create",
+      "mode": "New",
+      "lyrics_mode": "AI-Generated",
+      "song_idea_source": "inputs.audio.song_idea",
+      "style_source": "inputs.audio.style",
+      "language_source": "inputs.audio.language",
+      "music_name_source": "inputs.audio.music_name",
+      "accept_terms_before_lyrics": true,
+      "lyrics_submit_button": "Generate Lyrics",
+      "lyrics_success_page": "Lyric Preview",
+      "accept_terms_before_music": true,
+      "music_submit_button": "Generate Music",
+      "completion_page": "My Audio",
+      "completion_status": "Completed",
+      "download_for_artistly": true,
+      "download_rule": "Download exactly the completed track whose title matches inputs.audio.music_name and record its absolute local path.",
+      "videoexpress_transfer_rule": "Do not upload the downloaded copy into VideoExpress. Import the same completed title through VideoExpress's synchronized CloneVoice library."
+    },
+    "artistly": {
+      "start_url": "https://app.artistly.ai/choose-designer",
+      "designer": "Fast AI Image Designer",
+      "section": "AI Design Agents",
+      "agent": "Nursery Rhymes",
+      "audio_upload_source": "runtime.clonevoice_downloaded_audio_path",
+      "image_dimension_source": "inputs.artistly.image_dimension",
+      "generate_button": "Generate Images",
+      "output": "ordered_consistent_character_storyboard",
+      "scene_requirements": [
+        "scene processing is completed",
+        "scene image is visible",
+        "scene number or generated ordering is available",
+        "consistent main character appearance",
+        "no malformed faces or hands",
+        "no unwanted text, logos, or watermarks"
+      ],
+      "bulk_download_storyboard": false,
+      "videoexpress_transfer_method": "direct Artistly integration"
+    },
+    "videoexpress": {
+      "start_url": "https://app.videoexpress.ai/",
+      "artistly_import": {
+        "open_button": "Import Media Text to Speech",
+        "action": "Import from Artistly",
+        "selection_source": "all completed Artistly nursery-rhyme storyboard scenes",
+        "submit_button": "Import",
+        "expected_folder": "My Artistly Images",
+        "preserve_scene_order": true
+      },
+      "image_to_video": {
+        "open_path": [
+          "Create with AI",
+          "Image to Video"
+        ],
+        "source_folder": "My Artistly Images",
+        "selection_order": "ascending Artistly storyboard scene order",
+        "animation_style_source": "inputs.videoexpress.animation_style",
+        "use_artistly_generated_video_prompt": true,
+        "automatically_enhance_video_prompt_source": "inputs.videoexpress.automatically_enhance_video_prompt",
+        "lip_sync": false,
+        "video_length_booster_source": "inputs.videoexpress.video_length_booster_policy",
+        "submit_button": "Create Video",
+        "maximum_concurrent_generations_source": "inputs.videoexpress.maximum_concurrent_generations",
+        "expected_output_folder": "My AI Videos"
+      },
+      "timeline": {
+        "video_source_folder": "My AI Videos",
+        "video_add_method": "right_click_then_add_to_timeline",
+        "video_context_menu_action": "Add to Timeline",
+        "video_order": "ascending storyboard scene order",
+        "audio_source_folder": "My CloneVoice.ai Audio",
+        "audio_add_method": "right_click_then_add_to_timeline",
+        "audio_context_menu_action": "Add to Timeline",
+        "audio_target_track": "lower_audio_track",
+        "audio_start_time": "00:00:00",
+        "sync_policy": "Align all ordered video scenes to the complete song. Trim audio only when the intended final video is shorter; otherwise extend selected scenes with Video Length Booster.",
+        "project_save_name_source": "inputs.project_name"
+      },
+      "clonevoice_import": {
+        "open_button": "Import Media Text to Speech",
+        "action": "Import from CloneVoice.ai",
+        "media_type": "Music",
+        "music_title_source": "inputs.audio.music_name",
+        "submit_button": "Import Selected",
+        "expected_confirmation_contains": "successfully saved",
+        "expected_folder": "My CloneVoice.ai Audio"
+      }
+    },
+    "export": {
+      "enabled": true,
+      "open_button": "Export Video",
+      "file_name_source": "inputs.export.file_name",
+      "default_file_name_fallback": "inputs.audio.music_name",
+      "quality_source": "inputs.export.quality",
+      "resolution_source": "inputs.export.resolution",
+      "format_source": "inputs.export.format",
+      "submit_button": "Create",
+      "expected_confirmation_contains": "Your movie creation is currently number",
+      "render_mode": "background_queue"
+    },
+    "workflow": [
+      {
+        "step": 1,
+        "phase": "validate",
+        "action": "validate_inputs_and_sessions",
+        "details": "Require a project name, CloneVoice song idea, music style, music name, local download directory, and export file name. Require Landscape mapped to 16:9. Confirm authenticated CloneVoice, Artistly, and VideoExpress tabs or sessions are available."
+      },
+      {
+        "step": 2,
+        "phase": "validate",
+        "action": "validate_existing_integrations",
+        "details": "Confirm the linked features exist without exposing, copying, regenerating, or changing API keys. Skip all account-connection setup because prerequisites.accounts_connected_before_run is true."
+      },
+      {
+        "step": 3,
+        "phase": "clonevoice_music",
+        "action": "open_clonevoice_new_music",
+        "details": "Open clonevoice.create_url, select New, and select AI-Generated in the Lyrics section."
+      },
+      {
+        "step": 4,
+        "phase": "clonevoice_music",
+        "action": "fill_song_idea",
+        "details": "Enter inputs.audio.song_idea in the What's your song about field."
+      },
+      {
+        "step": 5,
+        "phase": "clonevoice_music",
+        "action": "fill_music_style",
+        "details": "Enter inputs.audio.style in the Style field. A preset button may be used only when it produces the requested style."
+      },
+      {
+        "step": 6,
+        "phase": "clonevoice_music",
+        "action": "select_language",
+        "details": "Select inputs.audio.language. English is the configured default."
+      },
+      {
+        "step": 7,
+        "phase": "clonevoice_music",
+        "action": "accept_lyrics_terms",
+        "details": "Check I have read and agreed to the terms of service for lyric generation."
+      },
+      {
+        "step": 8,
+        "phase": "clonevoice_music",
+        "action": "generate_lyrics",
+        "details": "Click Generate Lyrics and wait until Lyric Preview contains generated verse or chorus content."
+      },
+      {
+        "step": 9,
+        "phase": "clonevoice_music",
+        "action": "name_music",
+        "details": "Enter inputs.audio.music_name in Music Name."
+      },
+      {
+        "step": 10,
+        "phase": "clonevoice_music",
+        "action": "accept_music_terms",
+        "details": "Check I have read and agreed to the terms of service on Lyric Preview."
+      },
+      {
+        "step": 11,
+        "phase": "clonevoice_music",
+        "action": "generate_music",
+        "details": "Click Generate Music once. Wait on My Audio until the item with the exact configured music name has Status Completed, then record the CloneVoice audio ID."
+      },
+      {
+        "step": 12,
+        "phase": "clonevoice_music",
+        "action": "download_music_for_artistly",
+        "details": "Click Download only for the completed configured music item. Save it beneath inputs.audio.download_directory and record the absolute path as runtime.clonevoice_downloaded_audio_path."
+      },
+      {
+        "step": 13,
+        "phase": "artistly_storyboard",
+        "action": "open_nursery_rhymes_agent",
+        "details": "Open Artistly Create Design, Fast AI Image Designer, AI Design Agents, then Nursery Rhymes."
+      },
+      {
+        "step": 14,
+        "phase": "artistly_storyboard",
+        "action": "upload_rhyme_audio",
+        "details": "Upload runtime.clonevoice_downloaded_audio_path to Upload Your Rhyme Audio and verify the correct file name appears."
+      },
+      {
+        "step": 15,
+        "phase": "artistly_storyboard",
+        "action": "select_storyboard_ratio",
+        "details": "Select 16:9 for a horizontal YouTube music video. Never generate a mixed-ratio storyboard."
+      },
+      {
+        "step": 16,
+        "phase": "artistly_storyboard",
+        "action": "generate_storyboard",
+        "details": "Click Generate Images and continue polling while the storyboard scenes show Processing. Do not treat active processing as failure."
+      },
+      {
+        "step": 17,
+        "phase": "artistly_storyboard",
+        "action": "verify_storyboard",
+        "details": "Wait for every generated scene, verify ordered scene numbering and consistent characters, and record the total scene count and scene order."
+      },
+      {
+        "step": 18,
+        "phase": "videoexpress_import",
+        "action": "import_artistly_storyboard",
+        "details": "In VideoExpress open Import Media Text to Speech, choose Import from Artistly, select every verified storyboard scene, click Import, and verify the scenes appear in My Artistly Images. Do not bulk-download and re-upload the storyboard."
+      },
+      {
+        "step": 19,
+        "phase": "videoexpress_animation",
+        "action": "initialize_scene_loop",
+        "details": "Set current_scene_index to zero and process the imported Artistly images in ascending storyboard order."
+      },
+      {
+        "step": 20,
+        "phase": "videoexpress_animation",
+        "action": "open_image_to_video_for_scene",
+        "details": "Open Create with AI, Image to Video, Select Image, My Artistly Images, and choose the image matching current_scene_index."
+      },
+      {
+        "step": 21,
+        "phase": "videoexpress_animation",
+        "action": "configure_scene_animation",
+        "details": "Use the Artistly-provided action prompt, choose inputs.videoexpress.animation_style, leave automatic video-prompt enhancement enabled, disable lip sync, and enable Video Length Booster only when required for audio synchronization."
+      },
+      {
+        "step": 22,
+        "phase": "videoexpress_animation",
+        "action": "submit_scene_video",
+        "details": "Click Create Video once, record the scene and generated-video identifiers when available, and continue with up to the configured maximum concurrent generations."
+      },
+      {
+        "step": 23,
+        "phase": "videoexpress_animation",
+        "action": "advance_scene_loop",
+        "details": "Increment current_scene_index and repeat the Image to Video process until every storyboard scene has been submitted."
+      },
+      {
+        "step": 24,
+        "phase": "videoexpress_timeline",
+        "action": "wait_for_all_scene_videos",
+        "details": "Open Media Library and My AI Videos. Wait until every submitted scene is fully generated before adding any scene to the timeline."
+      },
+      {
+        "step": 25,
+        "phase": "videoexpress_timeline",
+        "action": "add_scene_videos_in_order",
+        "details": "Map the generated clips to storyboard order using recorded IDs, thumbnails, prompt-derived names, and scene content. Add every clip to the timeline exactly once in ascending scene order."
+      },
+      {
+        "step": 26,
+        "phase": "videoexpress_audio",
+        "action": "import_music_from_clonevoice",
+        "details": "Open Import Media Text to Speech, choose Import from CloneVoice.ai, select Music, select the completed item matching inputs.audio.music_name exactly, and click Import Selected. Do not upload the locally downloaded Artistly transfer copy into VideoExpress."
+      },
+      {
+        "step": 27,
+        "phase": "videoexpress_audio",
+        "action": "add_music_to_timeline",
+        "details": "Open My CloneVoice.ai Audio, right-click the imported named music item, select Add to Timeline, move it to the lower audio track when needed, and align its left edge with 00:00:00."
+      },
+      {
+        "step": 28,
+        "phase": "videoexpress_sync",
+        "action": "synchronize_video_and_audio",
+        "details": "Compare the final scene endpoint with the music endpoint. Prefer the automatically generated one-scene-per-approximately-five-seconds mapping. Use Video Length Booster on selected scenes when a small video extension is required. Trim only the excess music segment when the intended video is shorter."
+      },
+      {
+        "step": 29,
+        "phase": "videoexpress_sync",
+        "action": "verify_timeline",
+        "details": "Confirm all scene clips occur once in storyboard order, the music begins at zero on the lower track, and the audio and final scene end at the intended final duration."
+      },
+      {
+        "step": 30,
+        "phase": "videoexpress_save",
+        "action": "save_project",
+        "details": "Save the editable VideoExpress project using inputs.project_name and verify it can be reopened."
+      },
+      {
+        "step": 31,
+        "phase": "videoexpress_export",
+        "action": "configure_export",
+        "details": "Click Export Video, enter inputs.export.file_name or fall back to inputs.audio.music_name, and select the configured quality, resolution, and format."
+      },
+      {
+        "step": 32,
+        "phase": "videoexpress_export",
+        "action": "create_export",
+        "details": "Click Create exactly once and wait for the background rendering queue confirmation."
+      },
+      {
+        "step": 33,
+        "phase": "videoexpress_export",
+        "action": "verify_export_queue",
+        "details": "Require the confirmation that the movie is numbered in the queue and will be created in the background. Record the export name and queue position."
+      }
+    ],
+    "scene_loop": {
+      "collection": "runtime.artistly_storyboard_scenes",
+      "index_variable": "current_scene_index",
+      "maximum_concurrent_submissions": "inputs.videoexpress.maximum_concurrent_generations",
+      "iteration_order": [
+        "select Artistly scene image",
+        "verify generated video prompt",
+        "select 3D style",
+        "keep automatic prompt enhancement enabled",
+        "apply Video Length Booster only when required",
+        "submit Create Video",
+        "record scene-to-video mapping"
+      ],
+      "after_loop": [
+        "open My AI Videos",
+        "wait for all generated clips to finish",
+        "map clips to storyboard order",
+        "add clips to timeline in ascending scene order",
+        "verify clip count and order"
+      ]
+    },
+    "workflow_summary": [
+      "validate authenticated sessions and existing account integrations",
+      "use CloneVoice New and AI-Generated to create the nursery-rhyme song",
+      "download the completed song only for Artistly's audio-upload step",
+      "upload the song to Artistly AI Design Agents Nursery Rhymes",
+      "generate and verify a 16:9 consistent-character storyboard",
+      "import all storyboard images into VideoExpress through the Artistly integration",
+      "animate every scene through Image to Video in storyboard order",
+      "wait for all scene clips and assemble them sequentially on the timeline",
+      "import the completed song into VideoExpress through the CloneVoice integration",
+      "align and synchronize the music and video",
+      "save the editable project",
+      "export the final FullHD MP4 and verify background queue submission"
+    ],
+    "waits": {
+      "page_load_timeout_seconds": 30,
+      "lyrics_generation_timeout_seconds": 180,
+      "music_generation_soft_timeout_seconds": 600,
+      "music_download_timeout_seconds": 120,
+      "artistly_audio_upload_timeout_seconds": 120,
+      "storyboard_generation_soft_timeout_seconds": 1200,
+      "scene_video_generation_soft_timeout_seconds": 600,
+      "continue_while_loading_ui_visible": true,
+      "active_generation_hard_timeout_seconds": null,
+      "inactive_checks_required_before_blocking": 3,
+      "clonevoice_import_timeout_seconds": 120,
+      "save_project_timeout_seconds": 60,
+      "export_form_timeout_seconds": 30,
+      "export_queue_confirmation_timeout_seconds": 60,
+      "poll_interval_seconds": 10,
+      "progress_update_interval_seconds": 60
+    },
+    "verification": {
+      "authenticated_clonevoice": true,
+      "authenticated_artistly": true,
+      "authenticated_videoexpress": true,
+      "api_setup_skipped": true,
+      "clonevoice_mode_is_new": true,
+      "clonevoice_lyrics_mode_is_ai_generated": true,
+      "clonevoice_song_idea_matches_input": true,
+      "clonevoice_style_matches_input": true,
+      "clonevoice_language_matches_input": true,
+      "clonevoice_music_name_matches_input": true,
+      "clonevoice_music_completed": true,
+      "clonevoice_audio_downloaded_for_artistly": true,
+      "artistly_uploaded_audio_matches_clonevoice_item": true,
+      "artistly_image_dimension_is_16_9": true,
+      "artistly_storyboard_completed": true,
+      "artistly_storyboard_order_recorded": true,
+      "artistly_scenes_imported_to_videoexpress": true,
+      "videoexpress_scene_count_matches_storyboard": true,
+      "videoexpress_scene_order_matches_storyboard": true,
+      "all_scene_videos_completed": true,
+      "clonevoice_music_imported_through_integration": true,
+      "music_title_matches_input": true,
+      "music_is_on_lower_timeline_track": true,
+      "music_starts_at_zero": true,
+      "audio_video_sync_verified": true,
+      "project_saved": true,
+      "project_name_matches_input": true,
+      "export_file_name_matches_input": true,
+      "export_queue_confirmation_visible": true
+    },
+    "recovery": {
+      "authentication_required": "Stop on the affected app without changing accounts and ask the user to sign in.",
+      "integration_missing": "Stop without modifying API keys. Report the exact missing integration field or unavailable import action.",
+      "lyrics_generation_timeout": "Keep CloneVoice open, wait one additional soft-timeout period, and inspect for an explicit error before stopping.",
+      "music_generation_timeout": "Keep My Audio open and continue polling the exact named item while Processing remains visible.",
+      "music_download_blocked": "Keep the completed CloneVoice item open and request a manual download to inputs.audio.download_directory. Resume from the recorded absolute path without regenerating the song.",
+      "artistly_upload_failed": "Verify the local file exists and is a supported audio type, then retry the upload once. Never substitute a different track silently.",
+      "storyboard_generation_slow": "Continue polling while scene cards show Processing. Active generation is not a blocker and has no hard deadline.",
+      "unacceptable_storyboard_scene": "Regenerate or stop for manual review before importing scenes. Do not silently omit a scene.",
+      "artistly_import_missing_scenes": "Compare imported images with recorded storyboard scene count and re-import only the missing scenes.",
+      "scene_video_still_processing": "Wait in My AI Videos. Never add a processing clip to the timeline.",
+      "scene_order_uncertain": "Resolve order from recorded scene numbers, prompts, thumbnails, and IDs before editing the timeline.",
+      "clonevoice_import_missing_music": "Verify the exact named CloneVoice item is Completed, reopen the importer, and select Music again.",
+      "audio_shorter_than_video": "Do not create silence automatically. Report the mismatch or intentionally trim the video only when the configured creative intent permits it.",
+      "audio_longer_than_video": "Use Video Length Booster for small intended extensions; otherwise cut and delete only the post-video audio segment.",
+      "timeline_verification_failed": "Do not save or export until missing, duplicate, out-of-order, or mismatched media is corrected.",
+      "export_confirmation_missing": "Do not click Create again. Inspect the export queue once before reporting failure."
+    },
+    "safety": {
+      "never_store_credentials_or_api_keys_in_this_file": true,
+      "never_regenerate_api_keys": true,
+      "never_change_existing_integrations": true,
+      "never_use_old_clonevoice_music_mode": true,
+      "never_use_your_lyrics_unless_explicitly_configured": true,
+      "never_generate_lyrics_without_song_idea_and_style": true,
+      "never_generate_music_without_music_name": true,
+      "never_download_an_audio_item_with_a_different_title": true,
+      "never_upload_an_unverified_local_audio_file": true,
+      "never_mix_landscape_and_vertical_assets": true,
+      "never_bulk_download_artistly_scenes_for_videoexpress": true,
+      "never_enable_lip_sync_for_the_music_montage": true,
+      "never_add_processing_scene_videos_to_timeline": true,
+      "never_use_newest_sort_order_as_storyboard_order": true,
+      "never_import_a_clonevoice_item_with_a_different_title": true,
+      "never_upload_local_music_copy_to_videoexpress": true,
+      "never_cut_a_video_clip_when_trimming_music": true,
+      "never_delete_the_pre_cut_audio_segment": true,
+      "never_export_before_timeline_and_sync_verification": true,
+      "never_click_export_create_more_than_once_without_checking_queue": true,
+      "never_stop_only_because_generation_is_slow": true,
+      "never_send_final_response_while_generation_is_pending": true,
+      "stop_if_captcha_or_authentication_is_required": true
+    },
+    "result": {
+      "report_fields": [
+        "project_name",
+        "video_ratio",
+        "resolved_aspect_ratio",
+        "clonevoice_music_name",
+        "clonevoice_audio_id",
+        "clonevoice_music_status",
+        "clonevoice_downloaded_audio_path",
+        "artistly_uploaded_audio_name",
+        "artistly_storyboard_scene_count",
+        "artistly_storyboard_scene_ids_in_order",
+        "artistly_scenes_imported",
+        "videoexpress_scene_videos_submitted",
+        "videoexpress_scene_video_ids_in_order",
+        "timeline_scene_count",
+        "timeline_scene_order_verified",
+        "clonevoice_import_status",
+        "clonevoice_import_confirmation",
+        "audio_added_to_timeline",
+        "audio_start_time",
+        "audio_end_time",
+        "final_video_duration",
+        "audio_video_sync_verified",
+        "project_saved",
+        "export_file_name",
+        "export_quality",
+        "export_resolution",
+        "export_format",
+        "export_queue_position",
+        "export_queue_confirmation",
+        "failed_phase",
+        "failed_step",
+        "failure_reason"
+      ]
+    }
+  }
+}
