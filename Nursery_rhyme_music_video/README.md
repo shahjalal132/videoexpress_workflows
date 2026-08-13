@@ -8,14 +8,14 @@ An autonomous, browser‑based agent workflow that turns **one idea + one ratio*
 
 ## 🎬 Example output (this exact workflow, verified run)
 
-**Exported video:** https://cdn-ny-b.videoexpress.ai/video/1786569208_6a7ce1f88e6c9.mp4
+**Exported video:** https://cdn-ny-b.videoexpress.ai/video/1786603107_6a7d6663c966b.mp4
 
 | | |
 |---|---|
-| Song | *Ripa's First Day at School* (CloneVoice, Kids‑Rhyme, English, 127.63 s) |
-| Storyboard | 22 scenes, Artistly **Nursery Rhymes** agent, 16:9 |
-| Video | 22 clips (12 normal 4.04 s + 10 Video‑Length‑Booster 8.04 s), 3D animation |
-| Sync | video endpoint == audio endpoint, **0‑pixel difference** |
+| Song | *Jannat and Her Toys* (CloneVoice, Kids‑Rhyme, English, 139.22 s) |
+| Storyboard | 35 scenes, Artistly **Music Storyboard** agent, 16:9 |
+| Video | 35 clips (all normal 4.04 s — no booster needed), 3D animation |
+| Sync | video endpoint == audio endpoint, **0‑pixel difference** (final clip exact‑trimmed by 2.23 s) |
 | Export | **Landscape 16:9 · High · FullHD · mp4** |
 
 ---
@@ -24,9 +24,11 @@ An autonomous, browser‑based agent workflow that turns **one idea + one ratio*
 
 The agent asks exactly two questions, then runs autonomously. In this run the inputs were:
 
-> **1. Idea/prompt:** `Ripa is a 6 years old girl. Today is her first day at school.`
+> **1. Idea/prompt:** `Jannat is a 2 years old girl. She has lots of toys. He is enjoying by playing.`
 >
 > **2. Ratio:** `Landscape`
+
+*(Note the stray "He" in that idea — the identity lock still held Jannat as a girl across all 35 scenes, because identity is resolved once from the idea and re‑asserted in the storyboard prompt rather than re‑read per scene.)*
 
 Everything else — song title, lyrics, music style/language, protagonist identity lock, export name, story arc, and all visual treatment — was **inferred** from that one idea. You can add as much or as little detail to the idea as you like (protagonist gender/age/appearance/clothing, setting, action, mood, music style, language); anything omitted is inferred. **Only the ratio is never guessed.**
 
