@@ -366,6 +366,8 @@ Do not remove storyboard scenes and do not trim the music to hide the mismatch. 
 
 ### Final timeline audit
 
+Before running the audit, make **Auto Align Clips** the final timeline-arrangement action. Click the video track's `a.button-auto-align[data-original-title="Auto Align Clips"]` control after all `N` video clips and the music have been placed. If VideoExpress exposes a separate Auto Align Clips control for audio track 2, click that control as well so both tracks begin at zero. Do not treat the click alone as proof: re-read every brick's `left` and `width`, confirm the first video and audio starts are zero, ignore only the documented recurring 1px rendering round-off, and re-establish `video_end == audio_end` with zero-pixel tolerance before saving.
+
 Sort video bricks by left position and prove:
 
 - count equals `N`;

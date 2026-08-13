@@ -861,29 +861,35 @@
       {
         "step": 34,
         "phase": "videoexpress_sync",
+        "action": "click_auto_align_clips",
+        "details": "As the final timeline-arrangement action, click the video track's Auto Align Clips control (a.button-auto-align[data-original-title='Auto Align Clips']) after all N video clips and the music are present. If track 2 exposes its own Auto Align Clips control, click it as well so the audio begins at zero. Then re-read brick left/width geometry; require both tracks to start at zero, disregard only the documented recurring 1px rendering round-off, and re-establish video_end_px == audio_end_px with zero-pixel tolerance before saving."
+      },
+      {
+        "step": 35,
+        "phase": "videoexpress_sync",
         "action": "audit_exact_timeline_integrity",
         "details": "Sort video bricks by timeline left position. Require exactly N video bricks, N distinct storyboard scene IDs, one version per scene, each boosted clip in its source slot, first start zero, no gaps or overlaps, one music brick on track 2 at zero, and video_end equal to audio_end with zero-pixel tolerance. ALSO run the per-scene sync audit: for every scene k require |clip_end_time - k*(audio_seconds/N)| <= ~one normal clip length (~4s); if any scene drifts more, the boosted clips are unevenly distributed (clustered) and the picture will run ahead of the lyrics -- re-plan the boost distribution before saving."
       },
       {
-        "step": 35,
+        "step": 36,
         "phase": "videoexpress_save",
         "action": "save_project",
         "details": "Save the editable VideoExpress project using inputs.project_name. Require the successful-save confirmation, reopen or re-inspect the authoritative timeline, and repeat the endpoint and integrity audit to prove the exact match persisted."
       },
       {
-        "step": 36,
+        "step": 37,
         "phase": "videoexpress_export",
         "action": "configure_export",
         "details": "Click Export Video, enter inputs.export.file_name or fall back to inputs.audio.music_name, and select the configured quality, resolution, and format."
       },
       {
-        "step": 37,
+        "step": 38,
         "phase": "videoexpress_export",
         "action": "create_export",
         "details": "Click Create exactly once and wait for the background rendering queue confirmation."
       },
       {
-        "step": 38,
+        "step": 39,
         "phase": "videoexpress_export",
         "action": "verify_export_queue",
         "details": "Require the confirmation that the movie is numbered in the queue and will be created in the background. Record the export name and queue position."
@@ -1144,4 +1150,3 @@
     }
   }
 }
-
