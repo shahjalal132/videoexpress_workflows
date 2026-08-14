@@ -1,7 +1,7 @@
 ﻿{
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "config_version": "2.1.0",
-  "config_changelog": "2.1.0: Fixed a lyric-sync defect found on playback. The 2.0.0 'boost the last K scenes' placement kept endpoints equal but clustered short clips first, so the picture ran up to ~19s ahead of the lyrics through the first half. Replaced with EVEN distribution of boosted clips (running-total rule tracking k*(A/N)); added pacing_sync_gate and per-scene drift audit. | 2.0.0: Hardened from a verified end-to-end successful run. Added device-agnostic execution_mechanics (DOM-selector + event dispatch, never screenshot pixels), dom_api_contract (exact selectors/APIs/durations/confirmation strings), validation_checkpoints and support_investigation blocks. Corrected add-to-timeline to jQuery-UI drag, delete to ctxmenu:delete, music-import to jQuery trigger, exact-trim to playhead-slider+cut+tail-delete, Nursery Rhymes agent specifics.",
+  "config_version": "2.3.0",
+  "config_changelog": "2.3.0: Hardened storyboard agent selection with priority, validated retries, and a fallback. Nursery Rhymes is now the HIGH-priority agent and is always tried first; Music Storyboard is the LOW-priority fallback. Reason: Nursery Rhymes sometimes returns an error or generates only ONE image instead of a full storyboard. Every attempt is now validated before import: the batch must be a full multi-scene storyboard (never a single image; N >= ceil(audio_seconds/8.0417) so the clips can span the song) whose scenes match the music theme/lyrics and the locked identity. Nursery Rhymes gets up to 3 validated attempts; every failed attempt is appended to RUNTIME_STATE.json error_history with the agent, attempt number, exact error message/symptom, and design ids so the defect can be debugged later, and the failed batch is abandoned (never imported, never mixed with another attempt). After the third failure, Music Storyboard runs with the character-lock prompt, also with up to 3 validated attempts; 6 total logged failures are a reported true blocker. | 2.2.0: Fixed a talking-lips defect found on playback. Characters were animating their mouths as if speaking/singing, which reads as broken dubbing in a montage whose only vocal is the CloneVoice track. Root cause: the Image-To-Video prompt was used exactly as auto-filled and never said the character must not speak, so the model defaulted to singing motion on a music video (worsened when the source still already had an open mouth). Fix applied at three levels: (a) no_speech_prompt_suffix is now APPENDED to every auto-filled video prompt and asserted in the textarea before Create Video; (b) no_speech_prompt_suffix_short goes into the Artistly Storyboard Style prompt so the source stills are closed-mouth; (c) added per-batch mouth_motion_qc plus a no_speech_gate, same-slot repair rules, animation style pinned to '3d' (never 'human'), and lip-sync enforcement. Also documented Auto Align Clips as the final arrangement action with mandatory geometry re-verification. | 2.1.0: Fixed a lyric-sync defect found on playback. The 2.0.0 'boost the last K scenes' placement kept endpoints equal but clustered short clips first, so the picture ran up to ~19s ahead of the lyrics through the first half. Replaced with EVEN distribution of boosted clips (running-total rule tracking k*(A/N)); added pacing_sync_gate and per-scene drift audit. | 2.0.0: Hardened from a verified end-to-end successful run. Added device-agnostic execution_mechanics (DOM-selector + event dispatch, never screenshot pixels), dom_api_contract (exact selectors/APIs/durations/confirmation strings), validation_checkpoints and support_investigation blocks. Corrected add-to-timeline to jQuery-UI drag, delete to ctxmenu:delete, music-import to jQuery trigger, exact-trim to playhead-slider+cut+tail-delete, Nursery Rhymes agent specifics.",
   "automation": {
     "name": "CloneVoice Artistly VideoExpress Nursery Rhymes Music Video",
     "enabled": true,
@@ -159,6 +159,9 @@
         "artistly": [
           "uploaded_audio_name",
           "storyboard_tool",
+          "storyboard_attempt",
+          "storyboard_attempt_history",
+          "agent_fallback_triggered",
           "character_lock_prompt",
           "character_identity_verified",
           "storyboard_generation_started",
@@ -267,7 +270,8 @@
       "music_download_interrupted": "Check downloaded_audio_path and file size. Reuse a valid existing file; otherwise download only the exact completed item again.",
       "artistly_upload_interrupted": "Inspect the upload control for the expected file name. If already uploaded, continue. Otherwise retry only the file upload.",
       "artistly_storyboard_partially_completed": "Keep the same storyboard job open and wait for remaining scene IDs. Never start a second storyboard job while a matching one exists. If the browser reconnects, open Personal Designs, filter by the recorded storyboard_tool, find the matching job by timestamp and first image, and continue inspection without resubmitting.",
-      "artistly_character_hallucination": "Reject the storyboard before VideoExpress import when the named protagonist's gender, age, role, clothing, hair, or other locked identity attributes disagree with the song brief. Use Music Storyboard when Nursery Rhymes does not expose a character prompt, enter one compact immutable character-lock prompt, generate once, then visually verify every generated scene. Never animate a known wrong-gender or wrong-character storyboard.",
+      "artistly_nursery_rhymes_error_or_single_image": "Known Nursery Rhymes defect: an attempt sometimes ends in an explicit error or produces only ONE image instead of a full storyboard. This is a failed attempt, not a blocker. Append an error_history entry (support_investigation.error_history_entry_shape extended with agent, attempt, designs_returned, design_ids; symptom = the exact on-screen error message or 'single_image') for later debugging, abandon that batch entirely (never import it, never mix it with another attempt's designs), and retry Nursery Rhymes up to 3 validated attempts total. Only after the third failure switch to the Music Storyboard fallback with the character-lock prompt (the fallback also gets up to 3 validated attempts; 6 total logged failures are a reported true blocker).",
+      "artistly_character_hallucination": "Reject the storyboard before VideoExpress import when the named protagonist's gender, age, role, clothing, hair, or other locked identity attributes disagree with the song brief. The rejection counts as a failed attempt under inputs.artistly.agent_priority: record it in error_history, retry Nursery Rhymes while it has had fewer than 3 attempts, then fall back to Music Storyboard with one compact immutable character-lock prompt and visually verify every generated scene. Never animate a known wrong-gender or wrong-character storyboard.",
       "artistly_import_partially_completed": "Compare storyboard IDs with My Artistly Images and import only missing scene IDs while preserving storyboard order.",
       "scene_batch_partially_submitted": "Keep the same batch open. Read its planned_scene_ids, submitted_scene_ids, and My AI Videos. Submit only missing members until every scene in the current batch has one authoritative processing or completed job. A confirmation banner alone is insufficient; verify each accepted job in My AI Videos. Never fill a rejected slot with a scene from the next batch.",
       "scene_batch_partially_completed": "Wait for remaining submitted scenes. Add no partial batch to the timeline unless the runtime checkpoint explicitly records each completed insertion position and idempotency can be guaranteed.",
@@ -303,15 +307,34 @@
       "artistly": {
         "agent": "Nursery Rhymes",
         "agent_options": ["Nursery Rhymes", "Music Storyboard"],
-        "agent_selection_rule": "Use Nursery Rhymes when the user asks for it / for a rhyme montage; it has NO character-prompt field so identity must already be in the CloneVoice lyrics, and its dimension defaults to 1:1 and MUST be set to the selected ratio. Use Music Storyboard when an explicit typed character-lock prompt is required.",
+        "agent_priority": [
+          { "agent": "Nursery Rhymes", "priority": "high", "max_validated_attempts": 3 },
+          { "agent": "Music Storyboard", "priority": "low", "use_only_after": "3_failed_nursery_rhymes_attempts", "max_validated_attempts": 3 }
+        ],
+        "agent_selection_rule": "ALWAYS try Nursery Rhymes first (HIGH priority). Known defect: it sometimes returns an error or generates only ONE image instead of a full storyboard. Validate every attempt with storyboard_attempt_validation before import; on failure, append the attempt to RUNTIME_STATE.json error_history for later debugging and retry Nursery Rhymes, up to 3 validated attempts total. Fall back to Music Storyboard (LOW priority) only after the third failed Nursery Rhymes attempt; Music Storyboard then gets up to 3 validated attempts of its own under the same validation and error_history logging. If both agents exhaust their 3 attempts (6 logged failures), stop and report a true blocker with the error_history evidence instead of importing a failed batch. Nursery Rhymes has NO character-prompt field so identity must already be in the CloneVoice lyrics, and its dimension defaults to 1:1 and MUST be set to the selected ratio. Music Storyboard requires the explicit typed character-lock prompt.",
+        "storyboard_attempt_validation": {
+          "run_after_every_generation_attempt": true,
+          "fail_conditions": [
+            "the app shows an explicit generation error for this attempt",
+            "the batch contains exactly one design (a single image instead of a storyboard - the known Nursery Rhymes failure)",
+            "scene count is below the viable floor ceil(audio_seconds / 8.0417) - below it even all-boosted clips cannot span the song",
+            "the scenes do not match the music theme: they must depict the lyrics' protagonist and story arc as a coherent multi-scene progression",
+            "the locked protagonist identity or the selected ratio is violated"
+          ],
+          "on_fail": "Append an entry to RUNTIME_STATE.json error_history (support_investigation.error_history_entry_shape extended with agent, attempt, designs_returned, design_ids; symptom = the exact on-screen error message or 'single_image' | 'theme_mismatch' | 'identity_violation' | 'count_below_viable_floor') so the failure can be debugged later. Abandon the failed batch: never import it and never mix its designs with another attempt. Then retry per agent_priority.",
+          "on_pass": "Set N to the verified batch count, record scene IDs in ascending page_number order, and continue to VideoExpress import."
+        },
         "image_dimension": "16:9",
         "storyboard_selection": "all_completed_verified_scenes",
         "target_scene_count": "runtime.artistly.storyboard_scene_count",
-        "character_lock_prompt": "Only used with Music Storyboard. Example: '3D children's animation; <name> a <age> GIRL, <eyes>, <hair>, <clothing>; always a girl, never a boy'. Keep it under the field's character limit (Music Storyboard ~150 chars). Nursery Rhymes has no such field."
+        "character_lock_prompt": "Only used with the Music Storyboard fallback (after 3 failed validated Nursery Rhymes attempts). Example: '3D children's animation; <name> a <age> GIRL, <eyes>, <hair>, <clothing>; always a girl, never a boy; mouth closed, closed-lip smile, never singing or talking'. Keep it under the field's character limit (Music Storyboard ~150 chars); if it will not fit, drop optional identity detail (eye colour, footwear) before dropping the no-speech clause. Nursery Rhymes has no such field, so with that agent the no-speech rule can only be applied at the video stage."
       },
       "videoexpress": {
         "animation_style": "3D",
+        "animation_style_note": "Never select 'human' for a character montage; that path biases toward talking-head motion.",
         "automatically_enhance_video_prompt": true,
+        "no_speech_prompt_suffix": " Mouth closed and lips together for the entire clip. The character never speaks, sings, talks, mouths words, chants, or opens the mouth; no lip movement, no jaw movement, no visible teeth, no dialogue, no singing, no lip sync. Emotion is expressed only through the eyes, eyebrows, head turns, hands, and body movement. A gentle closed-lip smile is allowed.",
+        "no_speech_prompt_suffix_short": "mouth closed, closed-lip smile, never singing or talking",
         "video_length_booster_policy": "preserve_dynamic_scene_count_N_and_use_boosted_versions_only_as_same-slot_replacements",
         "maximum_concurrent_generations": 5,
         "batch_size_policy": "maximum_5_distinct_generations_per_batch",
@@ -404,18 +427,22 @@
       "start_url": "https://app.artistly.ai/choose-designer",
       "designer": "Fast AI Image Designer",
       "section": "AI Design Agents",
-      "agent": "Music Storyboard",
+      "agent": "Nursery Rhymes",
+      "agent_priority_source": "inputs.artistly.agent_priority",
+      "agent_fallback": "Music Storyboard (LOW priority; only after 3 failed validated Nursery Rhymes attempts, each logged in error_history; the fallback itself also gets up to 3 validated attempts)",
+      "attempt_validation_source": "inputs.artistly.storyboard_attempt_validation",
       "audio_upload_source": "runtime.clonevoice_downloaded_audio_path",
-      "storyboard_style_prompt_source": "inputs.artistly.character_lock_prompt",
+      "storyboard_style_prompt_source": "inputs.artistly.character_lock_prompt (Music Storyboard fallback only)",
       "image_dimension_source": "inputs.artistly.image_dimension",
       "generate_button": "Generate Images",
       "output": "ordered_consistent_character_storyboard",
       "scene_requirements": [
+        "the batch is a full multi-scene storyboard that matches the music theme (never a single image)",
         "scene processing is completed",
         "scene image is visible",
         "scene number or generated ordering is available",
         "the protagonist is visibly a girl in every selected scene",
-        "the protagonist retains auburn braids, green eyes, pink shirt, and cream apron",
+        "the protagonist retains every locked identity attribute (hair, eyes, clothing, medium) from the production brief",
         "consistent main character appearance",
         "no malformed faces or hands",
         "no unwanted text, logos, or watermarks"
@@ -442,8 +469,13 @@
         "selection_order": "ascending Artistly storyboard scene order",
         "animation_style_source": "inputs.videoexpress.animation_style",
         "use_artistly_generated_video_prompt": true,
+        "append_no_speech_suffix": true,
+        "no_speech_suffix_source": "inputs.videoexpress.no_speech_prompt_suffix",
+        "prompt_composition_rule": "Keep the auto-filled Artistly action prompt verbatim (it carries the scene action and the protagonist's pronouns) and APPEND the no-speech suffix to it. Never replace the auto-filled text and never submit it unmodified. Set the value with the native value setter plus input/change events, make the append idempotent, and assert the suffix is present in the textarea before clicking Create Video; abort the submission if it is missing.",
         "automatically_enhance_video_prompt_source": "inputs.videoexpress.automatically_enhance_video_prompt",
         "lip_sync": false,
+        "lip_sync_enforcement": "Lip sync stays off for every generation without exception; if the modal exposes a lip-sync toggle, assert it is unchecked before submitting. Never use the Lipsync Video tool in this workflow.",
+        "mouth_motion_qc": "Once per batch, before adding the batch to the timeline, play a representative sample of the completed clips (prioritising scenes whose source still showed an open mouth) and reject any clip whose lips part rhythmically or whose jaw opens and shuts as if speaking or singing. Repair a rejected scene by regenerating only that scene with the same source image and the same suffix, then replace it in its own timeline slot; never append the retry at the end and never leave both takes on the timeline. After one failed retry, keep the better take, log it in error_history, and surface it in the final report.",
         "video_length_booster_source": "inputs.videoexpress.video_length_booster_policy",
         "submit_button": "Create Video",
         "maximum_concurrent_generations_source": "inputs.videoexpress.maximum_concurrent_generations",
@@ -625,10 +657,11 @@
         { "gate": "auth", "verify": "each app shows logged-in UI or returns API 200; a login page is a true blocker" },
         { "gate": "clonevoice_gate", "verify": "inertia props: title matches, status Completed, capture music_uuid, duration_s, src_url" },
         { "gate": "identity_gate", "verify": "lyrics identity-consistent (she/her/girl throughout) AND montage screenshot QC of all N designs — the image-consistency validation" },
-        { "gate": "storyboard_gate", "verify": "designs API: tool_used+created_at batch, all status private, N counted, page_number->design_id recorded, aspect_ratio correct" },
+        { "gate": "storyboard_gate", "verify": "designs API: tool_used+created_at batch, all status private, N counted, page_number->design_id recorded, aspect_ratio correct; attempt validation passed: full multi-scene storyboard matching the music theme (never a single image), N >= ceil(audio_seconds/8.0417); agent attempt history recorded (Nursery Rhymes HIGH priority <=3 attempts, then Music Storyboard LOW-priority fallback <=3 attempts) with every failed attempt logged in error_history" },
         { "gate": "import_gate", "verify": "My Artistly Images folder API contains exactly the N recorded designs; ordered VE image ids recorded; unrelated ids excluded" },
         { "gate": "batch_submission_gate", "verify": "each planned scene has a unique job id in My AI Videos; <=5 active" },
         { "gate": "batch_completion_gate", "verify": "all batch jobs status completed with expected duration_ms before timeline insertion / next batch" },
+        { "gate": "no_speech_gate", "verify": "every submitted video prompt contained the no-speech suffix (asserted in the textarea before Create Video); lip sync off and animation style '3d' (never 'human') for every generation; per-batch mouth-motion spot-check found no clip reading as speaking or singing" },
         { "gate": "timeline_gate", "verify": "N .brick.video, first_start_px 0, contiguous (ignoring <=1px recurring render rounding), order verified" },
         { "gate": "audio_gate", "verify": "one .brick.audio on track 2 at left 0; ve_audio_id + duration_ms recorded" },
         { "gate": "sync_gate", "verify": "video_end_px == audio_end_px (0 diff) via .brick geometry" },
@@ -655,6 +688,7 @@
         "offscreen_drop_failed": "timeline drop dropped off-screen; zoomed out then re-dragged.",
         "stale_success_toast": "toast read 'success' from a prior job; verified real result via API/title instead.",
         "wrong_agent_or_ratio": "Nursery Rhymes used with default 1:1; corrected dimension to selected ratio before generating.",
+        "nursery_rhymes_error_or_single_image": "Nursery Rhymes attempt returned an error or a single image instead of a full storyboard; logged the attempt in error_history, abandoned the batch, retried (maximum 3 validated attempts), then fell back to Music Storyboard (also maximum 3 validated attempts) with the character-lock prompt.",
         "jquery_ui_resize_no_op": "clip resize-handle drag ignored; used playhead+cut exact-trim instead.",
         "first_half_out_of_sync_with_lyrics": "Root cause: boosted clips were clustered at the end ('boost the last K') so short clips front-loaded and the picture ran ahead of the lyrics through the first half (endpoints were still equal). Fix: distribute boosted clips evenly (booster_math.placement_strategy) so each clip's cumulative end tracks k*(A/N); re-plan and re-assemble if the pacing_sync_gate fails."
       }
@@ -736,7 +770,7 @@
         "step": 13,
         "phase": "artistly_storyboard",
         "action": "open_storyboard_agent",
-        "details": "Open Artistly choose-designer, Fast AI Image Designer, AI Design Agents tab, then the configured agent (inputs.artistly.agent). Nursery Rhymes: only a rhyme-audio FilePond upload and a dimension dropdown that defaults to 1:1 and MUST be set to the selected ratio; identity comes from the lyrics (no character field). Music Storyboard: has a Storyboard Style character-lock textarea. Inject the audio via the FilePond DataTransfer method (execution_mechanics.interaction_primitives.file_upload_without_os_dialog); do not use an OS file dialog."
+        "details": "Open Artistly choose-designer, Fast AI Image Designer, AI Design Agents tab, then the agent chosen by inputs.artistly.agent_priority: ALWAYS Nursery Rhymes (HIGH priority) first; increment runtime.artistly.storyboard_attempt (1-based). Open Music Storyboard (LOW priority) only when error_history already records 3 failed validated Nursery Rhymes attempts for this run. Nursery Rhymes: only a rhyme-audio FilePond upload and a dimension dropdown that defaults to 1:1 and MUST be set to the selected ratio; identity comes from the lyrics (no character field). Music Storyboard: has a Storyboard Style character-lock textarea. Inject the audio via the FilePond DataTransfer method (execution_mechanics.interaction_primitives.file_upload_without_os_dialog); do not use an OS file dialog."
       },
       {
         "step": 14,
@@ -748,19 +782,19 @@
         "step": 15,
         "phase": "artistly_storyboard",
         "action": "lock_character_and_select_storyboard_ratio",
-        "details": "Enter inputs.artistly.character_lock_prompt in Storyboard Style, explicitly requiring the 9-year-old baker girl and saying never a boy. Select 16:9 for a horizontal YouTube music video. Never generate a mixed-ratio storyboard."
+        "details": "Every attempt: set the image dimension to the selected ratio (Nursery Rhymes defaults to 1:1 and MUST be changed; 16:9 for Landscape). Music Storyboard fallback only: enter inputs.artistly.character_lock_prompt in Storyboard Style, explicitly requiring the locked protagonist identity (e.g. always a girl, never a boy). Never generate a mixed-ratio storyboard."
       },
       {
         "step": 16,
         "phase": "artistly_storyboard",
         "action": "generate_storyboard",
-        "details": "Click Generate Images and continue polling while the storyboard scenes show Processing. Do not treat active processing as failure."
+        "details": "Click Generate Images once for this attempt and continue polling while the storyboard scenes show Processing. Do not treat active processing as failure. If the app returns an explicit generation error instead, do not keep waiting: record the failed attempt (agent, attempt number, exact error message) in RUNTIME_STATE.json error_history and return to step 13 for the next attempt per inputs.artistly.agent_priority."
       },
       {
         "step": 17,
         "phase": "artistly_storyboard",
         "action": "verify_storyboard",
-        "details": "Wait for generation to finish, open Personal Designs, filter Music Storyboard, load all pages, and visually verify every generated scene. Set N to the complete verified storyboard count and record all N scene IDs in story order. Every scene must preserve the locked baker-girl identity."
+        "details": "Wait for generation to finish, identify this attempt's batch (designs API: tool_used + created_at cluster), load all pages, and run inputs.artistly.storyboard_attempt_validation: the batch must be a full multi-scene storyboard - exactly one image is the known Nursery Rhymes failure and always fails; require N >= ceil(audio_seconds/8.0417); visually verify the scenes match the music theme (the lyrics' protagonist and story arc), the locked identity, and the selected ratio. PASS: set N to the verified count and record all N scene IDs in ascending page_number story order. FAIL: append {agent, attempt, symptom, designs_returned, design_ids} to RUNTIME_STATE.json error_history for later debugging, abandon the batch (never import or mix it), then retry Nursery Rhymes from step 13 while it has had fewer than 3 attempts; after the third Nursery Rhymes failure run steps 13-17 with Music Storyboard (LOW priority) and the character-lock prompt, also up to 3 validated attempts with the same validation and error_history logging; if Music Storyboard also fails 3 validated attempts, stop and report a true blocker with the error_history evidence."
       },
       {
         "step": 18,
@@ -959,8 +993,8 @@
       "validate authenticated sessions and existing account integrations",
       "use CloneVoice New and AI-Generated to create the nursery-rhyme song",
       "download the completed song only for Artistly's audio-upload step",
-      "upload the song to Artistly Music Storyboard and enter the immutable baker-girl character lock",
-      "generate and visually verify all N 16:9 scenes with the girl identity consistent throughout",
+      "upload the song to Artistly Nursery Rhymes (HIGH priority; up to 3 validated attempts, logging every failure to RUNTIME_STATE.json, then fall back to Music Storyboard, also up to 3 validated attempts, with the immutable character lock)",
+      "validate every attempt as a full on-theme storyboard (never a single image) and visually verify all N scenes with the locked identity consistent throughout",
       "import all N verified storyboard images into VideoExpress through the Artistly integration",
       "animate scenes through Image To Video (Old Algorithm) in batches of five",
       "after each batch completes, assemble that batch sequentially before starting the next batch",
@@ -1068,6 +1102,10 @@
       "never_mix_landscape_and_vertical_assets": true,
       "never_bulk_download_artistly_scenes_for_videoexpress": true,
       "never_enable_lip_sync_for_the_music_montage": true,
+      "never_submit_a_video_prompt_without_the_no_speech_suffix": true,
+      "never_replace_the_auto_filled_artistly_action_prompt": true,
+      "never_select_human_animation_style_for_a_character_montage": true,
+      "never_ship_a_clip_whose_character_visibly_talks_or_sings": true,
       "never_add_processing_scene_videos_to_timeline": true,
       "never_use_newest_sort_order_as_storyboard_order": true,
       "never_import_a_clonevoice_item_with_a_different_title": true,

@@ -127,6 +127,32 @@ Create one immutable protagonist identity block containing only stable traits:
 
 Repeat the important identity traits in the Artistly **Storyboard Style** prompt. Use explicit exclusions when identity matters, for example: `always a girl; never a boy`. Never allow later prompts to change the protagonist’s gender, age, face, hair, core clothing, or visual medium.
 
+### No-speech performance rule (MANDATORY — applies to every image and every clip)
+
+This is a **music montage**, not a talking or lip-synced video. The vocal comes only from the CloneVoice track. A character whose mouth moves reads as badly dubbed dialogue and is a defect, so:
+
+- characters **act**, they never **speak**. They play, walk, run, jump, point, hug, clap, wave, dance, reach, look, and react;
+- the mouth stays **closed with lips together** for the whole clip — no talking, singing, mouthing words, chanting, reciting, narrating, jaw movement, or visible teeth;
+- **never** turn on lip sync, and never use the Lipsync Video tool for this workflow;
+- emotion is carried by **eyes, eyebrows, head turns, hands, and body movement**;
+- a **gentle closed-lip smile is allowed and encouraged** — the goal is a warm, expressive character, not a blank one.
+
+Define this canonical constant once and reuse it verbatim; do not paraphrase it per scene:
+
+```
+NO_SPEECH_SUFFIX =
+" Mouth closed and lips together for the entire clip. The character never speaks, sings, talks,
+mouths words, chants, or opens the mouth; no lip movement, no jaw movement, no visible teeth,
+no dialogue, no singing, no lip sync. Emotion is expressed only through the eyes, eyebrows,
+head turns, hands, and body movement. A gentle closed-lip smile is allowed."
+```
+
+And its compact form, for character-limited fields such as Artistly's 150-character Storyboard Style:
+
+```
+NO_SPEECH_SHORT = "mouth closed, closed-lip smile, never singing or talking"
+```
+
 Before importing anything into VideoExpress, visually inspect every generated storyboard scene. Reject and regenerate the storyboard if the protagonist contradicts the idea or identity lock. Do not rationalize or animate a known wrong-gender or wrong-character result.
 
 ## 4. Runtime state and resumability
@@ -138,7 +164,7 @@ Record at minimum:
 - run ID, current phase, step, substep, status, last verified checkpoint, and next safe action;
 - project title, song idea, style, language, music name, ratio, and aspect ratio;
 - CloneVoice music ID, status, and downloaded audio path;
-- Artistly storyboard tool, character-lock prompt, job status, total design count `N`, and all scene IDs in story order;
+- Artistly agent attempt history (agent, attempt number 1–3, failure symptom/exact error message per failed attempt, whether the Music Storyboard fallback was triggered), the storyboard tool finally used, character-lock prompt, job status, total design count `N`, and all scene IDs in story order;
 - VideoExpress imported image IDs, planned batch number, batch scene IDs, accepted job IDs, completed video IDs mapped by scene, and timeline order;
 - audio/video endpoints, replacement scene IDs, save state, and export queue state;
 - error and recovery history.
@@ -183,33 +209,48 @@ Open Artistly in the authenticated browser.
 1. Open **Create Design** (URL `https://app.artistly.ai/choose-designer`).
 2. Open **Fast AI Image Designer**.
 3. Open the **AI Design Agents** tab.
-4. Agent choice:
-   - Use **Nursery Rhymes** when the user asks for it or for a rhyme montage. It exposes **only** "Upload Your Rhyme Audio" and a "Select Image Dimension" dropdown — **no Storyboard Style / character-prompt field**. Character identity therefore comes from the audio's lyrics, so the CloneVoice lyrics must already be identity-consistent (verify at the CloneVoice gate). Its dimension defaults to **1:1 and MUST be changed to the selected ratio (16:9 / 9:16)** — this is the single most common Nursery Rhymes mistake.
-   - Use **Music Storyboard** when you need an explicit typed character-lock prompt. It exposes "Upload Your Audio", a **Storyboard Style** prompt, and the ratio dropdown.
+4. Agent choice — **priority, validated retries, and fallback**:
+   - **Nursery Rhymes is the HIGH-priority agent — always try it first.** It exposes **only** "Upload Your Rhyme Audio" and a "Select Image Dimension" dropdown — **no Storyboard Style / character-prompt field**. Character identity therefore comes from the audio's lyrics, so the CloneVoice lyrics must already be identity-consistent (verify at the CloneVoice gate). Its dimension defaults to **1:1 and MUST be changed to the selected ratio (16:9 / 9:16)** — this is the single most common Nursery Rhymes mistake.
+   - **Known Nursery Rhymes defect:** an attempt sometimes ends in an explicit error, or generates **only one image instead of a full storyboard**. Every attempt must therefore pass the attempt validation in step 15 below — a full multi-scene batch whose scenes match the music theme — before its designs may be imported.
+   - **Retry budget: up to 3 validated Nursery Rhymes attempts.** Append every failed attempt to `RUNTIME_STATE.json` → `error_history` (§18 entry shape, extended with `agent`, `attempt`, `designs_returned`, `design_ids`; the `symptom` is the exact on-screen error message, `"single_image"`, `"theme_mismatch"`, or `"identity_violation"`) so the defect can be debugged later. Abandon a failed batch entirely — never import it and never mix it with a later attempt.
+   - **Music Storyboard is the LOW-priority fallback — use it only after the third failed Nursery Rhymes attempt.** It exposes "Upload Your Audio", a **Storyboard Style** prompt (the character-lock prompt from §3, including `NO_SPEECH_SHORT`), and the ratio dropdown. It gets the same retry treatment: up to **3 validated attempts**, every failure logged to `error_history` the same way. If Music Storyboard also exhausts its 3 attempts (6 logged failures in total), stop and report a true blocker with the `error_history` evidence — never import a failed batch.
    - Either way, verify output identity, ratio, and story order before importing.
 5. Upload the exact completed CloneVoice audio by **injecting it into the FilePond input** (§0.4): fetch the CloneVoice `src` CDN mp3, build a `File`, set it on `input[type=file][name="filepond"]` via `DataTransfer`, dispatch `change`; wait for the dropzone to show "Upload complete". Do not attempt an OS file dialog.
-6. Enter a compact **Storyboard Style** prompt containing:
+6. **(Music Storyboard fallback only)** Enter a compact **Storyboard Style** prompt containing:
    - the selected visual style;
    - the immutable protagonist identity;
    - explicit gender/identity exclusions where relevant;
+   - **`NO_SPEECH_SHORT`** (`mouth closed, closed-lip smile, never singing or talking`) — an open-mouth or mid-song still is the single strongest cause of talking lips in the generated video, because Image-To-Video continues whatever mouth pose the source frame contains;
    - the selected ratio.
+
+   The Music Storyboard field is capped at **150 characters** (the counter turns red past the limit and Generate is refused). Budget it as roughly: style ~20 chars, identity ~65, no-speech ~55, ratio ~5. If it will not fit, drop optional identity detail (eye colour, footwear) before dropping the no-speech clause — mouth pose affects every frame, whereas a missing shoe colour does not.
+
+   **Nursery Rhymes has no Storyboard Style field at all.** With that agent you cannot pass the no-speech clause into the stills, so open-mouth singing poses are likelier; rely entirely on the video-stage suffix in §9.A and QC the stills harder. Do **not** switch to Music Storyboard for mouth control alone — under the priority rule it is only the fallback after three failed Nursery Rhymes attempts.
 7. Select the exact project ratio: Landscape 16:9 or Vertical 9:16.
-8. Click **Generate Images** once.
+8. Click **Generate Images** once per attempt. If the app returns an explicit generation error, do not keep polling: treat it as a failed attempt (step 15) and record the exact error message.
 9. Continue monitoring until the matching storyboard job is complete. Read status from `GET /api/internal/designs?folder_id=all` — each design goes `processing` → `private` (completed).
 10. Identify **this run's batch** in that API response by `tool_used` (`"AI Design Agents"` for Nursery Rhymes; `"Music Storyboard"` for Music Storyboard) **and** a matching `created_at` timestamp cluster (all created within the same few seconds). Never rely on newest-first display order, and never mix in an older unrelated batch that shares the tool name.
 11. Wait until every design in the matching batch has `status: "private"`.
-12. Determine `N` = the count of designs in the matching batch. `N` is dynamic (a prior run produced 22).
+12. Determine `N` = the count of designs in the matching batch. `N` is dynamic (a prior run produced 22). **Full-storyboard check:** a batch of exactly **one image is the known Nursery Rhymes failure** and fails the attempt immediately (step 15); also fail the attempt if `N < ceil(audio_seconds / 8.0417)` — below that floor even all-boosted clips cannot span the song.
 13. Record every design's `id` in ascending `page_number` order — this is the authoritative story order (1…N). Store `page_number → design_id` and the image URL (`images[0]`, path `…/<agent>/prompt-to-image-<uuid>.png`).
 14. Build an on-page montage overlay (a grid of `<img>` for the N image URLs, each labelled with its `page_number`) and screenshot it to visually inspect all `N` designs at once for:
    - correct protagonist gender, age, hair, face, clothing, and style;
    - selected ratio;
-   - coherent story progression;
+   - **theme match:** a coherent story progression that depicts the music's theme — the lyrics' protagonist and story arc across multiple scenes, never one generic image or an off-theme set (a mismatch fails the attempt — step 15);
    - acceptable anatomy;
-   - no unwanted text, logos, or watermarks.
+   - no unwanted text, logos, or watermarks;
+   - **mouth pose:** lips closed or a closed-lip smile. Zoom the montage on faces if the grid is too small to judge. Flag any still showing a wide-open mouth, a mid-word/mid-song shape, or prominent teeth — those frames become talking clips at the video stage. A few such stills do not require regenerating the whole batch (the §9.A suffix usually suppresses the motion), but they are the scenes to spot-check first in the clip QC below.
+
+15. **Attempt verdict — retry / fallback decision.** If the batch passes every check above, continue to §7 with exactly this batch. If the attempt failed — explicit generation error, a single image, `N` below the viable floor, a theme mismatch, or an identity/ratio violation — then:
+    - append a failure record to `RUNTIME_STATE.json` → `error_history` (§18 entry shape, extended with `agent`, `attempt`, `designs_returned`, `design_ids`, and the exact on-screen error message as the `symptom`) so the defect can be debugged later;
+    - abandon the failed batch entirely — never import it and never mix its designs with another attempt's;
+    - if Nursery Rhymes has had fewer than **3** attempts, retry Nursery Rhymes from step 1 of this section;
+    - after the **third** failed Nursery Rhymes attempt, switch to **Music Storyboard** (LOW priority) and rerun this section with the character-lock prompt — the fallback also gets up to **3 validated attempts** under the same validation and `error_history` logging;
+    - if Music Storyboard also fails its **3** attempts (6 logged failures in total), stop: report the last verified checkpoint and the `error_history` evidence as a true blocker instead of importing any failed batch.
 
 `N` is dynamic. Never impose a fixed count such as 20. If Artistly generates 25 designs, generate 25 videos. If it generates 27, generate 27 videos. The final VideoExpress timeline must contain exactly `N` distinct scene slots.
 
-If the storyboard identity is wrong, regenerate before VideoExpress import. Do not mix corrected designs with older incorrect designs.
+If the storyboard identity is wrong, regenerate before VideoExpress import — this counts as a failed attempt under step 4's retry budget. Do not mix corrected designs with older incorrect designs.
 
 ## 7. Create a new VideoExpress project
 
@@ -247,9 +288,23 @@ Use **Create with AI → Image To Video (Old Algorithm)**. Do not use the newer 
 2. Click the card whose text contains **"Image To Video"** and **"Old Algorithm"** → the "Image To Video" modal opens showing "Please select an image".
 3. Click the **"select"** link (first scene) or the **"Choose Image"** button (subsequent scenes — the modal stays open between submissions). The image picker opens.
 4. Open the **My Artistly Images** folder (single-click the `[class*="folder"]` element whose text matches; the picker resets to folder-root each time, and the folder may be below the fold — scroll the `.list-wrapper` to find it).
-5. Select the target image `.library-item[data-ident=<VE_IMAGE_ID>]`, then click **Choose**. The prompt textarea auto-fills with that image's action prompt (preserves the protagonist's pronouns/identity) — keep it.
-6. Set style: `select[name="select-type"]` → value `"3d"` (options Human/2D/3D/PhotoRealistic/Other); dispatch `change`.
-7. `input[name="video_length_booster"]`: **unchecked** in the primary pass (checked only in the duration-repair pass).
+5. Select the target image `.library-item[data-ident=<VE_IMAGE_ID>]`, then click **Choose**. The prompt textarea auto-fills with that image's action prompt (preserves the protagonist's pronouns/identity) — **keep that text and append `NO_SPEECH_SUFFIX` to it**. Never replace the auto-filled text (that would lose the scene action and the pronouns) and never leave it unmodified (that is what produces talking lips).
+
+   Append it with the native value setter so the app's model registers the change, then re-read the field to prove the suffix is present **before** submitting:
+   ```js
+   const ta = document.querySelector('textarea');
+   const base = ta.value.trim();                                  // keep the auto-filled action
+   if (!/never speaks/i.test(base)) {                             // idempotent — never append twice
+     const d = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(ta), 'value');
+     d.set.call(ta, base + NO_SPEECH_SUFFIX);
+     ta.dispatchEvent(new Event('input',  {bubbles:true}));
+     ta.dispatchEvent(new Event('change', {bubbles:true}));
+   }
+   if (!/never speaks/i.test(ta.value)) return {ok:false, why:'no-speech suffix missing — aborted'};
+   ```
+   This also composes with the §9.A prompt-match guard: verify the auto-filled prefix matches the intended scene **first**, then append. Both checks must pass before Create Video.
+6. Set style: `select[name="select-type"]` → value `"3d"` (options Human/2D/3D/PhotoRealistic/Other); dispatch `change`. Do **not** choose `human` for a character montage — the Human path biases toward talking-head motion and is the wrong lane for this workflow.
+7. `input[name="video_length_booster"]`: **unchecked** in the primary pass (checked only in the duration-repair pass). Leave any lip-sync / talking-video option **off**; if the modal exposes a lip-sync checkbox, assert it is unchecked before submitting.
 8. Click **Create Video** (element with exact text "Create Video", native mouse-event sequence). A "…will appear in your Media Library…" message confirms submission; the modal stays open for the next scene.
 
 Wrap steps 3–8 in a single function `submitScene(imageId, {boost})` and a wrapper that opens the tool for the first scene, so each of the `N` submissions is one call — do not re-derive the flow per scene.
@@ -257,13 +312,25 @@ Wrap steps 3–8 in a single function `submitScene(imageId, {boost})` and a wrap
 For the primary pass, generate exactly one normal video for every storyboard design:
 
 1. Choose the exact design from **My Artistly Images** using its recorded scene ID.
-2. Use the Artistly-provided action prompt, preserving the protagonist’s correct pronouns and identity.
-3. Select **3D** unless the idea explicitly requires another supported style.
-4. Keep lip sync off.
+2. Use the Artistly-provided action prompt, preserving the protagonist’s correct pronouns and identity, **then append `NO_SPEECH_SUFFIX`** and confirm it is present in the textarea before submitting.
+3. Select **3D** unless the idea explicitly requires another supported style; never `human` for a character montage.
+4. Keep lip sync off — always, with no exception for “expressive” or “singing” scenes.
 5. Keep **Video Length Booster** off during the primary pass.
 6. Verify the selected project ratio remains correct.
 7. Click **Create Video** exactly once for that scene.
 8. Verify a unique Processing or completed job appears in **My AI Videos** and record the generated-video ID.
+
+### Mouth-motion QC (run once per batch, before adding the batch to the timeline)
+
+Talking lips are only visible in motion, so a still thumbnail cannot prove the clip is clean. Once a batch completes, spot-check it:
+
+1. Take the batch's completed clips (prioritise any scene whose source still was flagged for an open mouth).
+2. Play each candidate in the VideoExpress preview, or open its `mediaPath` URL, and watch the character's mouth for the full clip.
+3. **Reject** a clip whose lips part and re-close rhythmically, whose jaw opens and shuts, or that otherwise reads as speaking or singing. Motion of the head, hands, body, hair, and background is fine and expected.
+4. To repair a rejected scene, re-generate **only that scene** with the same source image and the same `NO_SPEECH_SUFFIX`, then replace it **in its own timeline slot** — never append the retry at the end, and never let both versions sit on the timeline (§12's replacement rules apply unchanged).
+5. If a scene still animates the mouth after one retry, keep the better of the two takes and record it in `error_history` rather than looping indefinitely; note it in the final report instead of silently shipping it.
+
+Checking a couple of representative clips per batch is enough — full frame-by-frame review of every clip is not required.
 
 ### Five-generation batch system
 
@@ -399,10 +466,11 @@ Never advance without visible evidence:
 
 - **Input gate:** idea/prompt and ratio are both known.
 - **CloneVoice gate:** the exact music title is Completed.
-- **Storyboard gate:** all designs are complete, `N` is recorded, and every design passes identity and ratio review.
+- **Storyboard gate:** the attempt validation passed — a full multi-scene storyboard matching the music theme (never a single image), all designs complete, `N` recorded and at or above the viable floor, every design passes identity and ratio review, and every failed agent attempt (Nursery Rhymes ≤ 3, then the Music Storyboard fallback ≤ 3) is logged in `error_history`.
 - **Import gate:** all `N` IDs exist in My Artistly Images.
 - **Batch submission gate:** every planned batch member has a unique accepted job ID; maximum five active jobs.
 - **Batch completion gate:** all current-batch jobs are complete before timeline insertion or next-batch submission.
+- **No-speech gate:** every submitted video prompt contained `NO_SPEECH_SUFFIX` (asserted in the textarea before Create Video), lip sync was off for every generation, and the per-batch mouth-motion spot-check found no clip whose character reads as speaking or singing.
 - **Timeline gate:** exactly `N` distinct ordered video slots exist with no gap or overlap.
 - **Audio gate:** one exact music item begins at zero on track 2.
 - **Sync gate:** audio and video endpoints are equal with zero-pixel tolerance.
@@ -435,6 +503,8 @@ Recovery rules:
 - Never accept a protagonist whose gender or identity contradicts the idea.
 - Never mix Landscape and Vertical media.
 - Never use the newer Image to Video option when the workflow requires the Old Algorithm.
+- Never enable lip sync, never use the Lipsync Video tool, and never submit a video prompt that lacks `NO_SPEECH_SUFFIX`.
+- Never ship a clip whose character visibly talks or sings; repair it in its own slot instead.
 - Never add a still-processing video to the timeline.
 - Never exceed five concurrent VideoExpress generations.
 - Never start the next batch before the current batch passes its barriers.
@@ -484,7 +554,7 @@ Numeric folder `categoryId`s and media/design `id`s are **per-account**; the val
 - Right sidebar tabs are `<a>` links: `Media Library`, `Create with AI`, `Import Media … Text to Speech`, `Text Animations`, `Filters`, `Fast Cut`, `Automatic Captions`, `Audio Cutter` (click the `<a>`, not its label span).
 - Import panels: cards are `.panel.cursor-pointer` (match by text `Import from Artistly` / `Import from CloneVoice.ai`). Grid items `.library-item[data-ident]` inside `.col-xs-6.item`; `data-image` = URL, `title` = prompt; select by clicking the `.library-item` (adds `selected`); `More` button paginates (~20/page); submit buttons `Import` / `button.button-import` "Import Selected" (jQuery-trigger).
 - Folders API: `GET /api/library/get_media/4?categoryId=<ID>&page=1&limit=50&orderBy=id&orderDir=desc&filter=<image|>` → `{total, results:[{id,name,title,status,duration}]}`. Example ids: My Artistly Images `376019` (filter=image), My AI Videos `54109`, My CloneVoice.ai Audio `552829`. Outputs list: `GET /api/get_list_output`.
-- Image-To-Video (Old Algorithm) modal: image picker `select`/`Choose Image` → folder → `.library-item[data-ident]` → `Choose`; prompt textarea auto-fills; `select[name="select-type"]`(=`3d`); `input[name="video_length_booster"]`; `Create Video` button. Job durations: normal `4041.667 ms`, boosted `8041.667 ms`.
+- Image-To-Video (Old Algorithm) modal: image picker `select`/`Choose Image` → folder → `.library-item[data-ident]` → `Choose`; prompt textarea auto-fills — **append `NO_SPEECH_SUFFIX` via the native value setter + `input`/`change`, and assert it is present before submitting** (§9.A step 5); `select[name="select-type"]`(=`3d`, never `human`); `input[name="video_length_booster"]`; any lip-sync toggle stays unchecked; `Create Video` button. Job durations: normal `4041.667 ms`, boosted `8041.667 ms`.
 - Timeline: `.tracks-wrapper .track-row[0]` = video track 1, `[1]` = audio track 2. Clips `.brick.video`/`.brick.audio` with inline `style.left`/`style.width` (px). Clip jQuery events include `ctxmenu:delete`, `ctxmenu:resize_move`. Zoom buttons `button:has(i.bi-zoom-out)` / `i.bi-zoom-in`. Cut tool `button:has(i.bi-scissors)`. Ruler playhead slider `.timeline-header .ruler.ui-slider` (`$(r).slider('value')` in px). Auto-align link title `Auto Align Clips`.
 - Add-to-timeline = jQuery-UI drag (not synthetic menu click). Delete = `$(brick).trigger('ctxmenu:delete')`. Exact trim = playhead-slider + Cut + tail `ctxmenu:delete` (§0.5).
 - Save dialog `input[name="project_name"]` + `button.button-submit`; success = `document.title` = `"Video Express - <name>"`.
@@ -513,7 +583,7 @@ Write `RUNTIME_STATE.json` beside the workflow after every verified side effect,
 
 1. Never click by screenshot pixel; act by DOM selector + event dispatch (§0.1). Screenshots are for human QC only.
 2. Verify every gate from an authoritative **API or `document.title`/queue text**, never a toast alone.
-3. Nursery Rhymes has no character field and defaults to 1:1 — set the ratio; identity must already be in the lyrics.
+3. Nursery Rhymes is the HIGH-priority agent but sometimes errors or returns a single image instead of a full storyboard — validate every attempt (multi-scene, on-theme), log each failure to `RUNTIME_STATE.json` `error_history`, retry up to 3 times, then fall back to Music Storyboard (LOW priority, also up to 3 validated attempts). It has no character field and defaults to 1:1 — set the ratio; identity must already be in the lyrics.
 4. Inject uploads via FilePond `DataTransfer`; never invoke an OS file dialog.
 5. Add clips by jQuery-UI drag; delete by `ctxmenu:delete`; trim by playhead-slider + Cut. jQuery-UI resize does not respond to synthetic events.
 6. Zoom out before assembling so drops stay on-screen.
@@ -521,3 +591,5 @@ Write `RUNTIME_STATE.json` beside the workflow after every verified side effect,
 8. Respect ≤5 concurrent generations; pipeline the next batch while assembling the current one.
 9. Guard against stacked dialogs; act once, verify, close duplicates.
 10. Persist a concrete, human-readable checkpoint after every side effect for resumability and support.
+11. **Characters act, they never speak.** Append `NO_SPEECH_SUFFIX` to every Image-To-Video prompt (keeping the auto-filled action text), put `NO_SPEECH_SHORT` in the Artistly Storyboard Style prompt, keep lip sync off and style `3d` (never `human`), and spot-check each batch for mouth motion. The vocal belongs to the CloneVoice track alone — a mouth that moves reads as broken dubbing.
+12. Make **Auto Align Clips** the last arrangement action, then re-measure geometry — the click is not proof.

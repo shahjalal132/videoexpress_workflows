@@ -61,6 +61,7 @@ Typical wall‑clock: a few minutes for the song, a few for the storyboard, then
 
 - **Ratio is a project‑wide invariant** — every image, clip, canvas, and the export use the one chosen orientation; landscape and vertical are never mixed.
 - **Identity lock** — the protagonist's gender, age, face, hair, core clothing, and visual medium stay consistent across all scenes; a wrong‑character storyboard is rejected and regenerated, never animated.
+- **Storyboard agent priority & fallback** — Artistly **Nursery Rhymes** always runs first (high priority). It sometimes errors or returns a **single image instead of a full storyboard**, so every attempt is validated (multi-scene, matches the music theme, identity intact) with up to **3 attempts**; each failure is logged to `RUNTIME_STATE.json` `error_history` for later debugging, and only after the third failure does the run fall back to **Music Storyboard** (low priority) with the character-lock prompt — validated the same way, also with up to 3 attempts.
 - **Exact sync** — the final video endpoint equals the audio endpoint with **zero‑pixel tolerance** (achieved by the playhead‑set + cut + tail‑delete method).
 - **`N` is dynamic** — however many storyboard scenes are produced, exactly that many timeline clips are made (no fixed count).
 - **≤ 5 concurrent generations**, batched, with a completion barrier between batches.
