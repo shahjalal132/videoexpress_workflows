@@ -1,6 +1,6 @@
 {
   "$schema_note": "VOX-style documentary paper-collage animation video workflow for CloneVoice + Artistly + VideoExpress. All interaction is DOM-selector/API based; never click by screenshot pixels. Numeric folder/category/media ids are PER-ACCOUNT - always discover at runtime, never hardcode.",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "name": "vox-style-documentary-collage",
 
   "phase_0_auth_gate": {
@@ -33,7 +33,27 @@
     "ask_in_one_message_where_possible": true,
     "inputs": [
       {
+        "id": "script_source",
+        "order": "FIRST question, before anything else",
+        "prompt": "Do you have your own narration script, or should I generate one from an idea? Reply 'my script' (then paste it) or 'generate'.",
+        "branch_own_script": {
+          "when": "user supplies their own script",
+          "rules": [
+            "SKIP the niche question, the 5-idea suggestions, and the script-writing step entirely - do not suggest anything; start working directly with the user's script",
+            "use the script VERBATIM as the narration text; never rewrite, extend, or 'improve' it (fix nothing unless the user asks)",
+            "derive duration from the script instead of asking: estimated_minutes = word_count / 150; if word_count > 750 (over the 5-minute cap) tell the user and ask them to shorten or approve a cap override",
+            "still ask the ratio question (never guessed)",
+            "then continue at phase_3_narration with the user's script; beats/images/clips derive from it exactly as in duration_math"
+          ]
+        },
+        "branch_generate": {
+          "when": "user says generate / has no script",
+          "then": "continue with the niche_and_idea, ratio, and duration questions below"
+        }
+      },
+      {
         "id": "niche_and_idea",
+        "only_if": "script_source == generate",
         "prompt": "What niche are we in today? Options: 1. crime and documentary (house default) 2. history 3. money and power 4. disasters and survival 5. mysteries and the unexplained 6. technology 7. sports 8. your own: type it. Reply with a number or a niche.",
         "then": "generate exactly 5 video ideas in that niche (concrete hook: a date, a name, a number, or a place); user picks one or describes their own topic"
       },
@@ -50,6 +70,7 @@
       },
       {
         "id": "duration",
+        "only_if": "script_source == generate (with an own script, duration is DERIVED: word_count / 150)",
         "prompt": "How many minutes should the video be? Choose any number from 1 to 5. Reply with a number of minutes.",
         "max_minutes": 5,
         "rule": "if the user asks for more than 5 minutes, explain the cap and ask them to pick 1-5"
@@ -95,7 +116,9 @@
 
   "phase_2_script_and_beats": {
     "runs_in": "chat",
+    "own_script_branch": "if the user supplied their own script (phase_1 script_source), SKIP the script block below entirely - the user's text IS the narration, used verbatim, no gate needed; go straight to beats after phase_3 renders it",
     "script": {
+      "only_if": "script_source == generate",
       "word_math": "per duration_math.step_1: TARGET words = minutes x 150 (2.5 words per second), hit within 5 percent; max 750 words at the 5-minute cap",
       "rules": ["one continuous narration block, no headers or camera directions", "cold open on a precise date, location, and one small concrete action", "calm precise documentary tone, every sentence one self-contained idea", "facts stay accurate; write around uncertainty; never invent names, dates, numbers", "real-tragedy restraint: tension lives in objects, places, documents, money, weather, time", "mandatory cliffhanger ending, final line 12 words or fewer"],
       "gate": "show the script; user types yes to continue or no to stop"
@@ -266,7 +289,7 @@
       "current_phase": "phase key from this file",
       "current_step": "step number/key inside the phase",
       "next_safe_action": "one concrete sentence: exactly what a resumed run should do first",
-      "inputs": {"niche": "", "idea": "", "ratio": "Landscape|Vertical", "duration_min": "1-5"},
+      "inputs": {"script_source": "own|generate", "own_script_text": null, "niche": "", "idea": "", "ratio": "Landscape|Vertical", "duration_min": "1-5 (derived from word_count/150 when script_source=own)"},
       "duration_plan": {"target_words": 0, "actual_words": 0, "narration_A_s": 0, "N_beats": 0, "per_beat_clip_s": {}, "planned_total_s": 0, "overshoot_s": 0},
       "auth": {"clonevoice": {}, "artistly": {}, "videoexpress": {}},
       "narration": {"uuid": "", "title": "", "status": "", "duration_s": 0, "src_url": "", "voice": "Tyler Brooks", "generate_audio_clicked": false},

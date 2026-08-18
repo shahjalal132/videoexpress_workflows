@@ -20,8 +20,11 @@ One finished mp4: a continuous "Fern-style" narrated documentary over hand-cut-n
 
 ```
 Phase 0  Auth gate            - verify CloneVoice, Artistly, VideoExpress are logged in (blocker if not)
-Phase 1  User inputs          - niche/idea, ratio (Landscape 16:9 or Vertical 9:16), duration (1-5 min)
-Phase 2  Script and beats     - narration script (minutes x 150 words), beat table, image prompts
+Phase 1  User inputs          - FIRST: own script or generate? Own script = used verbatim, no
+                                suggestions, duration derived (words/150); Generate = niche/idea +
+                                duration (1-5 min). BOTH branches: ratio (Landscape 16:9 / Vertical 9:16)
+Phase 2  Script and beats     - (generate branch only) narration script (minutes x 150 words),
+                                beat table, image prompts
 Phase 3  Narration            - CloneVoice Create Audio -> Tyler Brooks voice -> Create New Audio
                                 -> Preview Segments (DRAFT!) -> click "Generate Audio" -> Completed
 Phase 5  Images               - one collage image per beat, chosen ratio, montage QC (max 3 takes/beat)
@@ -70,7 +73,7 @@ The run maintains **`WORKFLOW_STATE.json`** next to the workflow file:
 1. Make sure all three tools are logged in inside the browser the AI controls.
 2. Connect the Artistly and CloneVoice integrations in the VideoExpress profile (otherwise the runner falls back to direct upload for images).
 3. Give the AI runner `SYSTEM_PROMPT.md` (and `vox_workflow.json` alongside it).
-4. Answer the three questions it asks: niche/idea, ratio, duration (1–5 min).
+4. Answer its first question — paste **your own script** (used verbatim, duration derived from word count) or say **generate** (it then asks niche/idea and duration 1–5 min). Both paths ask for the ratio.
 5. Let it run. It reports progress per phase and stops only for true blockers (logins, payments, CAPTCHA).
 6. If a run is interrupted, say **"Resume"**.
 

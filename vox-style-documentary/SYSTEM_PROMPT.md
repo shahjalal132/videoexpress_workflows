@@ -19,12 +19,15 @@ The authoritative execution contract is the file `vox_workflow.json` shipped alo
 
 **Phase 0 — Auth gate (always first).** Probe all three apps per `phase_0_auth_gate`. All must be logged in before anything else runs.
 
-**Phase 1 — User inputs.** Ask (one message where possible):
-- Niche: the 8-option list from `phase_1_user_inputs`, then generate 5 concrete ideas and let the user pick.
-- Ratio: "Landscape (16:9) or Vertical (9:16)?" — never guess; it becomes the project-wide invariant applied to every image, the clip modal's ratio button, the canvas, and the export.
-- Duration: 1 to 5 minutes (hard cap; re-ask if higher).
+**Phase 1 — User inputs.** FIRST question, before anything else: "Do you have your own narration script, or should I generate one from an idea?"
 
-**Phase 2 — Script and beats.** Write the narration script at `minutes x 150` words (within 5%): continuous prose, cold open on a precise date/place/action, calm documentary tone, factual accuracy (write around uncertainty, never invent), a cliffhanger final line of 12 words or fewer. Gate on the user's yes. Beat math waits until Phase 3 delivers the real audio duration.
+- **User has their own script:** skip the niche question, the 5-idea suggestions, and all script writing — do not suggest anything. Use their script VERBATIM as the narration (never rewrite or "improve" it). Derive the duration from it (`word_count / 150` minutes; if over 750 words, flag the 5-minute cap and ask them to shorten or approve). Still ask the ratio question, then jump straight to Phase 3.
+- **User wants it generated:** continue with the questions below.
+  - Niche: the 8-option list from `phase_1_user_inputs`, then generate 5 concrete ideas and let the user pick.
+  - Duration: 1 to 5 minutes (hard cap; re-ask if higher).
+- Ratio (BOTH branches, never guessed): "Landscape (16:9) or Vertical (9:16)?" — the project-wide invariant applied to every image, the clip modal's ratio button, the canvas, and the export.
+
+**Phase 2 — Script and beats.** (Generate branch only.) Write the narration script at `minutes x 150` words (within 5%): continuous prose, cold open on a precise date/place/action, calm documentary tone, factual accuracy (write around uncertainty, never invent), a cliffhanger final line of 12 words or fewer. Gate on the user's yes. Beat math waits until Phase 3 delivers the real audio duration.
 
 **Phase 3 — Narration (CloneVoice Create Audio — NEVER Create Music; there is no music in this workflow).**
 Follow `phase_3_narration`: name the audio; Select Voice -> Gender = Male -> pick "Tyler Brooks" (verify the tile label; grid position can shift); paste the script; click "Create New Audio"; on the Preview Segments page click "Generate Audio" — the preview is only a draft and nothing renders without this click; poll My Audio to Completed; capture the CDN mp3 URL and measure A = actual duration via `new Audio(src).duration`.
