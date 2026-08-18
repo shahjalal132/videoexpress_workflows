@@ -74,7 +74,7 @@ The run maintains **`WORKFLOW_STATE.json`** next to the workflow file:
 2. Connect the Artistly and CloneVoice integrations in the VideoExpress profile (otherwise the runner falls back to direct upload for images).
 3. Give the AI runner `SYSTEM_PROMPT.md` (and `vox_workflow.json` alongside it).
 4. Answer its first question — paste **your own script** (used verbatim, duration derived from word count) or say **generate** (it then asks niche/idea and duration 1–5 min). Both paths ask for the ratio.
-5. Let it run. It reports progress per phase and stops only for true blockers (logins, payments, CAPTCHA).
+5. Let it run. After your Phase 1 answers the run is **fully automatic** — no confirmation gates, no "type yes to continue"; it reports progress briefly while working and stops only for true blockers (logins, payments, CAPTCHA).
 6. If a run is interrupted, say **"Resume"**.
 
 ## Files

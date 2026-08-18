@@ -1,6 +1,22 @@
 {
   "$schema_note": "VOX-style documentary paper-collage animation video workflow for CloneVoice + Artistly + VideoExpress. All interaction is DOM-selector/API based; never click by screenshot pixels. Numeric folder/category/media ids are PER-ACCOUNT - always discover at runtime, never hardcode.",
-  "version": "1.5.0",
+  "version": "1.6.0",
+
+  "autonomy_contract": {
+    "rule": "The workflow is FULLY AUTOMATIC after the Phase 1 answers. The user is asked things exactly TWICE in a normal run: (1) the Phase 1 inputs (script source; if generating: niche then one idea pick from the 5 suggestions; ratio; duration), and (2) nothing else. Once the idea/script, ratio, and duration are known, run every remaining phase back-to-back without asking permission, without confirmation gates, and without waiting for acknowledgements.",
+    "no_gates": [
+      "do NOT ask 'type yes to continue' after showing the generated script - show it as an FYI and IMMEDIATELY proceed to narration (the user can interrupt at any time to edit)",
+      "do NOT ask before starting narration, images, imports, clips, assembly, save, or export",
+      "do NOT ask 'shall I continue?' between batches or phases",
+      "do NOT pause to report intermediate results and wait - report progress briefly and keep working in the same turn"
+    ],
+    "still_stops_for": [
+      "true blockers only: login required, CAPTCHA, payment/credits, an explicit unrecoverable app error, an uncontrollable browser, or a vanished job after one refresh + three inspections",
+      "an own script over the 750-word cap (needs the user's shorten-or-override decision)",
+      "a destructive action outside the workflow's scope"
+    ],
+    "progress_style": "narrate briefly while working (one line per milestone); never end the turn while required work is pending; pending/Processing states are polled, not reported as stopping points"
+  },
   "name": "vox-style-documentary-collage",
 
   "phase_0_auth_gate": {
@@ -121,7 +137,7 @@
       "only_if": "script_source == generate",
       "word_math": "per duration_math.step_1: TARGET words = minutes x 150 (2.5 words per second), hit within 5 percent; max 750 words at the 5-minute cap",
       "rules": ["one continuous narration block, no headers or camera directions", "cold open on a precise date, location, and one small concrete action", "calm precise documentary tone, every sentence one self-contained idea", "facts stay accurate; write around uncertainty; never invent names, dates, numbers", "real-tragedy restraint: tension lives in objects, places, documents, money, weather, time", "mandatory cliffhanger ending, final line 12 words or fewer"],
-      "gate": "show the script; user types yes to continue or no to stop"
+      "gate": "NO GATE (autonomy_contract): show the script as an FYI and immediately proceed to narration; the user can interrupt at any time to edit or stop"
     },
     "beats": {
       "count": "N = ceil(A / 6) per duration_math.step_3, computed AFTER the narration renders (A = measured mp3 duration)",
@@ -336,6 +352,7 @@
   ],
 
   "global_rules": [
+    "AUTONOMY: after the Phase 1 answers, the run is continuous - no confirmation gates, no 'shall I continue', no yes-gates on the script (see autonomy_contract); stop only for true blockers",
     "phase_0 auth gate runs first, always; a login page or missing-API-key panel is a user action, never yours",
     "the ratio is asked, never guessed, and applied everywhere; never mix orientations or crop across them",
     "duration is capped at 5 minutes",
