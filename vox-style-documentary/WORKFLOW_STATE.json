@@ -1,0 +1,23 @@
+{
+  "run_id": "gtr-recreation-2026-08-19",
+  "workflow_version": "1.6.0",
+  "status": "complete",
+  "current_phase": "phase_9_save_export",
+  "current_step": "export_queued",
+  "next_safe_action": "none - export confirmed in background queue at position 1",
+  "inputs": {"script_source": "own (user-provided session transcript, verbatim)", "idea": "The Great Train Robbery 1963 (recreation of reference export)", "ratio": "Landscape", "duration_min": "derived ~1"},
+  "duration_plan": {"narration_A_s": 64.923, "N_beats": 11, "per_beat_clip_s": 6, "planned_total_s": 66, "overshoot_trimmed_px": 30},
+  "auth": {"clonevoice": true, "artistly": true, "videoexpress": true, "checked_at": "2026-08-19 phase_0"},
+  "narration": {"uuid": "01a0166d-01a1-7176-86f4-371492ffca43", "title": "The Great Train Robbery 1963 - Recreation", "status": "Completed", "duration_s": 64.923, "voice": "Tyler Brooks", "generate_audio_clicked": true, "ve_media_id": 38453967, "ve_duration_ms": 64966, "duration_method": "AudioContext.decodeAudioData (audio element decode blocked in this Chrome profile)"},
+  "images": {"note": "REUSED the reference run's own 11 images for exact scene fidelity (full prompts unrecoverable - VE truncates names at 53 chars, Artistly designs API stores no prompt field)", "beat_to_ve_image": {"1": 38449439, "2": 38449434, "3": 38449430, "4": 38449426, "5": 38449421, "6": 38449417, "7": 38449416, "8": 38449412, "9": 38449408, "10": 38449407, "11": 38449406}, "mapping_method": "Artistly design id ascending = beat order, matched to VE ids by unique PNG byte size"},
+  "clips": {"batches": [{"batch": 1, "beats": [1,2,3,4,5], "all_completed": true}, {"batch": 2, "beats": [6,7,8,9,10], "all_completed": true}, {"batch": 3, "beats": [11], "all_completed": true}], "beat_to_job": {"1": 38453388, "2": 38453414, "3": 38453431, "4": 38453455, "5": 38453469, "6": 38453620, "7": 38453646, "8": 38453665, "9": 38453683, "10": 38453712, "11": 38453849}, "all_verified_by_mediaId": true, "enhanceVideoPrompt_false_all": true, "rendered_ms_each": 6041.667},
+  "timeline": {"clips_placed": 11, "order_verified": "1..11 via fileName->job->beat", "audio_ve_id": 38453967, "video_end_px": 1299, "audio_end_px": 1299, "endpoint_diff_px": 0, "trim": "playhead 1299 + Cut + tail(30px) ctxmenu:delete"},
+  "save": {"project_name": "The Great Train Robbery 1963 - Recreation", "confirmed_via_title": true},
+  "export": {"name": "The Great Train Robbery 1963 - Recreation", "quality": "high", "size": "1080", "format": "mp4", "canvas_ratio": 1.776, "queue_text": "Your movie creation is currently number 1 in the queue", "queue_position": 1},
+  "error_history": [
+    {"phase": "reference_inspection", "symptom": "reference mp4 undecodable in controlled Chrome profile and pane (static snapshot)", "root_cause": "known profile media-decode limitation", "recovery_action": "identified reference via VE get_list_output (only export: The Great Train Robbery 1963); recovered exact scenes from the account's own records instead of pixels", "outcome": "recovered"},
+    {"phase": "narration duration", "symptom": "new Audio(src) loadedmetadata timeout (cold CDN + decode limitation)", "recovery_action": "AudioContext.decodeAudioData on fetched ArrayBuffer", "outcome": "recovered (A=64.923s)"},
+    {"phase": "clips batch 1 start", "symptom": "submitBeat threw getBoundingClientRect of undefined (modal buttons not rendered in 2s)", "recovery_action": "re-opened modal step-by-step with longer waits, then routine succeeded", "outcome": "recovered"},
+    {"phase": "assembly", "symptom": "media panel Back button not found via text selector", "recovery_action": "real click on the panel's arrow button located via screenshot", "outcome": "recovered"}
+  ]
+}
