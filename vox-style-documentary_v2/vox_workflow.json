@@ -1,6 +1,6 @@
 {
   "$schema_note": "VOX-style documentary paper-collage animation video workflow for CloneVoice + VideoExpress (v2: Artistly removed - images are generated INSIDE VideoExpress's Create Video From Prompt modal). All interaction is DOM-selector/API based; never click by screenshot pixels. Numeric folder/category/media ids are PER-ACCOUNT - always discover at runtime, never hardcode.",
-  "version": "2.1.0",
+  "version": "2.2.0",
 
   "prompt_book_standard": {
     "purpose": "USER RULE: every run's prompts must be prepared to the polished 'Storyboard + Prompt Book' standard (reference: MH370_VideoExpress_Storyboard_and_Prompt_Book.docx). Prompts are authored per SHOT as a complete package BEFORE any generation, on one continuous timeline.",
@@ -45,7 +45,7 @@
   },
 
   "autonomy_contract": {
-    "rule": "The workflow is FULLY AUTOMATIC after the Phase 1 answers. The user is asked things exactly TWICE in a normal run: (1) the Phase 1 inputs (script source; if generating: niche then one idea pick from the 5 suggestions; ratio; duration), and (2) nothing else. Once the idea/script, ratio, and duration are known, run every remaining phase back-to-back without asking permission, without confirmation gates, and without waiting for acknowledgements.",
+    "rule": "The workflow is FULLY AUTOMATIC after the Phase 1 answers. The user is asked things only in Phase 1 (script source; if generating: one genre pick from the 10 suggestions, then one idea pick from the 5 suggestions; ratio; duration) and nothing else. Once the final idea (or own script), ratio, and duration are known, the run BEGINS: every remaining phase runs back-to-back without asking permission, without confirmation gates, and without waiting for acknowledgements.",
     "no_gates": [
       "do NOT ask 'type yes to continue' after showing the generated script - show it as an FYI and IMMEDIATELY proceed to narration (the user can interrupt at any time to edit)",
       "do NOT ask before starting narration, images, imports, clips, assembly, save, or export",
@@ -100,14 +100,21 @@
         },
         "branch_generate": {
           "when": "user says generate / has no script",
-          "then": "continue with the niche_and_idea, ratio, and duration questions below"
+          "then": "continue with the genre_selection, idea_selection, ratio, and duration questions below"
         }
       },
       {
-        "id": "niche_and_idea",
+        "id": "genre_selection",
         "only_if": "script_source == generate",
-        "prompt": "What niche are we in today? Options: 1. crime and documentary (house default) 2. history 3. money and power 4. disasters and survival 5. mysteries and the unexplained 6. technology 7. sports 8. your own: type it. Reply with a number or a niche.",
-        "then": "generate exactly 5 video ideas in that niche (concrete hook: a date, a name, a number, or a place); user picks one or describes their own topic"
+        "order": "immediately after the user selects 'generate'",
+        "prompt": "Pick a genre. Options: 1. crime and documentary (house default) 2. history 3. money and power 4. disasters and survival 5. mysteries and the unexplained 6. technology 7. sports 8. science and nature 9. war and espionage 10. aviation and exploration. Reply with a number, or type your own genre.",
+        "rule": "suggest exactly 10 different genres; the user picks one (or types their own); do not generate ideas before a genre is chosen"
+      },
+      {
+        "id": "idea_selection",
+        "only_if": "script_source == generate",
+        "order": "after the genre is selected",
+        "then": "generate exactly 5 video ideas in the chosen genre (each with a concrete hook: a date, a name, a number, or a place); the user picks one or describes their own topic. Once the final idea is selected, the run BEGINS - the autonomy contract takes over and no further approvals are requested (ratio and duration are collected in the same exchange where possible)."
       },
       {
         "id": "ratio",
@@ -127,7 +134,8 @@
         "max_minutes": 5,
         "rule": "if the user asks for more than 5 minutes, explain the cap and ask them to pick 1-5"
       }
-    ]
+    ],
+    "generate_branch_sequence": "generate -> suggest 10 genres -> user picks one -> suggest 5 ideas in that genre -> user picks the final idea -> collect ratio + duration (same exchange where possible) -> the run BEGINS (autonomy contract)"
   },
 
   "duration_math": {
@@ -315,7 +323,7 @@
       "current_phase": "phase key from this file",
       "current_step": "step number/key inside the phase",
       "next_safe_action": "one concrete sentence: exactly what a resumed run should do first",
-      "inputs": {"script_source": "own|generate", "own_script_text": null, "niche": "", "idea": "", "ratio": "Landscape|Vertical", "duration_min": "1-5 (derived from word_count/150 when script_source=own)"},
+      "inputs": {"script_source": "own|generate", "own_script_text": null, "genre": "one of the 10 suggested (or user-typed)", "idea": "the final pick from the 5 suggestions", "ratio": "Landscape|Vertical", "duration_min": "1-5 (derived from word_count/150 when script_source=own)"},
       "duration_plan": {"target_words": 0, "actual_words": 0, "narration_A_s": 0, "N_beats": 0, "per_beat_clip_s": {}, "planned_total_s": 0, "overshoot_s": 0},
       "auth": {"clonevoice": {}, "videoexpress": {}},
       "narration": {"uuid": "", "title": "", "status": "", "duration_s": 0, "src_url": "", "voice": "Tyler Brooks", "generate_audio_clicked": false},

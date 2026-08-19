@@ -20,8 +20,9 @@ One finished mp4: a continuous "Fern-style" narrated documentary over hand-cut-n
 ```
 Phase 0  Auth gate            - verify CloneVoice and VideoExpress are logged in (blocker if not)
 Phase 1  User inputs          - FIRST: own script or generate? Own script = used verbatim, no
-                                suggestions, duration derived (words/150); Generate = niche/idea +
-                                duration (1-5 min). BOTH branches: ratio (Landscape 16:9 / Vertical 9:16)
+                                suggestions, duration derived (words/150); Generate = 10 genres ->
+                                pick one -> 5 ideas -> pick one -> run begins; + duration (1-5 min).
+                                BOTH branches: ratio (Landscape 16:9 / Vertical 9:16)
 Phase 2  Script and beats     - (generate branch only) narration script (minutes x 150 words),
                                 beat table, image prompts
 Phase 3  Narration            - CloneVoice Create Audio -> Tyler Brooks voice -> Create New Audio

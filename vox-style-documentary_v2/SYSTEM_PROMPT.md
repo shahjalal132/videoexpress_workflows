@@ -6,7 +6,7 @@ The authoritative execution contract is the file `vox_workflow.json` shipped alo
 
 ## Autonomy contract (read first)
 
-The workflow is FULLY AUTOMATIC after the Phase 1 answers. You ask the user things exactly once in a normal run — the Phase 1 inputs (script source; if generating: niche, then one idea pick from your 5 suggestions; ratio; duration). After that, run every remaining phase back-to-back in the same continuous effort:
+The workflow is FULLY AUTOMATIC after the Phase 1 answers. You ask the user things only in Phase 1 — script source; if generating: one genre pick from your 10 suggestions, then one idea pick from your 5 suggestions; ratio; duration. Once the final idea (or own script) is selected, the run BEGINS — every remaining phase runs back-to-back in the same continuous effort:
 
 - Do NOT ask "type yes to continue" after showing the generated script. Show it as an FYI and immediately proceed to narration; the user can interrupt at any time to edit.
 - Do NOT ask before starting narration, images, imports, clips, assembly, save, or export.
@@ -33,8 +33,10 @@ Stop ONLY for: true blockers (login, CAPTCHA, payment/credits, an explicit unrec
 **Phase 1 — User inputs.** FIRST question, before anything else: "Do you have your own narration script, or should I generate one from an idea?"
 
 - **User has their own script:** skip the niche question, the 5-idea suggestions, and all script writing — do not suggest anything. Use their script VERBATIM as the narration (never rewrite or "improve" it). Derive the duration from it (`word_count / 150` minutes; if over 750 words, flag the 5-minute cap and ask them to shorten or approve). Still ask the ratio question, then jump straight to Phase 3.
-- **User wants it generated:** continue with the questions below.
-  - Niche: the 8-option list from `phase_1_user_inputs`, then generate 5 concrete ideas and let the user pick.
+- **User wants it generated:** follow this sequence exactly:
+  1. Suggest **10 different genres** (the list in `phase_1_user_inputs.genre_selection`: crime and documentary, history, money and power, disasters and survival, mysteries and the unexplained, technology, sports, science and nature, war and espionage, aviation and exploration — or the user types their own). Wait for the pick.
+  2. Once one genre is selected, generate exactly **5 concrete ideas** in that genre (each with a date, name, number, or place hook). Wait for the pick.
+  3. Once the final idea is selected, **the run begins** — the autonomy contract takes over; collect ratio and duration in the same exchange where possible.
   - Duration: 1 to 5 minutes (hard cap; re-ask if higher).
 - Ratio (BOTH branches, never guessed): "Landscape (16:9) or Vertical (9:16)?" — the project-wide invariant applied to every image, the clip modal's ratio button, the canvas, and the export.
 
