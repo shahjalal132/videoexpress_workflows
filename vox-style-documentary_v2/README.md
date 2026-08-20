@@ -21,6 +21,13 @@ Rule of thumb: test any new model with a **1-minute video first** — a supporte
 
 ---
 
+## 🎬 Result samples
+
+Finished videos produced by this workflow:
+
+- [Result 1](https://drive.google.com/file/d/1-iMq3C7cch0x8_WySU8jvbQSifnhlGkD/view?usp=sharing)
+- [Result 2](https://drive.google.com/file/d/190Ct-MAxGk56VzqnZJal9Hpuu_y8QaNZ/view?usp=sharing)
+
 ## What the workflow produces
 
 One finished mp4: a continuous "Fern-style" narrated documentary over hand-cut-newsprint collage scenes that assemble themselves stop-motion style, with the video ending exactly on the narration's last word.
