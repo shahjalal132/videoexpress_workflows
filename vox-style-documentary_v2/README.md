@@ -88,6 +88,7 @@ The run maintains **`WORKFLOW_STATE.json`** next to the workflow file:
 | File | Purpose |
 |---|---|
 | `vox_workflow.json` | The full executable contract (selectors, APIs, rules, corner cases) |
-| `SYSTEM_PROMPT.md` | Drop-in system prompt for any AI agent (Claude, ChatGPT/Codex, etc.) |
+| `SYSTEM_PROMPT.md` | Drop-in system prompt for any AI agent (Claude, ChatGPT/Codex, etc.) — requires `vox_workflow.json` alongside it |
+| `SYSTEM_PROMPT_STANDALONE.md` | Single-file edition with the full JSON contract embedded — paste this ONE file when attachments aren't practical (recommended for Codex paste-only users) |
 | `WORKFLOW_STATE.json` | Created at runtime — live state, checkpoints, error history |
 | `README.md` | This file |
