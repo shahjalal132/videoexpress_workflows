@@ -1,0 +1,77 @@
+{
+  "run_id": "example-run",
+  "workflow_config_version": "2.8.0",
+  "authorization_mode": "standing_authorization_for_all_in_scope_workflow_actions",
+  "validation_mode": "minimal_signal_only_no_generated_media_preview",
+  "current_phase": "videoexpress_animation",
+  "current_step": 22,
+  "current_status": "processing",
+  "last_verified_checkpoint": "prompt_book_gate_passed",
+  "next_safe_action": "monitor current VideoExpress batch in My AI Videos",
+  "project_title": "Example Nursery Rhyme",
+  "ratio": "Landscape",
+  "aspect_ratio": "16:9",
+  "clonevoice": {
+    "music_uuid": "<clonevoice-id>",
+    "name": "Example Nursery Rhyme",
+    "status": "Completed",
+    "duration_seconds": 30
+  },
+  "artistly": {
+    "tool": "Nursery Rhymes",
+    "storyboard_scene_count": 5,
+    "scene_ids_in_story_order": [
+      "<design-1>",
+      "<design-2>",
+      "<design-3>",
+      "<design-4>",
+      "<design-5>"
+    ],
+    "aspect_ratio": "16:9",
+    "all_status": "private"
+  },
+  "prompt_book": {
+    "path": "prompt_book.json",
+    "schema_version": "1.0.0",
+    "scene_count": 5,
+    "global_settings": {
+      "animation_style": "3D",
+      "automatically_enhance_image_prompt": false,
+      "automatically_enhance_video_prompt": false,
+      "video_only_no_sound": true,
+      "advanced_mode": true
+    },
+    "planned_scene_durations_seconds": [6, 6, 6, 6, 6],
+    "gate": "pass"
+  },
+  "videoexpress": {
+    "flow": "Create with AI > Create Video From Prompt > Use from Library > My Artistly Images > choose mapped image > paste prompt_book final prompt into Video and Audio Prompt > Video Only ON > Advanced Mode ON > set planned duration > Create Video",
+    "creator_tab_kept_open": true,
+    "monitoring_tab": "Media Library > My AI Videos",
+    "target_timeline_scene_count": 5,
+    "current_batch_number": 1,
+    "current_batch_scene_ids": [1, 2, 3, 4, 5],
+    "submitted_scene_ids": [1, 2, 3, 4, 5],
+    "completed_video_ids_by_scene": {},
+    "timeline_scene_ids_in_order": []
+  },
+  "checkpoints": {
+    "prompt_book_gate": {
+      "gate": "prompt_book_gate",
+      "status": "pass",
+      "evidence": "N ordered mappings; unique Design IDs and VideoExpress image IDs; prompts end with exact terminal tail; durations total audio ceiling",
+      "method": "filesystem+dom",
+      "timestamp": "<ISO timestamp>",
+      "artifact_ids": ["prompt_book.json"]
+    },
+    "batch_submission_gate": {
+      "gate": "batch_submission_gate",
+      "status": "pass",
+      "evidence": "five unique accepted jobs visible in My AI Videos",
+      "method": "api",
+      "timestamp": "<ISO timestamp>",
+      "artifact_ids": []
+    }
+  },
+  "error_history": []
+}

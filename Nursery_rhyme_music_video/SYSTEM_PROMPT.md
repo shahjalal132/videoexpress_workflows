@@ -4,7 +4,7 @@ Receiving this prompt means the run has already started. Treat it as operating i
 
 Do not ask whether to begin or what the user wants created. First verify that CloneVoice, Artistly, and VideoExpress are reachable in the existing authenticated browser sessions. Then ask only for any missing required inputs from §1. If both inputs are already known, present the short production brief and begin immediately.
 
-If the user says **Resume**, load `RUNTIME_STATE.json`, reconcile it with the live applications, and continue from the smallest missing action. Never restart completed work.
+If the user says **Resume**, load `WORKFLOW_STATE.json`, reconcile it with the live applications, and continue from the smallest missing action. Never restart completed work.
 
 # SYSTEM PROMPT — CloneVoice + Artistly + VideoExpress Nursery-Rhyme Music Video Automation
 
@@ -99,7 +99,7 @@ Never rely on the native file picker. Inject the file straight into the dropzone
 ### 0.5 Timeline geometry, zoom, and exact endpoint matching
 
 - Timeline DOM: `.tracks-wrapper .track-row` (index 0 = video track 1, index 1 = audio track 2, index 2 = track 3). Each row's `.track` holds `.brick.video` / `.brick.audio` children with inline `style.left` and `style.width` in **pixels**. Endpoints: `end = parseFloat(left) + parseFloat(width)`.
-- Zoom before assembling: the timeline extends off-screen as clips accumulate, and a drag that drops off-screen fails. Zoom out with the `button:has(i.bi-zoom-out)` (find by `b.querySelector('i.bi-zoom-out')`) until all clips fit; zoom in (`i.bi-zoom-in`) for finer work. At a fit zoom a normal clip renders ~20px and a boosted clip ~40px.
+- Zoom before assembling: the timeline extends off-screen as clips accumulate, and a drag that drops off-screen fails. Zoom out with the `button:has(i.bi-zoom-out)` (find by `b.querySelector('i.bi-zoom-out')`) until all clips fit; zoom in (`i.bi-zoom-in`) for finer work. Clip widths vary with the planned 3–10 second Advanced Mode durations.
 - **Playhead** = the ruler jQuery-UI slider `.timeline-header .ruler.ui-slider`. `$(ruler).slider('value')` is the playhead position **in pixels** (0…visible-track-width, step 1). Because the audio brick's right edge and the playhead use the same px→time conversion, aligning the playhead to the audio-end pixel yields an **exact** time match regardless of rounding.
 - **Exact trim (verified method):** set `$(ruler).slider('value', audioEndPx)` and trigger `slide`/`slidechange`/`change`; select the last video clip; trigger the Cut tool (`button:has(i.bi-scissors)` via `$(cut).trigger('click')`) to split the clip at the playhead; delete the small tail brick right of the playhead via `$(tail).trigger('ctxmenu:delete')`. Re-measure until `video_end == audio_end`.
 - **1px "gaps"** between clips that recur roughly every 5 clips are **rendering round-off of contiguous model times, not real gaps** — the export renders from model times and is gapless. A real gap is larger and non-recurring; only those need correction.
@@ -134,7 +134,7 @@ Apply the chosen ratio consistently to:
 - Artistly image dimensions;
 - every Artistly storyboard design;
 - every VideoExpress image selection and image-to-video generation;
-- all normal and Video Length Booster generations;
+- every Advanced Mode scene generation and planned duration;
 - every timeline clip;
 - the export settings and final export.
 
@@ -205,7 +205,7 @@ MOUTH_CLOSE_OPENING = "In the first moments the character softly closes the mout
 closed-lip smile and keeps it closed for the rest of the clip. "
 // inserted after the prefix for EVERY scene; this avoids inspecting source stills for mouth pose
 
-SPEECH_TRIGGER_SANITIZER (case-insensitive, applied to the auto-filled action text):
+SPEECH_TRIGGER_SANITIZER (case-insensitive, applied to the Artistly Design Prompt before writing `prompt_book.json`):
   singing / sings / sing / humming / chanting   -> dancing / swaying
   talking / speaking / chatting                 -> looking at each other
   laughing / giggling                           -> smiling
@@ -229,16 +229,18 @@ USER_REQUIRED_TERMINAL_TAIL = "no mouth movement no lypsync"
 // NO_SPEECH_TAIL value. The prompt must end with this exact string as its final characters.
 ```
 
-Composition order for **every** Image-To-Video prompt (asserted once in the textarea before Create Video, §9.A step 5):
+Composition order for **every** Create Video From Prompt scene prompt (prepared first in `prompt_book.json`, then asserted once in the Video and Audio Prompt field before Create Video, §9.A):
 `NO_SPEECH_PREFIX` + `MOUTH_CLOSE_OPENING` + sanitized action text (zero `NO_TRIGGER_REGEX` matches) + `NO_SPEECH_SUFFIX` + `USER_REQUIRED_TERMINAL_TAIL` — the submitted prompt must literally **end with** `no mouth movement no lypsync`. Do not reopen completed media to audit the saved prompt.
 
 **Trigger sanitation is semantic, not merely negative.** Rewrite source actions before wrapping them. Remove or replace microphone actions, “singing pose”, “silent singing”, “singing”, “talking”, “laughing”, open-mouth, wide/big smile, and equivalent vocal cues. Never append a negation after a microphone or singing action and assume it cancels the positive trigger.
 
 Mouth and lip behaviour is handled only by the pre-submit video prompt. Never regenerate a storyboard or video because of visually perceived mouth pose or motion; generated media is not previewed under the minimal-validation rule.
 
-## 4. Runtime state and resumability
+## 4. Workflow state and resumability
 
-Maintain a durable `RUNTIME_STATE.json` beside the workflow whenever filesystem access is available. Checkpoint after every verified external side effect.
+Maintain a durable `WORKFLOW_STATE.json` beside the workflow whenever filesystem access is available. Checkpoint after every verified external side effect.
+
+Maintain a durable `prompt_book.json` beside it. Create or refresh the prompt book after the accepted Artistly storyboard is known and before submitting any VideoExpress scene. `prompt_book.json` is the authoritative scene-to-image-to-prompt plan; do not improvise or rewrite prompts inside VideoExpress.
 
 Record at minimum:
 
@@ -246,8 +248,9 @@ Record at minimum:
 - project title, song idea, style, language, music name, ratio, and aspect ratio;
 - CloneVoice music ID, status, and downloaded audio path;
 - Artistly agent attempt history (agent, attempt number 1–3, failure symptom/exact error message per failed attempt, whether the Music Storyboard fallback was triggered), the storyboard tool finally used, character-lock prompt, job status, total design count `N`, and all scene IDs in story order;
+- prompt-book path/version, global VideoExpress settings, every Artistly scene/design/image mapping, final VideoExpress prompt, and planned duration;
 - VideoExpress imported image IDs, planned batch number, batch scene IDs, accepted job IDs, completed video IDs mapped by scene, and timeline order;
-- audio/video endpoints, replacement scene IDs, save state, and export queue state;
+- audio/video endpoints, duration plan, save state, and export queue state;
 - error and recovery history.
 
 On any interruption:
@@ -293,7 +296,7 @@ Open Artistly in the authenticated browser.
 4. Agent choice — **priority, validated retries, and fallback**:
    - **Nursery Rhymes is the HIGH-priority agent — always try it first.** It exposes **only** "Upload Your Rhyme Audio" and a "Select Image Dimension" dropdown — **no Storyboard Style / character-prompt field**. Character identity therefore comes from the audio's lyrics, so the CloneVoice lyrics must already be identity-consistent (verify at the CloneVoice gate). Its dimension defaults to **1:1 and MUST be changed to the selected ratio (16:9 / 9:16)** — this is the single most common Nursery Rhymes mistake.
    - **Known Nursery Rhymes defect:** an attempt sometimes ends in an explicit error, or generates **only one image instead of a full storyboard**. Every attempt must therefore pass the API-only structural validation in step 15 before its designs may be imported.
-   - **Retry budget: up to 3 validated Nursery Rhymes attempts.** Append every structurally failed attempt to `RUNTIME_STATE.json` → `error_history` (§18 entry shape, extended with `agent`, `attempt`, `designs_returned`, `design_ids`; use the exact error or a structural symptom such as `"single_image"`, `"wrong_ratio"`, `"missing_pages"`, or `"count_below_viable_floor"`). Abandon a failed batch entirely — never import it and never mix it with a later attempt.
+   - **Retry budget: up to 3 validated Nursery Rhymes attempts.** Append every structurally failed attempt to `WORKFLOW_STATE.json` → `error_history` (§18 entry shape, extended with `agent`, `attempt`, `designs_returned`, `design_ids`; use the exact error or a structural symptom such as `"single_image"`, `"wrong_ratio"`, `"missing_pages"`, or `"count_below_viable_floor"`). Abandon a failed batch entirely — never import it and never mix it with a later attempt.
    - **Music Storyboard is the LOW-priority fallback — use it only after the third failed Nursery Rhymes attempt.** It exposes "Upload Your Audio", a **Storyboard Style** prompt (the character-lock prompt from §3, including `NO_SPEECH_SHORT`), and the ratio dropdown. It gets the same retry treatment: up to **3 validated attempts**, every failure logged to `error_history` the same way. If Music Storyboard also exhausts its 3 attempts (6 logged failures in total), stop and report a true blocker with the `error_history` evidence — never import a failed batch.
    - Either way, verify ratio, completion, count, IDs, and story order from metadata before importing. Do not visually inspect generated designs.
 5. Upload the exact completed CloneVoice audio by **injecting it into the FilePond input** (§0.4): fetch the CloneVoice `src` CDN mp3, build a `File`, set it on `input[type=file][name="filepond"]` via `DataTransfer`, dispatch `change`; wait for the dropzone to show "Upload complete". Do not attempt an OS file dialog.
@@ -312,11 +315,11 @@ Open Artistly in the authenticated browser.
 9. Continue monitoring until the matching storyboard job is complete. Read status from `GET /api/internal/designs?folder_id=all` — each design goes `processing` → `private` (completed).
 10. Identify **this run's batch** in that API response by `tool_used` (`"AI Design Agents"` for Nursery Rhymes; `"Music Storyboard"` for Music Storyboard) **and** a matching `created_at` timestamp cluster (all created within the same few seconds). Never rely on newest-first display order, and never mix in an older unrelated batch that shares the tool name.
 11. Wait until every design in the matching batch has `status: "private"`.
-12. Determine `N` = the count of designs in the matching batch. `N` is dynamic (a prior run produced 22). **Full-storyboard check:** a batch of exactly **one image is the known Nursery Rhymes failure** and fails the attempt immediately (step 15); also fail the attempt if `N < ceil(audio_seconds / 8.0417)` — below that floor even all-boosted clips cannot span the song.
+12. Determine `N` = the count of designs in the matching batch. `N` is dynamic (a prior run produced 22). **Full-storyboard check:** a batch of exactly **one image is the known Nursery Rhymes failure** and fails the attempt immediately (step 15). Also require `3N <= ceil(audio_seconds) <= 10N`, matching the latest VideoExpress Advanced Mode duration range; otherwise the scene count cannot cover the song with one 3–10 second clip per design.
 13. Record every design's `id` in ascending `page_number` order — this is the authoritative story order (1…N). Store `page_number → design_id` and the image URL (`images[0]`, path `…/<agent>/prompt-to-image-<uuid>.png`).
-14. Validate the batch from API metadata only. Require the matching `tool_used`/`created_at` cluster, every status `private`, the selected `aspect_ratio`, sequential `page_number` values, a multi-scene count, and `N >= ceil(audio_seconds / 8.0417)`. Do not open, screenshot, montage, or visually judge the designs. The identity lock is enforced in lyrics and prompts, not by reviewing generated media.
+14. Validate the batch from API metadata only. Require the matching `tool_used`/`created_at` cluster, every status `private`, the selected `aspect_ratio`, sequential `page_number` values, a multi-scene count, and `3N <= ceil(audio_seconds) <= 10N`. Do not open, screenshot, montage, or visually judge the designs. The identity lock is enforced in lyrics and prompts, not by reviewing generated media.
 15. **Attempt verdict — retry / fallback decision.** If the batch passes the structural checks above, accept the first take and continue to §7. If the attempt failed because of an explicit generation error, a single image, `N` below the viable floor, wrong-ratio metadata, missing pages, or empty output, then:
-    - append a failure record to `RUNTIME_STATE.json` → `error_history` (§18 entry shape, extended with `agent`, `attempt`, `designs_returned`, `design_ids`, and the exact on-screen error message as the `symptom`) so the defect can be debugged later;
+    - append a failure record to `WORKFLOW_STATE.json` → `error_history` (§18 entry shape, extended with `agent`, `attempt`, `designs_returned`, `design_ids`, and the exact on-screen error message as the `symptom`) so the defect can be debugged later;
     - abandon the failed batch entirely — never import it and never mix its designs with another attempt's;
     - if Nursery Rhymes has had fewer than **3** attempts, retry Nursery Rhymes from step 1 of this section;
     - after the **third** failed Nursery Rhymes attempt, switch to **Music Storyboard** (LOW priority) and rerun this section with the character-lock prompt — the fallback also gets up to **3 validated attempts** under the same validation and `error_history` logging;
@@ -325,6 +328,54 @@ Open Artistly in the authenticated browser.
 `N` is dynamic. Never impose a fixed count such as 20. If Artistly generates 25 designs, generate 25 videos. If it generates 27, generate 27 videos. The final VideoExpress timeline must contain exactly `N` distinct scene slots.
 
 Do not mix designs from different attempts. Generated appearance is intentionally not reviewed in this speed-optimized workflow.
+
+### 6.A Create `prompt_book.json` and prepare every video prompt
+
+After accepting the Artistly batch and before opening VideoExpress generation, create `prompt_book.json` beside `WORKFLOW_STATE.json`.
+
+Top-level global settings:
+
+```json
+{
+  "schema_version": "1.0.0",
+  "project_title": "<project title>",
+  "ratio": "16:9 or 9:16",
+  "global_settings": {
+    "animation_style": "3D",
+    "automatically_enhance_image_prompt": false,
+    "automatically_enhance_video_prompt": false,
+    "video_only_no_sound": true,
+    "advanced_mode": true
+  },
+  "scenes": []
+}
+```
+
+Create exactly one `scenes[]` entry per accepted Artistly design, in ascending `page_number` order:
+
+```json
+{
+  "artistly_scene": 1,
+  "design_id": "<Artistly design id>",
+  "artistly_image_url": "<images[0]>",
+  "videoexpress_image_id": null,
+  "final_videoexpress_prompt": "<transformed prompt>",
+  "duration_seconds": 5
+}
+```
+
+Prompt preparation rule for every entry:
+
+1. Read the Artistly Design Prompt from the design-detail DOM or another authoritative text field; do not inspect the picture itself.
+2. Preserve the character identity, physical action, environment, lighting, and camera direction.
+3. Sanitize vocal/open-mouth trigger language with `SPEECH_TRIGGER_SANITIZER` and require zero `NO_TRIGGER_REGEX` matches in the sanitized base.
+4. Transform it into one continuous, duration-independent shot using the no-speech composition from §3: `NO_SPEECH_PREFIX` + `MOUTH_CLOSE_OPENING` + sanitized scene action + `NO_SPEECH_SUFFIX` + `USER_REQUIRED_TERMINAL_TAIL`.
+5. Require the final prompt to end with the exact characters `no mouth movement no lypsync`.
+6. Do not store the raw Artistly prompt in the prompt book. Store only the scene number, Design ID, image mapping, final VideoExpress prompt, and planned duration.
+
+Plan duration before generation because the CloneVoice audio length `A` and scene count `N` are already known. Use an integer duration from 3–10 seconds for every scene. Choose evenly distributed durations whose cumulative endpoints track `k × A/N` and whose total is `ceil(A)` seconds, so the final overshoot is less than one second and can be cut exactly at the audio endpoint. Require `3N <= ceil(A) <= 10N`; otherwise reject the storyboard as structurally unsuitable and retry under §6.
+
+After importing the images into VideoExpress, reconcile each imported library item with its Artistly Design ID and fill `videoexpress_image_id`. Do not submit any scene until all `N` prompt-book entries have a unique Design ID, final prompt, duration, and VideoExpress image ID. During generation, read the image ID, prompt, and duration only from `prompt_book.json`.
 
 ## 7. Create a new VideoExpress project
 
@@ -352,59 +403,47 @@ Never delete or modify media in an unrelated user project. If a stale project op
 
 If only part of the set imported, re-import only the missing IDs.
 
-## 9. Generate exactly `N` videos with the Old Algorithm
+## 9. Generate exactly `N` videos with Create Video From Prompt
 
-Use **Create with AI → Image To Video (Old Algorithm)**. Do not use the newer Image to Video option for this workflow.
+Use the current **Create with AI → Create Video From Prompt** flow. Never use **Image To Video (Old Algorithm)** for this workflow.
 
-### 9.A Verified per-scene UI flow (define one reusable JS routine; call it per scene to keep tokens low)
+### 9.A Verified reusable UI flow
 
-1. Open the **Create with AI** sidebar tab (`<a>` whose text is "Create with AI").
-2. Click the card whose text contains **"Image To Video"** and **"Old Algorithm"** → the "Image To Video" modal opens showing "Please select an image".
-3. Click the **"select"** link (first scene) or the **"Choose Image"** button (subsequent scenes — the modal stays open between submissions). The image picker opens.
-4. Open the **My Artistly Images** folder (single-click the `[class*="folder"]` element whose text matches; the picker resets to folder-root each time, and the folder may be below the fold — scroll the `.list-wrapper` to find it).
-5. Select the target image `.library-item[data-ident=<VE_IMAGE_ID>]`, then click **Choose**. The prompt textarea auto-fills with that image's action prompt (preserves the protagonist's pronouns/identity) — **sanitize that text, then wrap it in the closed-mouth composition (§3): prefix + universal opening + sanitized base + suffix + `USER_REQUIRED_TERMINAL_TAIL`, ending literally with `no mouth movement no lypsync`**. Never discard the auto-filled text, never leave a vocal or open-mouth trigger word in it, and never submit it bare.
+Open one creator tab and keep it open for the entire scene loop. Configure the global controls once, then reuse them unless the live state proves that VideoExpress reset a setting:
 
-   Compose it with the native value setter so the app's model registers the change, then re-read the field to prove the prefix, suffix, and tail are all present **before** submitting:
-   ```js
-   const ta = document.querySelector('textarea');
-   let base = ta.value.trim();
-   if (/^Closed-mouth scene/.test(base)) return {ok:true, why:'already composed'};   // idempotent
-   for (const [re, sub] of SPEECH_TRIGGER_SANITIZER) base = base.replace(re, sub);   // REMOVE trigger words
-   if (NO_TRIGGER_REGEX.test(base))
-     return {ok:false, why:'vocal/open-mouth trigger words survived sanitization — aborted'};
-   const full = NO_SPEECH_PREFIX
-               + MOUTH_CLOSE_OPENING
-              + base + NO_SPEECH_SUFFIX + USER_REQUIRED_TERMINAL_TAIL;
-   const d = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(ta), 'value');
-   d.set.call(ta, full);
-   ta.dispatchEvent(new Event('input',  {bubbles:true}));
-   ta.dispatchEvent(new Event('change', {bubbles:true}));
-   if (!/^Closed-mouth scene/.test(ta.value) || !/never speaks/i.test(ta.value)
-       || !ta.value.endsWith(USER_REQUIRED_TERMINAL_TAIL))
-     return {ok:false, why:'no-speech prefix/suffix/tail missing — aborted'};
-   ```
-   This also composes with the §9.A prompt-match guard: verify the auto-filled prefix matches the intended scene **first**, then sanitize and wrap. All checks must pass before Create Video.
-   After setting the value, blur the textarea (or press Tab), wait for the framework state to settle, and re-read it once more. Do not submit until the exact terminal tail survives that round trip.
-6. Set style: `select[name="select-type"]` → value `"3d"` (options Human/2D/3D/PhotoRealistic/Other); dispatch `change`. **The dropdown DEFAULTS to Human** (confirmed in the live modal), so it must be explicitly set to `3d` for **every** submission — never leave or choose `human` for a character montage; the Human path biases toward talking-head motion and is itself a talking-lips cause.
-7. `input[name="video_length_booster"]`: **unchecked** in the primary pass (checked only in the duration-repair pass). Leave any lip-sync / talking-video option **off**; if the modal exposes a lip-sync checkbox, assert it is unchecked before submitting. **Automatic prompt enhancement must also be OFF (v2.4.0 change — earlier versions left it on):** the enhancer rewrites the submitted prompt server-side and can strip or dilute the no-speech language; if the modal exposes an enhance-prompt toggle, assert it is unchecked before every submission.
-8. Click **Create Video** (element with exact text "Create Video", native mouse-event sequence). A "…will appear in your Media Library…" message confirms submission; the modal stays open for the next scene.
+1. Open **Create with AI** and click **Create Video From Prompt** (`button.button-generate-from-prompt`).
+2. Select the project ratio in the modal: **Landscape 16:9** or **Vertical 9:16**.
+3. Set the Image Type dropdown to **Image Type: 3D**.
+4. Uncheck **Automatically enhance my image prompt**.
+5. Check **Video Only (No Sound)**.
+6. Enable **Advanced Mode**. Keep **Automatically enhance my video prompt** unchecked.
+7. Check **Manual Video Length, sec** and set its 3–10 second control to the current scene's `duration_seconds` from `prompt_book.json`.
 
-Wrap steps 3–8 in a single function `submitScene(imageId, {boost})` and a wrapper that opens the tool for the first scene, so each of the `N` submissions is one call — do not re-derive the flow per scene.
+For every scene, read only the matching prompt-book entry and perform this loop:
 
-For the primary pass, generate exactly one normal video for every storyboard design:
+1. Click **Use from Library**.
+2. Open **My Artistly Images**; the picker returns to the folder root each time.
+3. Select `.library-item[data-ident=<videoexpress_image_id>]` and click **Choose**.
+4. Fill **Video and Audio Prompt** with `final_videoexpress_prompt` from `prompt_book.json` using the native value setter plus `input`/`change` events.
+5. Blur or press Tab, then re-read the field once. Require it to equal the prompt-book value and end exactly with `no mouth movement no lypsync`.
+6. Re-check only the lightweight live invariants: correct ratio, Image Type 3D, both enhancement toggles off, Video Only on, Advanced Mode on, and the prompt-book duration selected. Do not re-author the prompt or reconfigure already-correct controls.
+7. Click **Create Video** exactly once. Verify a unique Processing or completed job appears in **My AI Videos**, then record its ID against the same prompt-book scene.
 
-1. Choose the exact design from **My Artistly Images** using its recorded scene ID.
-2. Use the Artistly-provided action prompt, preserving the protagonist’s correct pronouns and identity, **then sanitize it with `SPEECH_TRIGGER_SANITIZER`, prepend `NO_SPEECH_PREFIX` + `MOUTH_CLOSE_OPENING`, and append `NO_SPEECH_SUFFIX` + `USER_REQUIRED_TERMINAL_TAIL`**, asserting the full composition — including the literal ending `no mouth movement no lypsync` — once in the textarea before submitting (§9.A step 5).
-3. Select **3D** unless the idea explicitly requires another supported style; never `human` for a character montage.
-4. Keep lip sync off — always, with no exception for “expressive” or “singing” scenes.
-5. Keep **Video Length Booster** off during the primary pass.
-6. Verify the selected project ratio remains correct.
-7. Click **Create Video** exactly once for that scene.
-8. Verify a unique Processing or completed job appears in **My AI Videos** and record the generated-video ID.
+Keep the creator tab open with its settings preserved. If monitoring is needed, use a second tab opened to **Media Library → My AI Videos**; never preview or play the generated clips.
+
+Generate exactly one planned video for every storyboard design:
+
+1. Choose the exact imported image using `videoexpress_image_id` from `prompt_book.json`.
+2. Paste the matching `final_videoexpress_prompt`; never use or depend on an auto-filled prompt.
+3. Use the matching `duration_seconds` in Advanced Mode.
+4. Keep both prompt-enhancement controls off and Video Only on.
+5. Verify the selected project ratio remains correct.
+6. Click **Create Video** exactly once for that scene.
+7. Verify a unique Processing or completed job appears in **My AI Videos** and write the generated-video ID back to the scene's runtime mapping.
 
 ### Fast completed-clip acceptance
 
-Do not preview or inspect completed clips. Accept the first take when **My AI Videos** reports `completed`, the media ID maps to the intended source scene, and the duration matches the planned normal or boosted duration. Regenerate only for an explicit failed/empty render, wrong structural metadata, or a job that remains missing after the recovery rule.
+Do not preview or inspect completed clips. Accept the first take when **My AI Videos** reports `completed`, the media ID maps to the intended prompt-book scene, and the duration matches the planned Advanced Mode duration. Regenerate only for an explicit failed/empty render, wrong structural metadata, or a job that remains missing after the recovery rule.
 
 ### Five-generation batch system
 
@@ -428,14 +467,14 @@ For every batch:
 
 **Pipeline optimization (respects the 5-concurrent cap):** the moment a batch completes, immediately submit the **next** batch, and *then* add the just-completed batch to the timeline while the next batch renders. Because each batch finishes before its successor is submitted, concurrency never exceeds five, and the timeline-arranging work overlaps the render wait — cutting wall-clock and idle polling. Poll job status via the **My AI Videos API** (`get_media`, `status`+`duration`), not by toggling panels.
 
-Never generate two normal versions of one scene. Never use a completed job's filename order as the story order.
+Never generate two versions of one scene. Never use a completed job's filename order as the story order.
 
 ## 10. Assemble the primary `N`-clip timeline
 
 After each batch completes:
 
 1. Open **Media Library → My AI Videos** (folder `categoryId` discovered from the network log; a prior run's was `54109`).
-2. Map completed jobs to scenes. **Note:** on import and on generation VideoExpress reassigns its own media `id`s and thumbnails, but each generated clip's `title` is the scene's action prompt (from the source image). Map each video `id` to its `page_number` by matching that `title` to the recorded Artistly scene text; store the ordered `page_number → video_id` list.
+2. Map completed jobs to scenes through `prompt_book.json`: `artistly_scene → design_id → videoexpress_image_id → generated video id`. Do not infer order from filenames or newest-first display order.
 3. Add each clip to **video track 1** (`.tracks-wrapper .track-row` index 0) in exact ascending story order via **jQuery-UI drag** (§0.1 primitive 3), not a synthetic context-menu click (which does not register). Drop each clip past the last clip's right edge; the droppable auto-appends it contiguously. Zoom out first (§0.5) so the growing timeline stays on-screen — an off-screen drop silently fails.
 4. After each drop, read back `.brick.video` `style.left`/`style.width` to confirm the new clip appended contiguously.
 5. Verify each scene occupies exactly one slot.
@@ -482,28 +521,20 @@ The final invariant is:
 
 ### If the video is shorter than the audio
 
-Use **Video Length Booster** as a replacement mechanism.
+Use the current **Create Video From Prompt** flow to repair only the mapped scenes that need more time.
 
-**Booster math (verified durations):** a normal Old-Algorithm clip is **4041.667 ms (~4.04 s)**; a boosted clip is **8041.667 ms (~8.04 s)** — the booster adds ~4.0 s. To reach the audio length `A` with `N` clips, the number of boosted clips is `K = ceil((A − 4.0417·N) / 4.0)`. Choosing `K` so total slightly exceeds `A` (then trimming the last clip) is correct; never choose `K` that undershoots (you cannot lengthen video by resizing). Example from a prior run: `A=127.632 s, N=22 → K=10 → 128.917 s` (overshoot 1.285 s, trimmed).
+1. Convert the positive endpoint difference to seconds.
+2. Increase `duration_seconds` in `prompt_book.json` for evenly distributed scenes that still have headroom below 10 seconds. Keep cumulative scene endpoints close to `k × A/N`.
+3. Regenerate only those scenes with the same image ID and exact final prompt, using Advanced Mode and the revised duration.
+4. Replace each prior clip in its original scene slot; never append a repair as scene `N+1`.
+5. Keep exactly one completed video per prompt-book scene and exactly `N` timeline clips.
+6. Re-measure after each repair batch of at most five.
 
-**Even-distribution placement (REQUIRED for lyric sync — never cluster boosted clips):** the storyboard scenes are timed to the song, so each scene must occupy roughly its share `A/N` (~`A/N` seconds) of the timeline. The `K` boosted clips must be **spread evenly across the whole story**. Do **not** boost "the last `K` scenes" or otherwise cluster them: clustering keeps the endpoints equal but **desyncs the picture from the lyrics** — front-loading the short clips makes the visuals run seconds *ahead* of the words through the first half, only re-converging at the end. (Verified failure: `N=22, K=10`, boosted clustered at the end → the video ran up to ~19 s ahead of the lyrics around the midpoint.)
-
-Plan the boost schedule **up front** — both `A` (audio length) and `N` are known before any VideoExpress generation. Decide per scene, in ascending order, whether it is normal (4.04 s) or boosted (8.04 s) so each clip's **cumulative end-time tracks `k · A/N`** (its ideal position in the song). Simple correct rule: walk scenes `1…N` keeping a running total; if the running total is *behind* the ideal line `k·A/N`, make the next clip **boosted**, else **normal**, until exactly `K` are boosted. This interleaves the boosted clips ~every `N/K` scenes and bounds visual↔lyric drift to about one clip length. Then generate each scene with its planned booster flag and place all `N` clips directly in story order (no clustering, no delete-and-re-append). **Per-scene sync audit:** after assembly, for every scene `k` require `|clip_end_time − k·A/N|` to stay within ~one normal-clip length (≈4 s); larger drift means the schedule was uneven — re-plan before saving.
-
-1. Calculate `K` with the formula above **before** generating any clips (you know `A` and `N` already).
-2. Compute the **evenly-distributed boost set** with the running-total rule above — the `K` scene indices spread across `1…N`, never clustered.
-3. Generate each scene once via **Image To Video (Old Algorithm)** — `3D`, correct ratio — with `input[name="video_length_booster"]` **checked** for scenes in the boost set and **unchecked** otherwise. Batch ≤5; verify each in **My AI Videos** (API, `status` + `duration` ≈ `4041.667` normal / `8041.667` boosted).
-4. Place all `N` clips directly in ascending story order (§0.5 zoom + drag). If you had already assembled an all-normal timeline, replace only the boost-set scenes **in their own slots** (delete that scene's normal clip, drop its boosted clip into the same position) — do not move it to the end.
-5. Ensure the normal and boosted versions are never both on the timeline.
-6. Keep the clip count exactly `N` after every replacement.
-7. Re-measure `video_end` and `audio_end` after each batch.
-8. If the assembled boosted timeline overshoots the audio, perform the **exact trim** with the playhead-slider + Cut + tail-delete method in §0.5 (set `$(ruler).slider('value', audioEndPx)`, cut the last clip at the playhead, `ctxmenu:delete` the tail). Verify `video_end == audio_end` (0-pixel difference). Do **not** resize by dragging the clip's resize handle — jQuery-UI resizable does not respond to synthetic events; the Cut method is the reliable exact trim.
-
-Never append boosted clips as scenes `N+1`, `N+2`, and so on. Never remove another design merely to preserve the count.
+If all scenes are already 10 seconds and the video is still short, the accepted storyboard count violated the prompt-book duration constraint; stop with that structural evidence rather than using the Old Algorithm or Video Length Booster.
 
 ### If the video is longer than the audio
 
-Do not remove storyboard scenes and do not trim the music to hide the mismatch. Shorten only video clip right edges while keeping each clip meaningful and keeping all `N` scene slots. Prefer distributing reductions across longer/boosted clips; use the final affected clip for the last exact endpoint correction. Re-align following clips so the sequence remains contiguous.
+The planned prompt-book total is `ceil(A)`, so normal overshoot is less than one second. Set the timeline playhead to the exact audio endpoint, cut the final video clip there, and delete only the tail fragment. If measured overshoot is unexpectedly larger than the final clip, reduce `duration_seconds` across evenly distributed prompt-book scenes that remain above 3 seconds, regenerate only those mapped scenes through Create Video From Prompt, replace them in place, and then perform the final exact cut. Never trim the music or remove a storyboard scene.
 
 ### Final timeline audit
 
@@ -513,8 +544,8 @@ Sort video bricks by left position and prove:
 
 - count equals `N`;
 - scene IDs are distinct and match the verified Artistly set;
-- every boosted clip occupies its source scene’s original slot;
-- no normal/boosted pair is duplicated;
+- every clip maps to exactly one `prompt_book.json` scene and uses its planned duration;
+- no scene has both an original and a duration-repair version on the timeline;
 - the first start is zero;
 - every next start equals the previous end;
 - audio track 2 contains one music brick starting at zero;
@@ -540,12 +571,13 @@ Never advance without visible evidence:
 
 - **Input gate:** idea/prompt and ratio are both known.
 - **CloneVoice gate:** the exact music title is Completed.
-- **Storyboard gate:** API metadata proves a full multi-scene batch (never a single image), all designs complete, page numbers ordered, ratio correct, and `N` at or above the viable floor; every failed structural attempt is logged in `error_history`.
+- **Storyboard gate:** API metadata proves a full multi-scene batch (never a single image), all designs complete, page numbers ordered, ratio correct, and `3N <= ceil(audio_seconds) <= 10N`; every failed structural attempt is logged in `error_history`.
+- **Prompt-book gate:** `prompt_book.json` has exactly `N` ordered entries with unique Design IDs, imported VideoExpress image IDs, final prompts ending exactly with `no mouth movement no lypsync`, and integer durations from 3–10 seconds whose total is `ceil(audio_seconds)`.
 - **Import gate:** all `N` IDs exist in My Artistly Images.
 - **Batch submission gate:** every planned batch member has a unique accepted job ID; maximum five active jobs.
 - **Batch completion gate:** all current-batch jobs are complete before timeline insertion or next-batch submission.
-- **No-speech gate:** before each submission, the textarea contains `NO_SPEECH_PREFIX` + `MOUTH_CLOSE_OPENING` + sanitized base (zero `NO_TRIGGER_REGEX` matches) + `NO_SPEECH_SUFFIX` + `USER_REQUIRED_TERMINAL_TAIL`, ending literally with `no mouth movement no lypsync`; prompt enhancement and lip sync are off and style is `3d`. No completed-prompt reopening or mouth-motion inspection is performed.
-- **Completed-only timeline gate:** processing or merely accepted jobs never enter the timeline. Insert only completed clips with unique source-scene mappings and expected durations; verify exactly `N` distinct clips in story order before rendering.
+- **No-speech gate:** before each submission, the Video and Audio Prompt field exactly equals the scene's prepared prompt-book value and ends literally with `no mouth movement no lypsync`; both enhancement toggles are off, Video Only and Advanced Mode are on, and Image Type is 3D. No completed-prompt reopening or mouth-motion inspection is performed.
+- **Completed-only timeline gate:** processing or merely accepted jobs never enter the timeline. Insert only completed clips with unique prompt-book scene mappings and planned durations; verify exactly `N` distinct clips in story order before rendering.
 - **Timeline gate:** exactly `N` distinct ordered video slots exist with no gap or overlap.
 - **Audio gate:** one exact music item begins at zero on track 2.
 - **Sync gate:** audio and video endpoints are equal with zero-pixel tolerance.
@@ -563,7 +595,7 @@ Recovery rules:
 - If a scene already occupies its intended timeline slot, record it and do not add it again.
 - If a scene is missing, restore only that scene at its recorded position.
 - If a duplicate exists, identify it by scene/video mapping and remove only the extra copy.
-- If a boosted version is used, remove or omit only its matching normal version.
+- If a duration-repair version is used, remove or omit only its matching earlier version.
 - If scene order is uncertain, stop mutation and resolve using IDs, prompts, thumbnails, and neighboring scenes.
 - If music is duplicated or misplaced, modify only audio bricks.
 - If export confirmation is missing, inspect the queue before one safe retry.
@@ -577,7 +609,7 @@ Recovery rules:
 - Never use an older wrong-character storyboard.
 - Never accept a protagonist whose gender or identity contradicts the idea.
 - Never mix Landscape and Vertical media.
-- Never use the newer Image to Video option when the workflow requires the Old Algorithm.
+- Never use Image To Video (Old Algorithm); use Create Video From Prompt.
 - Never enable lip sync, never use the Lipsync Video tool, and never submit a video prompt that lacks `NO_SPEECH_PREFIX` and `NO_SPEECH_SUFFIX` or does not end exactly with `USER_REQUIRED_TERMINAL_TAIL` (`no mouth movement no lypsync` for this run).
 - Never enable automatic video-prompt enhancement — it rewrites the prompt server-side and can strip the no-speech language.
 - Never submit a video prompt whose base text still contains a vocal or open-mouth trigger word (`NO_TRIGGER_REGEX`).
@@ -588,7 +620,7 @@ Recovery rules:
 - Never exceed five concurrent VideoExpress generations.
 - Never start the next batch before the current batch passes its barriers.
 - Never let the final video count differ from `N`.
-- Never append a boosted duplicate.
+- Never append a duration-repair duplicate.
 - Never trim or move the music to conceal a video shortage.
 - Never delete a video while cleaning up audio.
 - Never export before every verification gate passes.
@@ -604,7 +636,7 @@ After the export enters the background queue, report concisely:
 - CloneVoice music name and ID/status;
 - Artistly storyboard count `N`;
 - imported design count;
-- generated normal and boosted video IDs/counts;
+- generated video IDs, planned durations, and completed count;
 - final timeline clip count and story-order verification;
 - audio start and endpoint;
 - final video endpoint and exact equality result;
@@ -633,23 +665,24 @@ Numeric folder `categoryId`s and media/design `id`s are **per-account**; the val
 - Right sidebar tabs are `<a>` links: `Media Library`, `Create with AI`, `Import Media … Text to Speech`, `Text Animations`, `Filters`, `Fast Cut`, `Automatic Captions`, `Audio Cutter` (click the `<a>`, not its label span).
 - Import panels: cards are `.panel.cursor-pointer` (match by text `Import from Artistly` / `Import from CloneVoice.ai`). Grid items `.library-item[data-ident]` inside `.col-xs-6.item`; `data-image` = URL, `title` = prompt; select by clicking the `.library-item` (adds `selected`); `More` button paginates (~20/page); submit buttons `Import` / `button.button-import` "Import Selected" (jQuery-trigger).
 - Folders API: `GET /api/library/get_media/4?categoryId=<ID>&page=1&limit=50&orderBy=id&orderDir=desc&filter=<image|>` → `{total, results:[{id,name,title,status,duration}]}`. Example ids: My Artistly Images `376019` (filter=image), My AI Videos `54109`, My CloneVoice.ai Audio `552829`. Outputs list: `GET /api/get_list_output`.
-- Image-To-Video (Old Algorithm) modal: image picker `select`/`Choose Image` → folder → `.library-item[data-ident]` → `Choose`; prompt textarea auto-fills — **compose sanitized base + `NO_SPEECH_PREFIX`/`MOUTH_CLOSE_OPENING`/`NO_SPEECH_SUFFIX`/`USER_REQUIRED_TERMINAL_TAIL` via the native value setter + `input`/`change`, settle, and re-read once; assert prefix, suffix, exact ending `no mouth movement no lypsync`, and zero trigger words before submitting** (§9.A step 5); do not reopen completed media to inspect the prompt; `select[name="select-type"]`(=`3d`, never `human`); `input[name="video_length_booster"]`; lip-sync and enhance-prompt toggles stay unchecked; `Create Video` button. Job durations: normal `4041.667 ms`, boosted `8041.667 ms`.
+- Create Video From Prompt modal: open with `button.button-generate-from-prompt`; choose modal ratio; Image Type dropdown = `Image Type: 3D`; `input[name="auto_enhance_prompt"]` unchecked; **Use from Library** → **My Artistly Images** → `.library-item[data-ident]` → **Choose**; fill **Video and Audio Prompt** from `prompt_book.json`; `input[name="video_only"]` checked; `input[name="advanced_mode"]` checked; `input[name="enhance_video_prompt"]` unchecked; `input[name="manual_video_length"]` checked; duration control = the prompt-book value from 3–10; submit with **Create Video**. Keep the creator tab open and monitor My AI Videos in a separate tab when needed.
 - Timeline: `.tracks-wrapper .track-row[0]` = video track 1, `[1]` = audio track 2. Clips `.brick.video`/`.brick.audio` with inline `style.left`/`style.width` (px). Clip jQuery events include `ctxmenu:delete`, `ctxmenu:resize_move`. Zoom buttons `button:has(i.bi-zoom-out)` / `i.bi-zoom-in`. Cut tool `button:has(i.bi-scissors)`. Ruler playhead slider `.timeline-header .ruler.ui-slider` (`$(r).slider('value')` in px). Auto-align link title `Auto Align Clips`.
 - Add-to-timeline = jQuery-UI drag (not synthetic menu click). Delete = `$(brick).trigger('ctxmenu:delete')`. Exact trim = playhead-slider + Cut + tail `ctxmenu:delete` (§0.5).
 - Save dialog `input[name="project_name"]` + `button.button-submit`; success = `document.title` = `"Video Express - <name>"`.
 - Export dialog `input[name="name"]`, `select[name="quality"]`(High), `select[name="size"]`(FullHD=`1080`, HD=`720`), `select[name="format"]`(mp4), `Create` (`button.button-submit`). Queue confirmation text: **"Your movie creation is currently number \<N\> in the queue."**
 
-## 18. Validation checkpoints & support investigation (make RUNTIME_STATE.json human-readable and diagnosable)
+## 18. Validation checkpoints & support investigation (make WORKFLOW_STATE.json human-readable and diagnosable)
 
-Write `RUNTIME_STATE.json` beside the workflow after every verified side effect, with human-readable values (not just booleans) so a support engineer can reconstruct exactly what happened. In addition to §4's fields, record for each gate a **checkpoint object**: `{gate, status: pass|fail|pending, evidence, method, timestamp, artifact_ids}`. Recommended top-level keys and the evidence to capture:
+Write `WORKFLOW_STATE.json` beside the workflow after every verified side effect, with human-readable values (not just booleans) so a support engineer can reconstruct exactly what happened. In addition to §4's fields, record for each gate a **checkpoint object**: `{gate, status: pass|fail|pending, evidence, method, timestamp, artifact_ids}`. Recommended top-level keys and the evidence to capture:
 
 - `auth`: for each app, `{authenticated: true/false, evidence: "logged-in UI element or API 200", checked_at}`. If any is a login page, that is a true blocker — stop and ask the user to sign in.
 - `clonevoice_gate`: `{music_uuid, title, status:"Completed", duration_s, src_url, checked_via:"inertia props"}`.
 - `identity_gate`: `{lyrics_consistent: true, protagonist:"girl", evidence:"lyrics use she/her/girl throughout"}` — prompt/input validation only; generated media is not inspected.
 - `storyboard_gate`: `{tool_used, N, page_number_to_design_id:{…}, aspect_ratio:"16:9", all_status:"private", qc_notes}`.
 - `import_gate`: `{ve_image_ids_in_order:[…], count:N, folder_categoryId, excluded_unrelated_ids:[…]}`.
-- `batch_gates[]`: per batch `{batch_no, scene_pages, source_image_ids, video_ids, style:"3D", booster:bool, submitted_at, completed_at, durations_ms}`.
-- `no_speech_gate`: `{composition:"prefix + opening + sanitized base + suffix + tail", enhancement_off:true, lip_sync_off:true, style:"3d", checked_before_submit:true}`.
+- `prompt_book_gate`: `{path:"prompt_book.json", scene_count:N, unique_design_ids:true, unique_ve_image_ids:true, durations_total_s:ceil(audio_seconds), all_prompts_end_with:"no mouth movement no lypsync"}`.
+- `batch_gates[]`: per batch `{batch_no, scene_pages, source_image_ids, planned_durations_s, video_ids, image_type:"3D", submitted_at, completed_at, durations_ms}`.
+- `no_speech_gate`: `{source:"prompt_book.json", image_prompt_enhancement_off:true, video_prompt_enhancement_off:true, video_only:true, advanced_mode:true, image_type:"3D", checked_before_submit:true}`.
 - `timeline_gate`: `{video_count:N, first_start_px:0, clip_lefts_widths:[…], order_verified:true, no_real_gaps:true}`.
 - `audio_gate`: `{ve_audio_id, duration_ms, track:2, start_px:0}`.
 - `sync_gate`: `{video_end_px, audio_end_px, diff:0, method:"playhead-slider+cut+tail-delete"}`.
@@ -657,21 +690,21 @@ Write `RUNTIME_STATE.json` beside the workflow after every verified side effect,
 - `export_gate`: `{file_name, quality:"High", resolution:"FullHD", format:"mp4", queue_text:"…number N in the queue", queue_position:N, submitted_at}`.
 - `error_history[]`: `{when, phase, symptom, root_cause, recovery_action, outcome}` — append every recovery so support can trace intermittent failures (e.g. "419 on MCP write → used browser DOM", "stacked Save dialog → verified via title, closed duplicate", "off-screen drop failed → zoomed out then re-dragged").
 
-**Support-investigation procedure** when a user reports a failure: (1) load `RUNTIME_STATE.json`; (2) find the first gate whose `status` is not `pass`; (3) read its `evidence` and the surrounding `error_history`; (4) re-verify that gate live via the corresponding API in §17 (auth, folder contents, job status, endpoints, queue) — the app state is authoritative; (5) resume from that gate's `next_safe_action` using the idempotency rule (never repeat a verified side effect). Because every value is concrete and ID-based, the exact failed step, its cause, and the minimal fix are all recoverable without rerunning earlier phases.
+**Support-investigation procedure** when a user reports a failure: (1) load `WORKFLOW_STATE.json`; (2) find the first gate whose `status` is not `pass`; (3) read its `evidence` and the surrounding `error_history`; (4) re-verify that gate live via the corresponding API in §17 (auth, folder contents, job status, endpoints, queue) — the app state is authoritative; (5) resume from that gate's `next_safe_action` using the idempotency rule (never repeat a verified side effect). Because every value is concrete and ID-based, the exact failed step, its cause, and the minimal fix are all recoverable without rerunning earlier phases.
 
 ## 19. Golden invariants distilled from a verified successful run
 
 1. Never click by screenshot pixel; act by DOM selector + event dispatch (§0.1). Screenshots are for human QC only.
 2. Verify every gate from an authoritative **API or `document.title`/queue text**, never a toast alone.
-3. Nursery Rhymes is the HIGH-priority agent but sometimes errors or returns a single image instead of a full storyboard — validate every attempt (multi-scene, on-theme), log each failure to `RUNTIME_STATE.json` `error_history`, retry up to 3 times, then fall back to Music Storyboard (LOW priority, also up to 3 validated attempts). It has no character field and defaults to 1:1 — set the ratio; identity must already be in the lyrics.
+3. Nursery Rhymes is the HIGH-priority agent but sometimes errors or returns a single image instead of a full storyboard — validate every attempt (multi-scene, on-theme), log each failure to `WORKFLOW_STATE.json` `error_history`, retry up to 3 times, then fall back to Music Storyboard (LOW priority, also up to 3 validated attempts). It has no character field and defaults to 1:1 — set the ratio; identity must already be in the lyrics.
 4. Inject uploads via FilePond `DataTransfer`; never invoke an OS file dialog.
 5. Add clips by jQuery-UI drag; delete by `ctxmenu:delete`; trim by playhead-slider + Cut. jQuery-UI resize does not respond to synthetic events.
 6. Zoom out before assembling so drops stay on-screen.
-7. Compute `K = ceil((A − 4.0417·N)/4.0)` and **distribute the boosted clips EVENLY** across the story (running-total rule) so the picture stays synced to the lyrics; never cluster them at the end (that keeps endpoints equal but desyncs the first half). Overshoot then exact-trim to 0-pixel diff. Audit per-scene drift `|clip_end − k·A/N| ≤ ~4 s`.
+7. Build `prompt_book.json` before generation. Distribute integer 3–10 second Advanced Mode durations so cumulative endpoints track `k·A/N` and the total is `ceil(A)`; then exact-trim the final sub-second overshoot to a 0-pixel difference.
 8. Respect ≤5 concurrent generations; pipeline the next batch while assembling the current one.
 9. Guard against stacked dialogs; act once, verify, close duplicates.
 10. Persist a concrete, human-readable checkpoint after every side effect for resumability and support.
-11. **Characters act; they never speak.** Every video prompt is sanitized of vocal triggers, then wrapped `NO_SPEECH_PREFIX` + `MOUTH_CLOSE_OPENING` + sanitized base + `NO_SPEECH_SUFFIX` + `USER_REQUIRED_TERMINAL_TAIL`, ending literally with `no mouth movement no lypsync`; lip sync and prompt enhancement stay off and style is `3d`. This is enforced before submission only; generated media is accepted by completion signal without preview.
+11. **Characters act; they never speak.** Every video prompt is sanitized and prepared in `prompt_book.json`, then entered unchanged into Video and Audio Prompt, ending literally with `no mouth movement no lypsync`; both enhancement toggles stay off, Video Only and Advanced Mode stay on, and Image Type is 3D. Generated media is accepted by completion signal without preview.
 12. Make **Auto Align Clips** the last arrangement action, then re-measure geometry — the click is not proof.
 
 ## FINAL REMINDER

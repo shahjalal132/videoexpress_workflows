@@ -2,7 +2,7 @@
 
 An autonomous, browser‑based agent workflow that turns **one idea + one ratio** into a finished nursery‑rhyme music video and submits it to VideoExpress's render queue — end to end, no manual clicking.
 
-**Pipeline:** generate the song in **CloneVoice.ai** → build a character‑consistent storyboard in **Artistly.ai** → generate one **VideoExpress.ai** clip per storyboard scene → assemble all clips on the timeline → add the music → **match the video endpoint exactly to the audio endpoint** → save → export FullHD MP4.
+**Pipeline:** generate the song in **CloneVoice.ai** → build a character‑consistent storyboard in **Artistly.ai** → prepare `prompt_book.json` with one final prompt, image mapping, and duration per scene → generate clips with VideoExpress **Create Video From Prompt** → assemble the clips → add the music → **match the video endpoint exactly to the audio endpoint** → save → export FullHD MP4.
 
 ---
 
@@ -14,7 +14,7 @@ An autonomous, browser‑based agent workflow that turns **one idea + one ratio*
 |---|---|
 | Song | *Jannat and Her Toys* (CloneVoice, Kids‑Rhyme, English, 139.22 s) |
 | Storyboard | 35 scenes, Artistly **Music Storyboard** agent, 16:9 |
-| Video | 35 clips (all normal 4.04 s — no booster needed), 3D animation |
+| Video | 35 ordered 3D animation clips |
 | Sync | video endpoint == audio endpoint, **0‑pixel difference** (final clip exact‑trimmed by 2.23 s) |
 | Export | **Landscape 16:9 · High · FullHD · mp4** |
 
@@ -51,8 +51,9 @@ Typical wall‑clock: a few minutes for the song, a few for the storyboard, then
 | File | Purpose |
 |---|---|
 | [`SYSTEM_PROMPT.md`](SYSTEM_PROMPT.md) | The agent's operating instructions. **§0** is the mandatory device‑agnostic interaction contract; **§17** is the exact DOM/API selector reference; **§18–19** cover validation checkpoints, support investigation, and the golden invariants. |
-| [`WORKFLOW.json`](WORKFLOW.json) | Machine‑readable config (v2.7.0): start contract, standing authorization, minimal validation, ordered steps, execution mechanics, APIs, checkpoints, recovery, and safety rules. |
-| [`RUNTIME_STATE.example.json`](RUNTIME_STATE.example.json) | A **real completed‑run** checkpoint file — a worked example of the resumable, human‑readable state the agent maintains. |
+| [`WORKFLOW.json`](WORKFLOW.json) | Machine‑readable config (v2.8.0): prompt-book preparation, current VideoExpress flow, ordered steps, execution mechanics, checkpoints, recovery, and safety rules. |
+| [`prompt_book.json`](prompt_book.json) | Runtime prompt-book template. The agent fills one ordered Artistly scene/Design ID/image mapping, final VideoExpress prompt, and 3–10 second Advanced Mode duration per scene before generation. |
+| [`WORKFLOW_STATE.example.json`](WORKFLOW_STATE.example.json) | Compact v2.8.0 checkpoint example showing prompt-book preparation, latest-flow submission, and separate generation monitoring. |
 | `README.md` | This file. |
 
 ---
@@ -63,6 +64,7 @@ Typical wall‑clock: a few minutes for the song, a few for the storyboard, then
 - **Identity lock at input/prompt level** — gender, age, hair, clothing, and visual medium are resolved once and repeated consistently in lyrics and prompts. Generated media is accepted without visual review.
 - **Storyboard agent priority & fallback** — Artistly **Nursery Rhymes** runs first. Every attempt receives cheap API-only structural validation: completed multi-scene batch, viable count, correct ratio, and sequential page numbers. It gets up to three attempts before the same three-attempt fallback to **Music Storyboard**. Failed batches are logged and never mixed.
 - **Narration-style, no lip-sync (v2.7.0)** — every VideoExpress prompt is sanitized and universally wrapped with narration/no-speech/close-mouth instructions, ending exactly with **`no mouth movement no lypsync`**. Prompt enhancement and lip sync remain off, and style is explicitly set to 3D. The prompt is checked once before submission; completed prompt metadata and mouth motion are not inspected.
+- **Prompt book + latest VideoExpress flow (v2.8.0)** — prompts are prepared once in `prompt_book.json` against their Artistly Design IDs and imported image IDs. Generation uses **Create Video From Prompt**, Image Type 3D, both enhancement toggles off, Video Only on, Advanced Mode on, and the planned manual duration. The creator tab stays open; My AI Videos may be monitored in a separate tab without previewing clips.
 - **Minimal validation for speed** — generated images and videos are never previewed, played, downloaded for review, screenshot, montaged, or frame-sampled. The first take is accepted from application completion signals and source-ID mapping. Validation is limited to acceptance, completion, structure, project-save persistence, and export confirmation.
 - **Standing authorization** — navigation, named controls, generations, normal retries, working-timeline cleanup, save, and export are authorized when the run starts. The agent stops only for a true blocker such as login/CAPTCHA, visible app refusal, exhausted unrecoverable error, uncontrollable browser, vanished job, out-of-scope destruction, or unsafe ambiguity.
 - **Exact sync** — the final video endpoint equals the audio endpoint with **zero‑pixel tolerance** (achieved by the playhead‑set + cut + tail‑delete method).
@@ -74,11 +76,11 @@ Typical wall‑clock: a few minutes for the song, a few for the storyboard, then
 
 ## 🛠️ Resumability & support
 
-The agent writes a durable **`RUNTIME_STATE.json`** (see the `.example` file) after every verified side effect, with a per‑gate checkpoint `{gate, status, evidence, method, timestamp, artifact_ids}`. Evidence is signal-based (`api`, `dom`, or `document_title`), never generated-media inspection.
+The agent writes a durable **`WORKFLOW_STATE.json`** (see the `.example` file) after every verified side effect, with a per‑gate checkpoint `{gate, status, evidence, method, timestamp, artifact_ids}`. Evidence is signal-based (`api`, `dom`, or `document_title`), never generated-media inspection.
 
 If a run fails and a user reports it, follow **`support_investigation`** in `WORKFLOW.json`:
 
-1. Load `RUNTIME_STATE.json`.
+1. Load `WORKFLOW_STATE.json`.
 2. Find the first gate whose `status` isn't `pass`.
 3. Read its `evidence` + surrounding `error_history`.
 4. Re‑verify that gate live via the matching read API in `dom_api_contract` (auth, folder contents, job status, endpoints, queue) — app state is authoritative.
