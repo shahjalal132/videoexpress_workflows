@@ -82,6 +82,14 @@ The moment a timeline exists it must exist **on the server**, not just in a tab:
 
 Unsaved timelines have been destroyed twice by tab cleanup between turns, each costing a full rebuild. With continuous saves the worst case is a handful of re-dropped clips.
 
+## Never preview your own output
+
+**Do not inspect generated media to judge quality — ever.** No playback, no opening a clip in a viewer, no downloading, no screenshots, no frame sampling, no montage grids. Each costs minutes and a large share of the context window, and none of it changes what happens next.
+
+An asset is **accepted when the app says it is finished** — a completed record with the right duration and the right `mediaId` mapping. That signal is the proof; appearance is not verified by you. Accept the first take for images and clips alike; regenerate (max 1) only on an explicit failure signal — a job error, wrong duration, wrong source image, or an empty render. Cosmetic imperfections ship with a one-line note. Never re-verify something already proven.
+
+The only checks worth the clock: acceptance by ID, completion status, timeline count/order/geometry, the save proof, and the export queue text.
+
 ## Operate the UI yourself — a stubborn control is never a blocker
 
 This is a jQuery single-page app: **every control is reachable from JavaScript**, even when the accessibility tree does not expose it. "Not exposed to the accessible DOM", "the modal closed", or "the field won't accept the value" are *never* reasons to stop, ask, or hand work back.
@@ -186,7 +194,7 @@ This fenced block IS the `vox_workflow.json` contract referenced throughout this
 ```json
 {
   "$schema_note": "VOX-style documentary paper-collage animation video workflow for CloneVoice + VideoExpress (v2: Artistly removed - images are generated INSIDE VideoExpress's Create Video From Prompt modal). All interaction is DOM-selector/API based; never click by screenshot pixels. Numeric folder/category/media ids are PER-ACCOUNT - always discover at runtime, never hardcode.",
-  "version": "3.4.0",
+  "version": "3.4.1",
 
   "how_to_start": {
     "RECEIVING_THIS_DOCUMENT_STARTS_THE_RUN": "This file is your OPERATING INSTRUCTION SET, not a document to review, summarize, critique, or wait on. However it arrives - pasted into chat, attached as pasted-text.txt, or loaded from disk - the run has begun the moment you receive it.",
@@ -550,7 +558,7 @@ This fenced block IS the `vox_workflow.json` contract referenced throughout this
     ],
     "batching": "USER RULE - ROLLING SLOT-BASED: the all-access plan handles 5 concurrent generations. Submit 5 shots sequentially, then check Media Library -> My AI Videos; each check, submit as many new shots as slots have freed (completed jobs), keeping the invariant active_jobs = min(5, shots_remaining) and NEVER exceeding 5. One library check per cycle - it confirms completions (status + mediaId) AND licenses the next submissions; never per-job checks. A timed-out submission is reconciled against its library record before any resubmit",
     "qc": {
-      "mode": "FAST (USER RULE): NO per-clip frame sampling, previews, or playback inspection in the normal run - the locked-camera behavior is enforced by the prompt, not re-verified per clip. A clip is accepted when its record reaches 'completed' with the correct duration and mediaId mapping. Regenerate (max 1) only on an obvious failure: explicit job error, wrong duration, or wrong source image.",
+      "mode": "FAST (USER RULE - STRICT): NEVER PREVIEW GENERATED CLIPS. No playback, no opening a clip in a viewer or new tab, no downloading it, no screenshotting it, no frame sampling, no montage grids, no 'let me just check how it looks'. Each costs minutes and large amounts of context and changes nothing about the next action. The locked-camera behaviour is enforced by the prompt, not re-verified per clip. A clip is ACCEPTED when its record reaches 'completed' with the correct duration and mediaId mapping - that signal is the proof; appearance is not verified by the agent. The same applies to generated images: accept the first take, no inspection. Regenerate (max 1) only on an obvious failure signal from the app: explicit job error, wrong duration, wrong source image, or an empty/failed render. Cosmetic imperfections ship with a one-line note. Never re-verify something already proven.",
       "optional_deep_qc": "only if the USER asks to inspect clips: frame-sample via <video crossOrigin=anonymous> + canvas overlay; if canvases are blank the CDN lacks CORS in that context - render a visible <video> and screenshot; if the profile cannot decode, download the mp4s and hand them to the user"
     }
   },

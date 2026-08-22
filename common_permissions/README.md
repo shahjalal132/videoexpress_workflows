@@ -1,9 +1,10 @@
-# Common workflow blocks — run instruction + standing authorization
+# Common workflow blocks — run instruction, standing authorization, minimal validation
 
-Two reusable, workflow-agnostic prompt blocks that fix the behaviours which stall autonomous runs:
+Three reusable, workflow-agnostic prompt blocks that fix the behaviours which stall autonomous runs:
 
-1. the agent reads a pasted prompt as a **document to review** instead of instructions to execute, and
-2. the agent asks the user for **permission** to do work the user already authorized by starting the run.
+1. the agent reads a pasted prompt as a **document to review** instead of instructions to execute,
+2. the agent asks the user for **permission** to do work the user already authorized by starting the run, and
+3. the agent burns time and tokens **inspecting its own output** instead of finishing the job.
 
 Nothing below names a specific app, tool, or step, so the same text serves every workflow — copy the blocks into any system prompt and fill the `{SLOTS}`.
 
@@ -15,8 +16,9 @@ Nothing below names a specific app, tool, or step, so the same text serves every
 BLOCK 1 — RUN INSTRUCTION            very first: "this document IS your instructions, start now"
   role sentence                      "You are an autonomous agent that ..."
 BLOCK 2 — STANDING AUTHORIZATION     "nothing left to approve, never ask permission"
+BLOCK 3 — MINIMAL VALIDATION         "never preview your own output; verify by signal, not by looking"
   ... the workflow itself ...
-BLOCK 3 — FINAL REMINDER             optional last line of the prompt
+BLOCK 4 — FINAL REMINDER             optional last line of the prompt
 ```
 
 First and last tokens carry the most weight; rules in the middle are the easiest for a model to lose, which is why the authorization is restated at the end.
@@ -136,7 +138,36 @@ When one occurs: checkpoint state, name the blocker in one line with the exact o
 
 ---
 
-## BLOCK 3 — Final reminder
+## BLOCK 3 — Minimal validation (speed)
+
+Paste after Block 2. This is what keeps a long run from doubling in cost.
+
+```markdown
+## MINIMAL VALIDATION — NEVER PREVIEW YOUR OWN OUTPUT
+
+**Do not inspect generated media to judge its quality. Ever.** No previewing, no playback, no opening it in a viewer, no downloading it, no screenshotting it, no frame-sampling, no montage grids, no "let me just check how it looks". Each of these costs minutes and large amounts of context, and none of them changes what the workflow does next.
+
+**A generated asset is accepted when the application says it is finished** — a completed status, a media record, an ID that maps to the request. That signal is the proof. Appearance is not verified by you.
+
+- **Accept the first take.** Regenerate only on an explicit failure signal from the app: an error, a rejected request, a wrong-format refusal, or an empty/failed render.
+- Never re-verify something already proven. If a check has passed once and nothing since could have changed it, do not run it again.
+- Imperfections that are merely cosmetic ship. Note them in one line and keep moving.
+- If the user wants a quality review, they will ask for one — then, and only then, inspect.
+
+**The only validations worth doing** are the ones that prevent silent disasters, and they are all cheap signal checks, never visual ones:
+
+1. **Acceptance** — the submitted job exists and maps to the right source (by ID, never by position or order).
+2. **Completion** — the job reports finished, with the expected duration/size where the workflow defines one.
+3. **Structure** — counts, order and geometry of assembled output (how many items, in what sequence, ending where).
+4. **Persistence** — the save actually happened, proven by the app's own title/record, not a toast.
+5. **Terminal signal** — the export/publish confirmation text that ends the run.
+
+Anything not on that list is not worth the clock.
+```
+
+---
+
+## BLOCK 4 — Final reminder
 
 Paste at the very **end** of the system prompt.
 
@@ -161,6 +192,16 @@ Every entry came from an observed production failure, not from theory.
 | Asking to begin | "Shall I start?" |
 | Hunting for absent files | "Please attach the contract" when it is embedded in the same document |
 | Restarting on Resume | Rebuilding completed work instead of reconciling and continuing |
+
+**Block 3 — minimal validation**
+
+| Habit | What it costs |
+|---|---|
+| Previewing each generated clip | Minutes per asset and a large share of the context window |
+| Frame-sampling or montage QC | Same cost, and it rarely changes the next action |
+| Downloading output "just to check" | Slow transfers plus tool time, for information the app already reported |
+| Re-verifying settled facts | Repeated reads of state that cannot have changed |
+| Chasing cosmetic imperfections | Extra generations that spend credits without changing delivery |
 
 **Block 2 — standing authorization**
 
@@ -247,4 +288,4 @@ If a workflow also has a JSON contract, merge these keys so both halves agree:
 
 These blocks make the expected behaviour unambiguous, which reliably helps capable models. They cannot manufacture stamina: a light-tier model asks permission and yields turns as a trained reflex, and no instruction can restart a turn that has already ended. For unattended runs, pair this module with a model tier that can sustain the work.
 
-**Version 1.1** — distilled from the VOX documentary workflow contract (v3.4.0), August 2026.
+**Version 1.2** — adds the minimal-validation block. Distilled from the VOX documentary workflow contract (v3.4.0), August 2026.
