@@ -24,11 +24,11 @@ An autonomous, browser‑based agent workflow that turns **one idea + one ratio*
 
 The agent asks exactly two questions, then runs autonomously. In this run the inputs were:
 
-> **1. Idea/prompt:** `Jannat is a 2 years old girl. She has lots of toys. He is enjoying by playing.`
+> **1. Idea/prompt:** `Bunny's ABC Garden. A cute bunny explores a magical garden where objects appear for each letter.`
 >
 > **2. Ratio:** `Landscape`
 
-*(Note the stray "He" in that idea — the identity lock still held Jannat as a girl across all 35 scenes, because identity is resolved once from the idea and re‑asserted in the storyboard prompt rather than re‑read per scene.)*
+The protagonist and creative direction are resolved from the idea and used in lyrics and prompts. Generated storyboard content is accepted from structural metadata without visual or description-based character review.
 
 Everything else — song title, lyrics, music style/language, protagonist identity lock, export name, story arc, and all visual treatment — was **inferred** from that one idea. You can add as much or as little detail to the idea as you like (protagonist gender/age/appearance/clothing, setting, action, mood, music style, language); anything omitted is inferred. **Only the ratio is never guessed.**
 
@@ -51,9 +51,9 @@ Typical wall‑clock: a few minutes for the song, a few for the storyboard, then
 | File | Purpose |
 |---|---|
 | [`SYSTEM_PROMPT.md`](SYSTEM_PROMPT.md) | The agent's operating instructions. **§0** is the mandatory device‑agnostic interaction contract; **§17** is the exact DOM/API selector reference; **§18–19** cover validation checkpoints, support investigation, and the golden invariants. |
-| [`WORKFLOW.json`](WORKFLOW.json) | Machine‑readable config (v2.8.0): prompt-book preparation, current VideoExpress flow, ordered steps, execution mechanics, checkpoints, recovery, and safety rules. |
+| [`WORKFLOW.json`](WORKFLOW.json) | Machine‑readable config (v2.8.2): verified audio transfer, structural-only storyboard acceptance, prompt-book preparation, current VideoExpress flow, checkpoints, recovery, and safety rules. |
 | [`prompt_book.json`](prompt_book.json) | Runtime prompt-book template. The agent fills one ordered Artistly scene/Design ID/image mapping, final VideoExpress prompt, and 3–10 second Advanced Mode duration per scene before generation. |
-| [`WORKFLOW_STATE.example.json`](WORKFLOW_STATE.example.json) | Compact v2.8.0 checkpoint example showing prompt-book preparation, latest-flow submission, and separate generation monitoring. |
+| [`WORKFLOW_STATE.example.json`](WORKFLOW_STATE.example.json) | Compact v2.8.2 checkpoint example showing verified audio transfer, structural storyboard acceptance, prompt-book preparation, latest-flow submission, and separate generation monitoring. |
 | `README.md` | This file. |
 
 ---
@@ -62,11 +62,12 @@ Typical wall‑clock: a few minutes for the song, a few for the storyboard, then
 
 - **Ratio is a project‑wide invariant** — every image, clip, canvas, and the export use the one chosen orientation; landscape and vertical are never mixed.
 - **Identity lock at input/prompt level** — gender, age, hair, clothing, and visual medium are resolved once and repeated consistently in lyrics and prompts. Generated media is accepted without visual review.
-- **Storyboard agent priority & fallback** — Artistly **Nursery Rhymes** runs first. Every attempt receives cheap API-only structural validation: completed multi-scene batch, viable count, correct ratio, and sequential page numbers. It gets up to three attempts before the same three-attempt fallback to **Music Storyboard**. Failed batches are logged and never mixed.
+- **Storyboard agent priority & fallback** — Artistly **Nursery Rhymes** runs first. Every attempt receives API-only structural validation: completed multi-scene batch, viable count, correct ratio, and sequential page numbers. Descriptions, names, prompts, thumbnails, identity, species, gender, theme, and appearance are never reviewed. Only structural failures count toward the three-attempt fallback to **Music Storyboard**; a user-approved Design-ID list is authoritative.
 - **Narration-style, no lip-sync (v2.7.0)** — every VideoExpress prompt is sanitized and universally wrapped with narration/no-speech/close-mouth instructions, ending exactly with **`no mouth movement no lypsync`**. Prompt enhancement and lip sync remain off, and style is explicitly set to 3D. The prompt is checked once before submission; completed prompt metadata and mouth motion are not inspected.
 - **Prompt book + latest VideoExpress flow (v2.8.0)** — prompts are prepared once in `prompt_book.json` against their Artistly Design IDs and imported image IDs. Generation uses **Create Video From Prompt**, Image Type 3D, both enhancement toggles off, Video Only on, Advanced Mode on, and the planned manual duration. The creator tab stays open; My AI Videos may be monitored in a separate tab without previewing clips.
 - **Minimal validation for speed** — generated images and videos are never previewed, played, downloaded for review, screenshot, montaged, or frame-sampled. The first take is accepted from application completion signals and source-ID mapping. Validation is limited to acceptance, completion, structure, project-save persistence, and export confirmation.
 - **Standing authorization** — navigation, named controls, generations, normal retries, working-timeline cleanup, save, and export are authorized when the run starts. The agent stops only for a true blocker such as login/CAPTCHA, visible app refusal, exhausted unrecoverable error, uncontrollable browser, vanished job, out-of-scope destruction, or unsafe ambiguity.
+- **Verified audio handoff (v2.8.1)** — the exact completed CloneVoice CDN source is fetched and binary-validated before it is injected into Artistly FilePond. A Download click or guessed path is never accepted as proof. Local download is used only as a verified fallback, and source-transfer failures do not consume storyboard retry attempts.
 - **Exact sync** — the final video endpoint equals the audio endpoint with **zero‑pixel tolerance** (achieved by the playhead‑set + cut + tail‑delete method).
 - **`N` is dynamic** — however many storyboard scenes are produced, exactly that many timeline clips are made (no fixed count).
 - **≤ 5 concurrent generations**, batched, with a completion barrier between batches.

@@ -1,6 +1,8 @@
 ﻿{
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "config_version": "2.8.0",
+  "config_version": "2.8.2",
+  "config_changelog_v2_8_2": "Remove stale hardcoded human/girl/boy storyboard checks and prohibit semantic generated-media rejection. Artistly batches are accepted from structural API metadata only: completion, multi-scene count, selected ratio, sequential page numbers, and duration viability. Design descriptions, names, prompts, thumbnails, species, gender, theme, and appearance are never inspected for QC and can never trigger retry or Music Storyboard fallback. A user-approved batch or explicit Design-ID list is authoritative and continues immediately. The agent must never ask the user to repeat an audio upload.",
+  "config_changelog_v2_8_1": "Harden the CloneVoice-to-Artistly audio handoff. The primary path now fetches the exact completed CloneVoice CDN source, validates HTTP success, byte size, MIME/signature, constructs a deterministic File, and injects it into Artistly FilePond. A Download click or guessed path is never proof. Local download is a verified fallback only, and source-transfer failures do not consume Artistly storyboard retry attempts. The intake-to-execution transition also explicitly forbids credit or saved-project confirmation questions.",
   "config_changelog_v2_8_0": "Create prompt_book.json after the accepted Artistly storyboard and before VideoExpress generation. The prompt book stores one ordered image/design mapping, final transformed prompt, and planned 3-10 second duration per scene. VideoExpress generation now uses Create with AI > Create Video From Prompt with Image Type 3D, both prompt-enhancement toggles off, Video Only on, Advanced Mode on, and manual duration from the prompt book. Image To Video (Old Algorithm) and Video Length Booster are retired from this workflow.",
   "config_changelog_v2_7_0": "Speed and low-model compatibility: receiving the contract starts the run; all normal workflow actions are pre-authorized; permission questions and user-delegated browser work are banned; generated images and videos are never previewed; persisted video-prompt metadata audit, storyboard montage review, open-mouth flagging, per-clip mouth-motion QC, frame sampling, and QC repair generations are removed. Validation is limited to acceptance, completion, structure, project-save persistence, and the export terminal signal. The strict no-speech prompt is still asserted once before submission.",
   "automation": {
@@ -48,7 +50,7 @@
         "account settings"
       ],
       "never_delegate_browser_work_to_the_user": true,
-      "host_safety_boundary": "This authorization never bypasses approval or safety mechanisms imposed by the host platform or tool runtime."
+      "host_safety_boundary": "This authorization never bypasses approval or safety mechanisms actually surfaced by the host platform or tool runtime. Never invent a confirmation checkpoint because normal generation consumes credits or creates saved assets."
     },
     "minimal_validation": {
       "never_preview_generated_media": true,
@@ -163,10 +165,13 @@
           "use_for": "native <select> dropdowns (VideoExpress style, quality, size, format; CloneVoice music-type)",
           "recipe": "select.value = optionValue; select.dispatchEvent(new Event('change',{bubbles:true}));"
         },
-        "file_upload_without_os_dialog": {
-          "use_for": "Artistly FilePond audio upload",
-          "recipe": "fetch(cdnUrl) -> blob -> new File([blob],name,{type}) -> DataTransfer -> input.files -> input.dispatchEvent(new Event('change',{bubbles:true})). CloneVoice CDN mp3 URLs are public and CORS-open.",
-          "target_selector": "input[type=file][name=\"filepond\"]"
+        "verified_clonevoice_audio_to_filepond": {
+          "use_for": "Primary CloneVoice-to-Artistly audio handoff without an OS dialog or assumed local file",
+          "recipe": "Read the exact Completed CloneVoice record's uuid/title/src. fetch(src,{cache:'no-store'}); require response.ok; read ArrayBuffer/Blob; require byte_size >= 16384 and audio/* MIME or MP3 ID3/MPEG-frame signature; create deterministic <sanitized-title>-<uuid>.mp3 File with audio/mpeg; DataTransfer -> input.files -> dispatch change with bubbling.",
+          "target_selector": "input[type=file][name=\"filepond\"]",
+          "success_gate": "FilePond shows the deterministic filename and completed/success state.",
+          "source_retry_rule": "Re-read and fetch the same CloneVoice source up to 3 times. Source fetch/payload failures do not increment Artistly storyboard_attempt.",
+          "fallback": "Only if direct transfer is unavailable: click CloneVoice Download, wait for browser download completion, discover the actual path, require file exists and size >= 16384, then upload that exact file. Never guess a path."
         }
       },
       "state_reading_prefers_api": "Verify gates from app APIs, not by toggling panels and screenshotting. See dom_api_contract.read_apis.",
@@ -233,7 +238,13 @@
           "music_name",
           "audio_id",
           "generation_status",
-          "downloaded_audio_path"
+          "src_url",
+          "audio_transfer_method",
+          "audio_transfer_file_name",
+          "audio_transfer_byte_size",
+          "audio_transfer_mime_type",
+          "audio_transfer_payload_validated",
+          "fallback_downloaded_audio_path"
         ],
         "artistly": [
           "uploaded_audio_name",
@@ -344,9 +355,9 @@
       "browser_tab_closed": "Open the application again, load the exact named saved project or account-level item, reconcile IDs and status, and continue from the checkpoint.",
       "page_reload_during_form_entry": "Restore only unsaved fields for current_substep from workflow state. Do not repeat earlier submitted steps.",
       "clonevoice_generation_submitted_without_completion": "Open My Audio, find the exact music_name and audio_id, and wait while Processing. Click Generate Music only if no matching submitted item exists.",
-      "clonevoice_completed_before_checkpoint_write": "Find the exact completed title, capture its audio_id, mark generation completed, and continue with download without regenerating.",
-      "music_download_interrupted": "Check downloaded_audio_path and file size. Reuse a valid existing file; otherwise download only the exact completed item again.",
-      "artistly_upload_interrupted": "Inspect the upload control for the expected file name. If already uploaded, continue. Otherwise retry only the file upload.",
+      "clonevoice_completed_before_checkpoint_write": "Find the exact completed title and UUID, capture its src URL, mark generation completed, and continue with the verified audio handoff without regenerating.",
+      "audio_transfer_interrupted": "Inspect the transfer record and Artistly FilePond. If the deterministic filename is already complete, continue. Otherwise re-read the same CloneVoice src and repeat byte validation before reinjection. Never assume a Download click produced a file.",
+      "artistly_upload_interrupted": "Inspect FilePond for the deterministic expected filename and completed/success state. If complete, continue. If absent, repeat the verified source transfer. If selected but incomplete, retry only FilePond upload after confirming the source bytes remain valid.",
       "artistly_storyboard_partially_completed": "Keep the same storyboard job open and wait for remaining scene IDs. Never start a second storyboard job while a matching one exists. If the browser reconnects, open Personal Designs, filter by the recorded storyboard_tool, find the matching job by timestamp and first image, and continue inspection without resubmitting.",
       "artistly_nursery_rhymes_error_or_single_image": "Known Nursery Rhymes defect: an attempt sometimes ends in an explicit error or produces only ONE image instead of a full storyboard. This is a failed attempt, not a blocker. Append an error_history entry (support_investigation.error_history_entry_shape extended with agent, attempt, designs_returned, design_ids; symptom = the exact on-screen error message or 'single_image') for later debugging, abandon that batch entirely (never import it, never mix it with another attempt's designs), and retry Nursery Rhymes up to 3 validated attempts total. Only after the third failure switch to the Music Storyboard fallback with the character-lock prompt (the fallback also gets up to 3 validated attempts; 6 total logged failures are a reported true blocker).",
       "artistly_generated_appearance": "Do not inspect or judge generated appearance in the speed-optimized workflow. Enforce identity in lyrics and prompts, then accept the first structurally completed batch.",
@@ -380,7 +391,7 @@
         "style": "{{CLONEVOICE_MUSIC_STYLE}}",
         "language": "English",
         "music_name": "{{MUSIC_NAME}}",
-        "download_directory": "{{LOCAL_DOWNLOAD_DIRECTORY}}"
+        "fallback_download_directory": "{{LOCAL_DOWNLOAD_DIRECTORY}}"
       },
       "artistly": {
         "agent": "Nursery Rhymes",
@@ -417,11 +428,11 @@
         "image_dimension": "16:9",
         "storyboard_selection": "all_completed_verified_scenes",
         "target_scene_count": "runtime.artistly.storyboard_scene_count",
-        "character_lock_prompt": "Only used with the Music Storyboard fallback (after 3 failed validated Nursery Rhymes attempts). Example: '3D children's animation; <name> a <age> GIRL, <eyes>, <hair>, <clothing>; always a girl, never a boy; mouth closed, closed-lip smile, never singing or talking'. Keep it under the field's character limit (Music Storyboard ~150 chars); if it will not fit, drop optional identity detail (eye colour, footwear) before dropping the no-speech clause. Nursery Rhymes has no such field, so with that agent the no-speech rule can only be applied at the video stage."
+        "character_lock_prompt": "Only used with the Music Storyboard fallback after 3 structural Nursery Rhymes failures. Derive it from the user's resolved protagonist without assuming a human or gender. Example: '3D children's animation; single white bunny only; blue overalls, yellow scarf; no humans; mouth closed; never talking'. Keep it under the field's character limit (Music Storyboard ~150 chars). Nursery Rhymes has no such field, so identity remains in the lyrics and video prompts."
       },
       "videoexpress": {
         "animation_style": "3D",
-        "animation_style_note": "Never select 'human' for a character montage; that path biases toward talking-head motion.",
+        "animation_style_note": "Use 3D for this workflow; do not infer species or character identity from the animation-style control.",
         "automatically_enhance_image_prompt": false,
         "automatically_enhance_video_prompt": false,
         "automatically_enhance_video_prompt_note": "v2.4.0: MUST stay false - the enhancer rewrites the submitted prompt server-side and can strip or dilute the no-speech language. Assert any enhance toggle is unchecked before every submission.",
@@ -486,7 +497,7 @@
           "style",
           "language",
           "music_name",
-          "download_directory"
+          "fallback_download_directory"
         ],
         "allowed_languages": [
           "English"
@@ -535,9 +546,9 @@
       "music_submit_button": "Generate Music",
       "completion_page": "My Audio",
       "completion_status": "Completed",
-      "download_for_artistly": true,
-      "download_rule": "Download exactly the completed track whose title matches inputs.audio.music_name and record its absolute local path.",
-      "videoexpress_transfer_rule": "Do not upload the downloaded copy into VideoExpress. Import the same completed title through VideoExpress's synchronized CloneVoice library."
+      "prepare_verified_transfer_for_artistly": true,
+      "artistly_transfer_rule": "Primary path: fetch and binary-validate the exact Completed record's src, construct a deterministic File, and inject it directly into Artistly FilePond. Local download is a verified fallback only; never guess a path.",
+      "videoexpress_transfer_rule": "Do not upload the Artistly transfer copy into VideoExpress. Import the same completed title through VideoExpress's synchronized CloneVoice library."
     },
     "artistly": {
       "start_url": "https://app.artistly.ai/choose-designer",
@@ -547,22 +558,21 @@
       "agent_priority_source": "inputs.artistly.agent_priority",
       "agent_fallback": "Music Storyboard (LOW priority; only after 3 failed validated Nursery Rhymes attempts, each logged in error_history; the fallback itself also gets up to 3 validated attempts)",
       "attempt_validation_source": "inputs.artistly.storyboard_attempt_validation",
-      "audio_upload_source": "runtime.clonevoice_downloaded_audio_path",
+      "audio_upload_source": "runtime.clonevoice.src_url via execution_mechanics.interaction_primitives.verified_clonevoice_audio_to_filepond; runtime.clonevoice.fallback_downloaded_audio_path only after verified fallback",
       "storyboard_style_prompt_source": "inputs.artistly.character_lock_prompt (Music Storyboard fallback only)",
       "image_dimension_source": "inputs.artistly.image_dimension",
       "generate_button": "Generate Images",
       "output": "ordered_consistent_character_storyboard",
       "scene_requirements": [
-        "the batch is a full multi-scene storyboard that matches the music theme (never a single image)",
-        "scene processing is completed",
-        "scene image is visible",
-        "scene number or generated ordering is available",
-        "the protagonist is visibly a girl in every selected scene",
-        "the protagonist retains every locked identity attribute (hair, eyes, clothing, medium) from the production brief",
-        "consistent main character appearance",
-        "no malformed faces or hands",
-        "no unwanted text, logos, or watermarks"
+        "the accepted batch is a completed multi-scene storyboard, never a single image",
+        "every scene status is completed/private",
+        "the batch aspect ratio equals the selected project ratio",
+        "page_number values provide a complete sequential story order",
+        "scene count N satisfies 3N <= ceil(audio_seconds) <= 10N",
+        "no image, thumbnail, description, autogenerated prompt, character name, species, gender, theme, clothing, or appearance is inspected for QC"
       ],
+      "semantic_rejection_forbidden": "Never reject or regenerate a structurally valid batch because generated descriptions, names, prompts, thumbnails, or images seem to contain the wrong protagonist, species, gender, theme, setting, clothing, or appearance. Never use such judgments to trigger Music Storyboard fallback.",
+      "user_approved_batch_rule": "If the user explicitly approves a completed batch or provides its Design IDs, record that batch as accepted and continue immediately with exactly those IDs. Do not inspect, revalidate semantically, regenerate, switch agents, or request another audio upload.",
       "bulk_download_storyboard": false,
       "videoexpress_transfer_method": "direct Artistly integration"
     },
@@ -914,7 +924,7 @@
         },
         {
           "gate": "identity_gate",
-          "verify": "lyrics and submitted prompts are identity-consistent; generated media is not visually inspected"
+          "verify": "user input, lyrics, and submitted prompts are internally consistent; generated images, descriptions, names, prompts, and thumbnails are not inspected"
         },
         {
           "gate": "storyboard_gate",
@@ -1069,26 +1079,26 @@
       {
         "step": 12,
         "phase": "clonevoice_music",
-        "action": "download_music_for_artistly",
-        "details": "Click Download only for the completed configured music item. Save it beneath inputs.audio.download_directory and record the absolute path as runtime.clonevoice_downloaded_audio_path."
+        "action": "prepare_verified_audio_for_artistly",
+        "details": "Read the exact Completed CloneVoice record's uuid, title, src URL, and duration. Do not click Download by default. Fetch src with cache disabled; require HTTP success, at least 16 KB, and audio MIME or MP3 signature; construct the deterministic <sanitized-title>-<uuid>.mp3 File and record src_url, filename, byte size, MIME, payload_validated, and transfer_method=direct_cdn_filepond. Retry this source preparation up to 3 times before using the verified local-download fallback. Never invent a file path."
       },
       {
         "step": 13,
         "phase": "artistly_storyboard",
         "action": "open_storyboard_agent",
-        "details": "Open Artistly choose-designer, Fast AI Image Designer, AI Design Agents tab, then the agent chosen by inputs.artistly.agent_priority: ALWAYS Nursery Rhymes (HIGH priority) first; increment runtime.artistly.storyboard_attempt (1-based). Open Music Storyboard (LOW priority) only when error_history already records 3 failed validated Nursery Rhymes attempts for this run. Nursery Rhymes: only a rhyme-audio FilePond upload and a dimension dropdown that defaults to 1:1 and MUST be set to the selected ratio; identity comes from the lyrics (no character field). Music Storyboard: has a Storyboard Style character-lock textarea. Inject the audio via the FilePond DataTransfer method (execution_mechanics.interaction_primitives.file_upload_without_os_dialog); do not use an OS file dialog."
+        "details": "Open Artistly choose-designer, Fast AI Image Designer, AI Design Agents tab, then the agent chosen by inputs.artistly.agent_priority: ALWAYS Nursery Rhymes (HIGH priority) first; increment runtime.artistly.storyboard_attempt (1-based) only after the verified audio is uploaded and storyboard generation is submitted. Open Music Storyboard (LOW priority) only when error_history already records 3 failed validated Nursery Rhymes storyboard attempts for this run. Nursery Rhymes: only a rhyme-audio FilePond upload and a dimension dropdown that defaults to 1:1 and MUST be set to the selected ratio; identity comes from the lyrics (no character field). Music Storyboard: has a Storyboard Style character-lock textarea. Inject the validated File via execution_mechanics.interaction_primitives.verified_clonevoice_audio_to_filepond; do not use an OS file dialog."
       },
       {
         "step": 14,
         "phase": "artistly_storyboard",
         "action": "upload_rhyme_audio",
-        "details": "Upload runtime.clonevoice_downloaded_audio_path to Upload Your Rhyme Audio and verify the correct file name appears."
+        "details": "Inject the byte-validated deterministic File into Upload Your Rhyme Audio. Require FilePond to show the exact expected filename and completed/success state; filename presence alone is insufficient. If source fetch or payload validation fails, return to step 12 without incrementing storyboard_attempt and do not report Artistly as down."
       },
       {
         "step": 15,
         "phase": "artistly_storyboard",
         "action": "lock_character_and_select_storyboard_ratio",
-        "details": "Every attempt: set the image dimension to the selected ratio (Nursery Rhymes defaults to 1:1 and MUST be changed; 16:9 for Landscape). Music Storyboard fallback only: enter inputs.artistly.character_lock_prompt in Storyboard Style, explicitly requiring the locked protagonist identity (e.g. always a girl, never a boy). Never generate a mixed-ratio storyboard."
+        "details": "Every attempt: set the image dimension to the selected ratio (Nursery Rhymes defaults to 1:1 and MUST be changed; 16:9 for Landscape). Music Storyboard fallback only: enter inputs.artistly.character_lock_prompt derived from the user's resolved protagonist without assuming a human or gender. Never generate a mixed-ratio storyboard."
       },
       {
         "step": 16,
@@ -1345,13 +1355,15 @@
       "clonevoice_language_matches_input": true,
       "clonevoice_music_name_matches_input": true,
       "clonevoice_music_completed": true,
-      "clonevoice_audio_downloaded_for_artistly": true,
+      "clonevoice_audio_payload_verified_for_artistly": true,
+      "clonevoice_audio_transfer_method_recorded": true,
       "artistly_uploaded_audio_matches_clonevoice_item": true,
       "artistly_image_dimension_is_16_9": true,
       "artistly_storyboard_completed": true,
       "artistly_storyboard_order_recorded": true,
       "artistly_character_lock_prompt_recorded": true,
-      "artistly_protagonist_is_consistently_a_girl": true,
+      "artistly_batch_passes_structural_metadata_only": true,
+      "artistly_generated_content_not_semantically_inspected": true,
       "artistly_selected_scene_count_equals_N": true,
       "artistly_scenes_imported_to_videoexpress": true,
       "videoexpress_scene_count_matches_storyboard": true,
@@ -1386,10 +1398,11 @@
       "integration_missing": "Stop without modifying API keys. Report the exact missing integration field or unavailable import action.",
       "lyrics_generation_timeout": "Keep CloneVoice open, wait one additional soft-timeout period, and inspect for an explicit error before stopping.",
       "music_generation_timeout": "Keep My Audio open and continue polling the exact named item while Processing remains visible.",
-      "music_download_blocked": "Retry the exact completed CloneVoice source through the authenticated browser and documented FilePond/DataTransfer path. If the browser rejects it after the retry ladder, checkpoint and report the exact blocker; never delegate the download to the user.",
-      "artistly_upload_failed": "Verify the local file exists and is a supported audio type, then retry the upload once. Never substitute a different track silently.",
+      "audio_source_fetch_or_payload_invalid": "Re-read the exact Completed CloneVoice record and retry its same src up to 3 times. Verify response.ok, byte size >= 16384, and audio MIME or MP3 signature. Do not increment Artistly storyboard_attempt. If still unavailable, use the verified local-download fallback and discover the actual completed path; never guess it or delegate download to the user.",
+      "artistly_upload_failed": "First distinguish source-transfer failure from FilePond failure. Revalidate the exact source bytes. If invalid, return to source preparation; if valid, reinject the deterministic File and require FilePond completed/success. Never substitute a different track silently and never blame Artistly solely because an assumed local path was missing.",
       "storyboard_generation_slow": "Continue polling while scene cards show Processing. Active generation is not a blocker and has no hard deadline.",
-      "unacceptable_storyboard_scene": "Regenerate before importing scenes. If the protagonist is a boy or violates the locked girl identity, reject the entire affected storyboard set; do not animate, silently omit, or rationalize the mismatch.",
+      "perceived_storyboard_character_or_theme_mismatch": "Do not inspect or reject the batch. Generated descriptions, names, prompts, thumbnails, and appearance are outside minimal validation. If structural metadata passes, accept the batch and continue; if the user explicitly approved its Design IDs, that approval is authoritative.",
+      "user_approved_existing_storyboard": "Record the approved agent, batch, and Design IDs; abandon unapproved fallback attempts without deleting them; continue directly from import/mapping with the approved IDs. Do not ask for another audio upload.",
       "artistly_import_missing_scenes": "Compare imported images with recorded storyboard scene count and re-import only the missing scenes.",
       "scene_video_still_processing": "Wait in My AI Videos. Never add a processing clip to the timeline.",
       "scene_order_uncertain": "Resolve order from recorded scene numbers, prompts, thumbnails, and IDs before editing the timeline.",
@@ -1410,7 +1423,9 @@
       "never_generate_lyrics_without_song_idea_and_style": true,
       "never_generate_music_without_music_name": true,
       "never_download_an_audio_item_with_a_different_title": true,
-      "never_upload_an_unverified_local_audio_file": true,
+      "never_treat_a_download_click_as_file_success": true,
+      "never_guess_or_invent_a_download_path": true,
+      "never_upload_audio_without_binary_payload_validation": true,
       "never_mix_landscape_and_vertical_assets": true,
       "never_bulk_download_artistly_scenes_for_videoexpress": true,
       "never_enable_lip_sync_for_the_music_montage": true,
@@ -1422,7 +1437,7 @@
       "never_preview_or_visually_inspect_generated_media": true,
       "never_regenerate_for_cosmetic_or_visually_perceived_defects": true,
       "always_include_mouth_close_opening_in_every_video_prompt": true,
-      "never_select_human_animation_style_for_a_character_montage": true,
+      "always_use_3d_animation_style_for_this_workflow": true,
       "never_add_processing_scene_videos_to_timeline": true,
       "never_treat_render_queue_pending_as_final_delivery": true,
       "never_submit_a_prompt_without_exact_terminal_tail_override_when_present": true,
@@ -1436,7 +1451,8 @@
       "never_append_a_duration_repair_duplicate_after_the_N_scene_sequence": true,
       "never_leave_both_earlier_and_revised_duration_versions_on_timeline": true,
       "never_change_a_neighboring_scene_when_replacing_a_duration_repair_scene": true,
-      "never_accept_a_boy_protagonist_when_the_song_specifies_a_baker_girl": true,
+      "never_reject_generated_media_by_species_gender_name_description_theme_or_appearance": true,
+      "never_request_the_user_to_repeat_an_audio_upload": true,
       "never_trim_music_to_hide_a_short_video": true,
       "never_add_the_same_duration_repair_video_twice": true,
       "never_accept_rounded_duration_labels_as_exact_endpoint_proof": true,
@@ -1465,7 +1481,11 @@
         "clonevoice_music_name",
         "clonevoice_audio_id",
         "clonevoice_music_status",
-        "clonevoice_downloaded_audio_path",
+        "clonevoice_audio_src_url",
+        "clonevoice_audio_transfer_method",
+        "clonevoice_audio_transfer_file_name",
+        "clonevoice_audio_transfer_byte_size",
+        "clonevoice_fallback_downloaded_audio_path",
         "artistly_uploaded_audio_name",
         "artistly_storyboard_scene_count",
         "artistly_storyboard_scene_ids_in_order",

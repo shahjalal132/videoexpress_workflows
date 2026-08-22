@@ -1,6 +1,6 @@
 {
   "run_id": "example-run",
-  "workflow_config_version": "2.8.0",
+  "workflow_config_version": "2.8.2",
   "authorization_mode": "standing_authorization_for_all_in_scope_workflow_actions",
   "validation_mode": "minimal_signal_only_no_generated_media_preview",
   "current_phase": "videoexpress_animation",
@@ -15,10 +15,23 @@
     "music_uuid": "<clonevoice-id>",
     "name": "Example Nursery Rhyme",
     "status": "Completed",
-    "duration_seconds": 30
+    "duration_seconds": 30,
+    "src_url": "https://cdn.clonevoice.ai/<exact-completed-source>.mp3",
+    "audio_transfer": {
+      "method": "direct_cdn_filepond",
+      "file_name": "example-nursery-rhyme-<clonevoice-id>.mp3",
+      "byte_size": 480000,
+      "mime_type": "audio/mpeg",
+      "payload_validated": true,
+      "filepond_status": "complete",
+      "fallback_local_path": null
+    }
   },
   "artistly": {
     "tool": "Nursery Rhymes",
+    "acceptance_method": "structural_metadata_only",
+    "semantic_content_reviewed": false,
+    "user_approved_batch": false,
     "storyboard_scene_count": 5,
     "scene_ids_in_story_order": [
       "<design-1>",
