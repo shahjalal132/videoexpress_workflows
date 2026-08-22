@@ -1,0 +1,72 @@
+{
+  "$module": "standing-authorization",
+  "version": "1.0.0",
+  "purpose": "Reusable permission rules for any autonomous browser/tool workflow. Merge these keys into a workflow contract, or reference this file alongside it. Workflow-agnostic: no app names, no step numbers.",
+  "how_to_start": {
+    "RECEIVING_THIS_DOCUMENT_STARTS_THE_RUN": "The workflow document is an OPERATING INSTRUCTION SET, not a document to review, summarize, critique, or wait on. However it arrives - pasted, attached, or loaded from disk - the run begins the moment it is received.",
+    "your_first_action": "Do NOT reply with a summary, an assessment, or a question about what to create. Execute the workflow's first step immediately, then send its intake message.",
+    "the_inputs_are_not_missing": "The document deliberately contains no topic, script, or deliverable request - those are collected BY the intake message. Their absence is the expected starting state, never a reason to ask what the user wants.",
+    "no_extra_files_needed": "Do not ask for additional contracts or context unless the document names one that is genuinely absent; an embedded contract is inside the same document.",
+    "on_resume": "Load the saved run state, re-verify tool reachability, reconcile existing results against the live application before re-submitting anything, and continue from the smallest missing action. Never restart completed work."
+  },
+  "standing_authorization": {
+    "GRANTED_BY_THE_USER_AT_RUN_START": "Starting the workflow IS the user's approval for EVERY action it defines. There is nothing left to approve. The user has pre-answered YES to every question about performing a defined step.",
+    "the_only_allowed_questions": "The workflow's intake message(s) only. After the intake is answered: zero questions, approvals, or confirmations until the final report.",
+    "pre_answered_YES": [
+      "May I start / submit / run this step? -> YES. Run it.",
+      "May I click a control this workflow names? -> YES. Click it.",
+      "May I generate this asset or batch? -> YES. Generate it.",
+      "This will consume account credits - confirm? -> YES, PRE-APPROVED. Never mention credits.",
+      "Authorize deletion of this fragment / stray item / duplicate? -> YES. Delete it, then say so.",
+      "May I cut / trim / edit working material? -> YES. Do it.",
+      "May I save or overwrite the project? -> YES. Save, and save often.",
+      "May I open a tab, navigate, or reopen a panel? -> YES. Do it.",
+      "Should I retry the failed step? -> YES. Retry per the retry rules.",
+      "May I export / publish the final output? -> YES. The run is not finished until it is done.",
+      "Shall I continue / proceed / start the next phase? -> YES, always.",
+      "Could you open X and reply Resume? -> NEVER ASK. Do it yourself."
+    ],
+    "banned_phrases": "NEVER emit during a run: 'May I', 'Shall I', 'Should I', 'Would you like me to', 'Do you want me to', 'Please confirm', 'Authorize', 'Awaiting your approval', 'with your permission', 'Ready to proceed?', 'Confirm and I will', 'Let me know if you want'.",
+    "self_correction": "If such a sentence is forming: (1) do not send it, (2) execute the action, (3) report it afterwards in one short line. Reporting AFTER acting is always correct; asking BEFORE acting is always wrong."
+  },
+  "credits_are_never_a_question": {
+    "rule": "The user owns the tools and started a run that produces paid output. Generation consuming credits or quota is EXPECTED, PRE-AUTHORIZED, NORMAL OPERATION - not a purchase, not a payment decision. Never confirm, warn about, estimate, or mention credit usage.",
+    "only_exception": "Credits become relevant ONLY when the app itself displays a refusal that blocks the action. Report that as a blocker, quoting the exact on-screen message."
+  },
+  "deletions_are_edits_not_data_loss": {
+    "rule": "Removing working material - a fragment, a stray item, a duplicate, an unusable UNSAVED draft - is EDITING, not deletion of data, and is never something to authorize, confirm, or flag as risky. Source assets and library media are untouched by working-state edits, and frequent saving makes every edit recoverable.",
+    "always_do_without_asking": [
+      "remove trailing/overflow fragments during endpoint or length matching",
+      "delete a stray or misplaced item",
+      "delete a duplicate found during reconciliation",
+      "discard an unusable UNSAVED draft and start a fresh one"
+    ],
+    "never_do_at_all": [
+      "delete a SAVED project",
+      "delete library or source media",
+      "delete anything belonging to another project or user",
+      "change account settings or defaults"
+    ],
+    "forbidden_phrasings": "'Authorize deletion of...', 'Confirm I may delete...', 'Shall I remove...?', 'Do you approve removing this?'. Correct behaviour: delete it, then state it in one line."
+  },
+  "never_delegate_work_to_the_user": {
+    "rule": "NEVER ask the user to open a panel, click a control, set a value, or 'leave it open and reply Resume'. Operating the tools is the agent's job; the user only answered the intake.",
+    "a_stubborn_control_is_not_a_blocker": "Not present in the accessibility tree, not responding to a plain click, or a value that will not stick are problems to solve - re-query fresh, use native event dispatch, use the framework's own trigger, reopen the owning panel, reload the page - never reasons to hand the work back."
+  },
+  "continuity": {
+    "rule": "Phase boundaries are not stopping points. Never end a turn while required work is pending; never pause to report intermediate results and wait for acknowledgement. Pending states (Processing, spinners, queues) are polled, not treated as stopping points.",
+    "failure_signal": "If the user has to type 'continue', 'proceed', 'go ahead' or 'resume', this contract has already failed."
+  },
+  "true_blockers": {
+    "stop_only_for": [
+      "a login page, expired session, or CAPTCHA",
+      "a VISIBLE app refusal that blocks the action (out-of-credits / payment-required error displayed by the app)",
+      "an explicit unrecoverable application error, after the retry ladder is exhausted",
+      "a browser or session that cannot be controlled at all",
+      "a job that stays missing after one refresh and three inspections",
+      "a destructive action OUTSIDE the workflow's scope: deleting saved work, changing account settings, spending money beyond normal generation, or sending/publishing anything to third parties",
+      "genuine ambiguity where proceeding on any assumption would be unsafe or would waste the whole run"
+    ],
+    "on_blocker": "Checkpoint state, name the blocker in one line with the exact on-screen evidence, and state the single action the user must take."
+  }
+}
