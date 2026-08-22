@@ -1,14 +1,82 @@
 ﻿{
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "config_version": "2.6.0",
-  "config_changelog_v2_6_0": "Live-run hardening after lip-sync and timeline failures: use the user's literal terminal_tail_override 'no mouth movement no lypsync' verbatim as the final prompt characters; audit the persisted Video prompt in Media Library Details/Redesign after completion; require native value setter plus input/change followed by blur/Tab, settle, and re-read; remove microphone, singing-pose, silent-singing, and equivalent positive vocal triggers before wrapping; and keep processing or merely accepted jobs off the timeline until completed, uniquely mapped clips pass prompt metadata and frame-sampling QC. Final render/download/playback verification remains required.",
-  "config_changelog": "2.5.0: Mouth control moved entirely to the VideoExpress video prompt at user instruction. (a) The storyboard mouth-pose check is now RECORD-ONLY as a hard rule - mouth pose can never cause a storyboard regeneration, re-run, retry or attempt failure at any count, and open-mouth stills are accepted without complaint (the previous behaviour still left the agent re-generating boards in Artistly, which is unwinnable because the Nursery Rhymes house style is open-mouthed on nearly every still); mouth-related entries were removed from storyboard_attempt_validation.fail_conditions. (b) The terminal tail phrase is now the user-specified 'No lip-sync or mouth movement.' (was 'No Mouth Movement or lip-sync.'), still asserted as the literal ending of every video prompt before Create Video. (c) no_speech_prompt_prefix now opens with the positive narration framing 'Narration-style scene with no lip-sync: the character never speaks or mouths any words...' because generators follow positive framing over bare negation. The video is narration style: the only vocal is the CloneVoice track and characters never lip-sync. | 2.4.2: Storyboard mouth-pose gate demoted from attempt-fail to RECORD-ONLY after live-run feedback: the >ceil(0.10*N) threshold made the workflow regenerate the storyboard again and again (the Nursery Rhymes house style renders open-mouth joy on virtually every still, so a regenerated board fails the same gate). Open-mouth stills no longer fail an attempt and no longer consume the agent retry budget; montage QC now records ONLY the affected scene numbers into RUNTIME_STATE.json open_mouth_flagged_scenes, and the mouth is closed at the video stage instead (mouth_close_opening for every flagged scene + suffix/tail + per-clip mouth QC). All other attempt-fail conditions (explicit error, single image, viable floor, theme mismatch, identity/ratio violation) unchanged. | 2.4.1: Added the user-verified terminal tail phrase. Every Image-To-Video prompt now ENDS with the literal sentence 'No Mouth Movement or lip-sync' (inputs.videoexpress.no_speech_prompt_tail), appended after no_speech_prompt_suffix and enforced with an ends-with assert before Create Video. Also documented from the live modal that the style dropdown DEFAULTS to Human - '3d' must be explicitly set for every submission. | 2.4.0: STRICT closed-mouth overhaul after a verified failed run (2026-08-14 'Bella' storyboard) still produced talking lips. Investigation evidence: 4 of 4 sampled source stills had a wide-open mouth with visible teeth, so Image-To-Video animated speech regardless of the appended suffix (frame 0 wins - a suffix cannot hold closed what starts open); action prompts contained vocal/open-mouth wording ('huge, bright smile'); automatically_enhance_video_prompt was true, letting the server-side enhancer rewrite away the no-speech language; and mouth QC was sample-only, so talking clips shipped. Fixes: (a) mouth pose is now a storyboard attempt-validation FAIL condition - more than ceil(0.10*N) flagged open-mouth stills fail the attempt, and the flagged scene list is always recorded; (b) every video prompt is composed sanitize -> no_speech_prompt_prefix -> mouth_close_opening (flagged scenes only) -> base -> no_speech_prompt_suffix, with speech_trigger_sanitizer REMOVING vocal/open-mouth trigger words (a generator follows 'singing' over any negation) and a no-trigger assert before Create Video; (c) automatically_enhance_video_prompt is now false and asserted off; (d) mouth-motion QC watches EVERY clip with per-scene recorded verdicts, a two-stage repair retry, and no silent shipping of a talking clip. | 2.3.0: Hardened storyboard agent selection with priority, validated retries, and a fallback. Nursery Rhymes is now the HIGH-priority agent and is always tried first; Music Storyboard is the LOW-priority fallback. Reason: Nursery Rhymes sometimes returns an error or generates only ONE image instead of a full storyboard. Every attempt is now validated before import: the batch must be a full multi-scene storyboard (never a single image; N >= ceil(audio_seconds/8.0417) so the clips can span the song) whose scenes match the music theme/lyrics and the locked identity. Nursery Rhymes gets up to 3 validated attempts; every failed attempt is appended to RUNTIME_STATE.json error_history with the agent, attempt number, exact error message/symptom, and design ids so the defect can be debugged later, and the failed batch is abandoned (never imported, never mixed with another attempt). After the third failure, Music Storyboard runs with the character-lock prompt, also with up to 3 validated attempts; 6 total logged failures are a reported true blocker. | 2.2.0: Fixed a talking-lips defect found on playback. Characters were animating their mouths as if speaking/singing, which reads as broken dubbing in a montage whose only vocal is the CloneVoice track. Root cause: the Image-To-Video prompt was used exactly as auto-filled and never said the character must not speak, so the model defaulted to singing motion on a music video (worsened when the source still already had an open mouth). Fix applied at three levels: (a) no_speech_prompt_suffix is now APPENDED to every auto-filled video prompt and asserted in the textarea before Create Video; (b) no_speech_prompt_suffix_short goes into the Artistly Storyboard Style prompt so the source stills are closed-mouth; (c) added per-batch mouth_motion_qc plus a no_speech_gate, same-slot repair rules, animation style pinned to '3d' (never 'human'), and lip-sync enforcement. Also documented Auto Align Clips as the final arrangement action with mandatory geometry re-verification. | 2.1.0: Fixed a lyric-sync defect found on playback. The 2.0.0 'boost the last K scenes' placement kept endpoints equal but clustered short clips first, so the picture ran up to ~19s ahead of the lyrics through the first half. Replaced with EVEN distribution of boosted clips (running-total rule tracking k*(A/N)); added pacing_sync_gate and per-scene drift audit. | 2.0.0: Hardened from a verified end-to-end successful run. Added device-agnostic execution_mechanics (DOM-selector + event dispatch, never screenshot pixels), dom_api_contract (exact selectors/APIs/durations/confirmation strings), validation_checkpoints and support_investigation blocks. Corrected add-to-timeline to jQuery-UI drag, delete to ctxmenu:delete, music-import to jQuery trigger, exact-trim to playhead-slider+cut+tail-delete, Nursery Rhymes agent specifics.",
+  "config_version": "2.7.0",
+  "config_changelog_v2_7_0": "Speed and low-model compatibility: receiving the contract starts the run; all normal workflow actions are pre-authorized; permission questions and user-delegated browser work are banned; generated images and videos are never previewed; persisted video-prompt metadata audit, storyboard montage review, open-mouth flagging, per-clip mouth-motion QC, frame sampling, and QC repair generations are removed. Validation is limited to acceptance, completion, structure, project-save persistence, and the export terminal signal. The strict no-speech prompt is still asserted once before submission.",
   "automation": {
     "name": "CloneVoice Artistly VideoExpress Nursery Rhymes Music Video",
     "enabled": true,
     "run_mode": "manual",
     "trigger_phrase": "Generate nursery rhymes music video",
     "timezone": "Asia/Dhaka",
+    "how_to_start": {
+      "RECEIVING_THIS_DOCUMENT_STARTS_THE_RUN": "This is an operating instruction set, not a document to review, summarize, critique, or wait on.",
+      "your_first_action": "Verify CloneVoice, Artistly, and VideoExpress are reachable in their existing authenticated sessions. Ask only for any missing idea or ratio; if both are known, present the brief and start.",
+      "the_inputs_are_not_missing": "Idea and ratio are collected by the intake rule; their absence is an expected starting state.",
+      "on_resume": "Load RUNTIME_STATE.json, reconcile live application state, and continue from the smallest missing action. Never restart completed work."
+    },
+    "standing_authorization": {
+      "GRANTED_BY_THE_USER_AT_RUN_START": "Starting the workflow is approval for every normal action explicitly defined by it.",
+      "the_only_allowed_questions": "Missing intake fields from idea and ratio. After that, no routine permission or continuation questions.",
+      "pre_answered_YES": [
+        "navigate, click named controls, generate assets and batches",
+        "retry within the configured retry ladder",
+        "import media and edit the working timeline",
+        "remove an unsaved tail fragment, stray item, duplicate, or unusable unsaved draft",
+        "save or overwrite the named workflow project",
+        "submit the final export"
+      ],
+      "banned_phrases": [
+        "May I",
+        "Shall I",
+        "Should I",
+        "Would you like me to",
+        "Do you want me to",
+        "Please confirm",
+        "Authorize",
+        "Awaiting your approval",
+        "with your permission",
+        "Ready to proceed?",
+        "Confirm and I will",
+        "Let me know if you want"
+      ],
+      "credits_are_never_a_question": "Normal generation credits or quota are expected. Mention them only if the app visibly refuses the action.",
+      "never_delete": [
+        "saved projects",
+        "library or source media",
+        "another project or user's material",
+        "account settings"
+      ],
+      "never_delegate_browser_work_to_the_user": true,
+      "host_safety_boundary": "This authorization never bypasses approval or safety mechanisms imposed by the host platform or tool runtime."
+    },
+    "minimal_validation": {
+      "never_preview_generated_media": true,
+      "forbidden": [
+        "preview generated images or videos",
+        "play generated media",
+        "download generated media for review",
+        "screenshot or montage generated media",
+        "frame-sample generated media",
+        "inspect cosmetic quality, identity, mouth motion, or artistic consistency"
+      ],
+      "accept_first_take_when": "The app reports completion, the asset ID maps to the intended source, and expected structural metadata is present.",
+      "regenerate_only_for": [
+        "explicit application failure",
+        "empty or failed render",
+        "wrong-format or wrong-ratio metadata",
+        "missing job after the recovery ladder",
+        "structural count failure"
+      ],
+      "allowed_validations": [
+        "acceptance by mapped job ID",
+        "completion status and expected duration/size/ratio",
+        "counts, IDs, order, tracks, and timeline geometry",
+        "project save persistence by document title or saved record",
+        "export terminal confirmation"
+      ],
+      "never_reverify_settled_facts": true
+    },
+    "final_reminder": "Standing authorization covers every in-scope action. Never ask whether to start, proceed, retry, edit, save, or export. Act, then report briefly.",
     "browser": {
       "preferred_browser": "chrome",
       "use_existing_authenticated_session": true,
@@ -41,23 +109,25 @@
         "ask_user_to_watch_the_tab"
       ],
       "true_blocking_conditions": [
-        "explicit_generation_failure_message",
         "authentication_required",
         "captcha_or_human_verification_required",
-        "payment_credits_or_account_access_required",
-        "required_api_integration_is_missing",
+        "visible_app_refusal_for_payment_credits_or_account_access",
+        "explicit_unrecoverable_application_error_after_retry_ladder_exhausted",
         "browser_session_closed_disconnected_or_uncontrollable",
-        "required_audio_download_or_upload_is_rejected_by_the_browser",
-        "loading_disappeared_without_result_after_one_safe_refresh_and_three_consecutive_inspections"
+        "loading_disappeared_without_result_after_one_safe_refresh_and_three_consecutive_inspections",
+        "destructive_action_outside_workflow_scope",
+        "genuine_unsafe_or_run_wasting_ambiguity"
       ],
       "not_a_blocker": [
         "mcp_or_api_write_returns_419_page_expired_or_csrf_error_use_authenticated_browser_dom_instead",
         "visible_processing_percentage_or_spinner",
-        "stale_toast_text_verify_via_authoritative_signal_instead"
+        "stale_toast_text_verify_via_authoritative_signal_instead",
+        "normal_generation_credit_or_quota_consumption",
+        "phase_boundary_or_pending_job"
       ]
     },
     "execution_mechanics": {
-      "principle": "All three apps are jQuery + Inertia SPAs whose CSS layout moves with screen size, zoom, and browser-pane scaling. Locate and act on every control by DOM selector (text, name, class, or data-ident) plus JavaScript event dispatch. NEVER click actionable controls by screenshot pixel coordinates. Screenshots are only for human-visible verification and image QC (girl-vs-boy, reading a toast, montage review).",
+      "principle": "All three apps are jQuery + Inertia SPAs whose CSS layout moves with screen size, zoom, and browser-pane scaling. Locate and act on every control by DOM selector (text, name, class, or data-ident) plus JavaScript event dispatch. NEVER click actionable controls by screenshot pixel coordinates and never screenshot generated media for review.",
       "device_agnostic": true,
       "forbidden": [
         "clicking_actionable_controls_by_screenshot_pixel_coordinates",
@@ -170,7 +240,6 @@
           "storyboard_attempt_history",
           "agent_fallback_triggered",
           "character_lock_prompt",
-          "character_identity_verified",
           "storyboard_generation_started",
           "storyboard_scene_count",
           "storyboard_scene_ids_in_order",
@@ -183,9 +252,6 @@
           "current_batch_scene_ids",
           "submitted_scene_ids",
           "completed_video_ids_by_scene",
-          "open_mouth_flagged_scenes",
-          "mouth_qc_verdicts_by_scene",
-          "mouth_qc_exceptions",
           "timeline_scene_ids_in_order",
           "target_timeline_scene_count",
           "boosted_scene_ids",
@@ -259,7 +325,7 @@
         "reconcile external state before retrying",
         "retry only the smallest unverified action once",
         "continue waiting when an item is processing",
-        "request user action only for authentication, CAPTCHA, credits, permissions, or an explicit unrecoverable application error"
+        "request user action only for a true blocker in execution_contract.true_blocking_conditions; ordinary workflow actions and normal credit use are already authorized"
       ],
       "forbidden_recovery_actions": [
         "restart the workflow from step 1",
@@ -281,7 +347,7 @@
       "artistly_upload_interrupted": "Inspect the upload control for the expected file name. If already uploaded, continue. Otherwise retry only the file upload.",
       "artistly_storyboard_partially_completed": "Keep the same storyboard job open and wait for remaining scene IDs. Never start a second storyboard job while a matching one exists. If the browser reconnects, open Personal Designs, filter by the recorded storyboard_tool, find the matching job by timestamp and first image, and continue inspection without resubmitting.",
       "artistly_nursery_rhymes_error_or_single_image": "Known Nursery Rhymes defect: an attempt sometimes ends in an explicit error or produces only ONE image instead of a full storyboard. This is a failed attempt, not a blocker. Append an error_history entry (support_investigation.error_history_entry_shape extended with agent, attempt, designs_returned, design_ids; symptom = the exact on-screen error message or 'single_image') for later debugging, abandon that batch entirely (never import it, never mix it with another attempt's designs), and retry Nursery Rhymes up to 3 validated attempts total. Only after the third failure switch to the Music Storyboard fallback with the character-lock prompt (the fallback also gets up to 3 validated attempts; 6 total logged failures are a reported true blocker).",
-      "artistly_character_hallucination": "Reject the storyboard before VideoExpress import when the named protagonist's gender, age, role, clothing, hair, or other locked identity attributes disagree with the song brief. The rejection counts as a failed attempt under inputs.artistly.agent_priority: record it in error_history, retry Nursery Rhymes while it has had fewer than 3 attempts, then fall back to Music Storyboard with one compact immutable character-lock prompt and visually verify every generated scene. Never animate a known wrong-gender or wrong-character storyboard.",
+      "artistly_generated_appearance": "Do not inspect or judge generated appearance in the speed-optimized workflow. Enforce identity in lyrics and prompts, then accept the first structurally completed batch.",
       "artistly_import_partially_completed": "Compare storyboard IDs with My Artistly Images and import only missing scene IDs while preserving storyboard order.",
       "scene_batch_partially_submitted": "Keep the same batch open. Read its planned_scene_ids, submitted_scene_ids, and My AI Videos. Submit only missing members until every scene in the current batch has one authoritative processing or completed job. A confirmation banner alone is insufficient; verify each accepted job in My AI Videos. Never fill a rejected slot with a scene from the next batch.",
       "scene_batch_partially_completed": "Wait for remaining submitted scenes. Add no partial batch to the timeline unless the runtime checkpoint explicitly records each completed insertion position and idempotency can be guaranteed.",
@@ -301,8 +367,7 @@
       "project_save_interrupted": "Open the project list and look for the exact project name and latest expected timestamp. If present, reopen and verify the timeline; otherwise save the current verified timeline once.",
       "export_create_interrupted": "Inspect My Videos or the export queue for the exact export filename before clicking Create again. If queued or rendering, record the position/status and do not resubmit.",
       "runtime_state_file_corrupt": "Do not restart automatically. Reconstruct state read-only from exact titles, IDs, account folders, saved project timeline, and export queue; write a recovered checkpoint and resume from the first unverified action.",
-      "runtime_state_and_ui_disagree": "Treat stable application IDs and visible authoritative status as truth, update the runtime checkpoint with an audit entry, and continue from the reconciled next_safe_action.",
-      "mouth_qc_failed_after_the_single_repair": "v2.5.0: keep the better of the two takes in the scene's own slot, set mouth_qc_verdicts_by_scene[scene]=fail_shipped, append an error_history entry, and list the scene as a named exception in the final report. Do NOT generate a third take, do NOT restart the batch, and do NOT regenerate the storyboard - mouth control lives in the video prompt, which ends with 'No lip-sync or mouth movement'."
+      "runtime_state_and_ui_disagree": "Treat stable application IDs and visible authoritative status as truth, update the runtime checkpoint with an audit entry, and continue from the reconciled next_safe_action."
     },
     "inputs": {
       "project_name": "{{PROJECT_NAME}}",
@@ -341,12 +406,11 @@
             "the app shows an explicit generation error for this attempt",
             "the batch contains exactly one design (a single image instead of a storyboard - the known Nursery Rhymes failure)",
             "scene count is below the viable floor ceil(audio_seconds / 8.0417) - below it even all-boosted clips cannot span the song",
-            "the scenes do not match the music theme: they must depict the lyrics' protagonist and story arc as a coherent multi-scene progression",
-            "the locked protagonist identity or the selected ratio is violated"
+            "the batch metadata reports the wrong aspect ratio",
+            "page numbers are missing, duplicated, or non-sequential"
           ],
-          "on_fail": "Append an entry to RUNTIME_STATE.json error_history (support_investigation.error_history_entry_shape extended with agent, attempt, designs_returned, design_ids; symptom = the exact on-screen error message or 'single_image' | 'theme_mismatch' | 'identity_violation' | 'count_below_viable_floor') so the failure can be debugged later. Abandon the failed batch: never import it and never mix its designs with another attempt. Then retry per agent_priority.",
-          "on_pass": "Set N to the verified batch count, record scene IDs in ascending page_number order, and continue to VideoExpress import.",
-          "mouth_pose_never_fails_an_attempt": "v2.5.0: mouth pose, open mouths, visible teeth and smiles are NEVER a fail condition and never consume the retry budget. Montage QC records the affected scene numbers in open_mouth_flagged_scenes and moves on. Two live runs proved the loop is unwinnable - the Nursery Rhymes house style is open-mouthed on virtually every still, so a regenerated board fails identically while burning image quota."
+          "on_fail": "Append an entry to RUNTIME_STATE.json error_history (support_investigation.error_history_entry_shape extended with agent, attempt, designs_returned, design_ids; symptom = the exact on-screen error message or 'single_image' | 'wrong_ratio' | 'missing_pages' | 'count_below_viable_floor') so the failure can be debugged later. Abandon the structurally failed batch: never import it and never mix its designs with another attempt. Then retry per agent_priority.",
+          "on_pass": "Accept the first take. Set N to the completed batch count, record scene IDs in ascending page_number order, and continue to VideoExpress import without previewing the designs."
         },
         "image_dimension": "16:9",
         "storyboard_selection": "all_completed_verified_scenes",
@@ -362,7 +426,7 @@
         "no_speech_prompt_suffix_short": "mouth closed, closed-lip smile, never singing or talking",
         "no_speech_prompt_prefix": "Narration-style scene with no lip-sync: the character never speaks or mouths any words, and the lips stay gently closed the entire time. ",
         "mouth_close_opening": "In the first moments the character softly closes the mouth into a gentle closed-lip smile and keeps it closed for the rest of the clip. ",
-        "mouth_close_opening_rule": "Insert after the prefix ONLY for scenes whose source still was flagged open-mouth in storyboard QC - you cannot keep closed what starts open, so instruct an immediate gentle close instead.",
+        "mouth_close_opening_rule": "Insert after the prefix for EVERY scene. This keeps prompt composition universal and avoids inspecting source stills.",
         "no_speech_prompt_tail": " No lip-sync or mouth movement.",
         "terminal_tail_override": "no mouth movement no lypsync",
         "terminal_tail_override_rule": "When the user supplies a literal terminal phrase, it supersedes no_speech_prompt_tail and must be appended verbatim as the final characters. Do not normalize spelling, capitalization, or punctuation. For this run assert the prompt ends exactly with 'no mouth movement no lypsync'.",
@@ -379,8 +443,6 @@
         },
         "no_trigger_regex": "\\b(sing(s|ing)?|sang|talk(s|ing)?|speak(s|ing)?|chat(s|ting)?|shout(s|ing)?|chant(s|ing)?|laugh(s|ing)?|giggl(e|es|ing)|cheer(s|ing)?|yell(s|ing)?|grin(s|ning)?|microphone|singing[- ]pose|silent[- ]singing)\\b|open[- ]?mouth|mouth open|wide smile|big smile",
         "no_trigger_regex_rule": "Applied to the SANITIZED BASE TEXT ONLY (the suffix itself legitimately contains these words as negations). Zero matches required or the submission is aborted.",
-        "open_mouth_still_policy": "RECORD-ONLY (v2.4.2): flag affected scenes into RUNTIME_STATE.json open_mouth_flagged_scenes - store only the affected scene numbers, never the whole board. NEVER fail or regenerate a storyboard attempt for mouth pose (the old ceil(0.10*N) fail threshold caused endless regenerations because the agent's house style is open-mouth on virtually every still). The mouth is closed at the video stage via mouth_close_opening + per-clip mouth QC.",
-        "mouth_motion_qc_scope": "every_clip_no_sampling",
         "video_length_booster_policy": "preserve_dynamic_scene_count_N_and_use_boosted_versions_only_as_same-slot_replacements",
         "maximum_concurrent_generations": 5,
         "batch_size_policy": "maximum_5_distinct_generations_per_batch",
@@ -502,7 +564,7 @@
       "artistly_import": {
         "open_button": "Import Media Text to Speech",
         "action": "Import from Artistly",
-        "selection_source": "all N completed and visually verified Music Storyboard scenes",
+        "selection_source": "all N structurally completed storyboard scenes in ascending page_number order",
         "submit_button": "Import",
         "expected_folder": "My Artistly Images",
         "preserve_scene_order": true
@@ -522,23 +584,22 @@
         "no_speech_prefix_source": "inputs.videoexpress.no_speech_prompt_prefix",
         "sanitizer_source": "inputs.videoexpress.speech_trigger_sanitizer",
         "no_trigger_regex_source": "inputs.videoexpress.no_trigger_regex",
-        "mouth_close_opening_source": "inputs.videoexpress.mouth_close_opening (only for scenes flagged open-mouth in storyboard QC)",
+        "mouth_close_opening_source": "inputs.videoexpress.mouth_close_opening (included for every scene)",
         "append_no_speech_tail": true,
         "no_speech_tail_source": "inputs.videoexpress.terminal_tail_override || inputs.videoexpress.no_speech_prompt_tail",
-        "persisted_prompt_metadata_audit": "After each job is completed, open Media Library -> Details/Redesign and assert the saved Video prompt ends exactly with terminal_tail_override when present (this audit is authoritative; a textarea read, toast, job id, or processing status alone is insufficient). If missing or altered, repair only that scene in its own slot.",
-        "completed_only_timeline_rule": "Never add processing or merely accepted jobs. Insert only completed clips with unique scene mappings after persisted prompt metadata and frame-sampling mouth QC; verify exactly N distinct clips in story order before render/export.",
-        "prompt_composition_rule_v2_6_0": "Authoritative v2.6.0 composition: sanitize the Artistly base (zero no_trigger_regex matches), prepend prefix and optional mouth_close_opening, append no_speech_prompt_suffix, then append terminal_tail_override when present (otherwise no_speech_prompt_tail). Set via native value setter plus input/change, blur or Tab, wait for state settle, re-read, and require exact endsWith('no mouth movement no lypsync') before Create Video.",
-        "prompt_composition_rule": "v2.4.0 STRICT order - sanitize, prepend, append, assert: (1) take the auto-filled Artistly action prompt as the base (it carries the scene action and the protagonist's pronouns - never discard it outside mouth-QC retry 2); (2) run speech_trigger_sanitizer over the base so no vocal or open-mouth trigger word survives - a generator follows 'singing'/'laughing' over any negation, so triggers must be REMOVED, not merely contradicted; (3) assert no_trigger_regex finds nothing in the sanitized base, abort if it does; (4) compose full = no_speech_prompt_prefix + (mouth_close_opening if this scene's still is open-mouth-flagged) + base + no_speech_prompt_suffix + no_speech_prompt_tail; (5) set the value with the native value setter plus input/change events, idempotently (skip if the field already starts with the prefix); (6) re-read the textarea and assert it starts with the prefix, contains the suffix, and ENDS WITH the tail phrase 'No lip-sync or mouth movement' before clicking Create Video - abort the submission if any of the three is missing.",
+        "completed_only_timeline_rule": "Never add processing or merely accepted jobs. Insert only completed clips with unique source-scene mappings and expected durations; verify exactly N distinct clips in story order before render/export. Do not preview clips or reopen their prompt metadata.",
+        "prompt_composition_rule_v2_7_0": "Authoritative composition: sanitize the Artistly base (zero no_trigger_regex matches), prepend prefix plus universal mouth_close_opening, append no_speech_prompt_suffix and terminal_tail_override. Set via native value setter plus input/change, settle, re-read once, and require exact endsWith('no mouth movement no lypsync') before Create Video.",
+        "prompt_composition_rule": "Speed-optimized strict order: (1) take the auto-filled Artistly action prompt as the base; (2) sanitize it so no vocal or open-mouth trigger survives; (3) compose full = no_speech_prompt_prefix + mouth_close_opening + sanitized base + no_speech_prompt_suffix + terminal tail; (4) set it with the native value setter plus input/change; (5) re-read once and assert prefix, suffix, zero base triggers, and exact terminal tail before Create Video. Never reopen completed media to audit prompt persistence.",
         "automatically_enhance_video_prompt_source": "inputs.videoexpress.automatically_enhance_video_prompt",
         "lip_sync": false,
         "lip_sync_enforcement": "Lip sync stays off for every generation without exception; if the modal exposes a lip-sync toggle, assert it is unchecked before submitting. Never use the Lipsync Video tool in this workflow.",
-        "mouth_motion_qc": "v2.5.0 BOUNDED - every clip checked, repairs capped at ONE per scene so QC can never become its own regeneration loop. (1) Check every completed clip in the batch (max 5) by FRAME SAMPLING: load mediaPath in a <video crossOrigin=anonymous>, seek to ~6 points across the clip (0.2/0.9/1.6/2.3/3.0/3.7s), draw each frame to a canvas cropped to the face, tile and screenshot once - this covers the whole clip in seconds; full-length playback is optional, never required. (2) Record mouth_qc_verdicts_by_scene {scene_k: pass|fail|fail_shipped} in RUNTIME_STATE.json; the no_speech_gate requires a verdict for all N scenes. (3) Reject only rhythmic lip parting or a jaw opening and shutting as if speaking/singing. Head, hand, body, hair and background motion is fine. Explicit PASS: a flagged-source clip that closes its mouth early and stays closed, AND a clip holding a STATIC open or half-open expression that never articulates - a still grin is not lip-sync and chasing it wastes generations. (4) ONE repair attempt per scene only: regenerate in the scene's own slot from the same source image, enhancement off, action text replaced by a minimal neutral description (subject + one non-vocal movement + setting) wrapped in prefix + mouth_close_opening + suffix + tail. Going straight to neutral text is deliberate - re-running the same wording rarely changes the outcome. (5) Then STOP: keep the better take, record fail_shipped + an error_history entry, name the scene in the final report. Never a third generation for a scene, never restart the batch, and NEVER regenerate the Artistly storyboard over lip movement.",
+        "completed_clip_acceptance": "Accept the first take when My AI Videos reports completed, the media ID maps to the intended source scene, and duration matches the planned normal or boosted duration. Do not preview, play, screenshot, frame-sample, or visually inspect it. Regenerate only for an explicit failed/empty render, wrong structural metadata, or a missing job after recovery.",
         "video_length_booster_source": "inputs.videoexpress.video_length_booster_policy",
         "submit_button": "Create Video",
         "maximum_concurrent_generations_source": "inputs.videoexpress.maximum_concurrent_generations",
         "batch_execution_policy": "Partition all N scenes into consecutive batches of at most five. For each batch, submit every distinct member first, verifying that each job is accepted in My AI Videos. The all-access plan permits at most five concurrent jobs, so never submit a sixth active generation. After all accepted jobs in the current batch complete, add that completed batch in storyboard order; only then begin the next batch.",
         "expected_output_folder": "My AI Videos",
-        "mouth_is_a_video_stage_concern_only": "v2.5.0 HARD RULE: mouth and lip behaviour is corrected HERE and only here. Never regenerate, re-run or retry an Artistly storyboard because of mouth pose, open mouths, visible teeth or smiles - at any count, even if every still is open-mouthed. If clips still show lip movement, strengthen this video prompt and re-generate THAT CLIP via the mouth-QC repair path; never produce another board."
+        "no_visual_mouth_validation": "Mouth control is prompt-only. Apply the universal opening and no-speech wrappers before submission, then accept completed media without preview or mouth-motion repair."
       },
       "timeline": {
         "video_source_folder": "My AI Videos",
@@ -552,7 +613,7 @@
         "audio_target_track": "lower_audio_track",
         "audio_start_time": "00:00:00",
         "audio_cleanup_rule": "Before placing music, remove only duplicate or misplaced audio bricks. Never delete, move, trim, or replace a video brick during audio cleanup.",
-        "sync_policy": "Let N equal the number of completed, visually verified Artistly designs for this run. The timeline must contain exactly N ordered video clips and its endpoint must exactly match the music endpoint. Each scene has exactly one normal-or-boosted clip in its own slot; a boosted result replaces, never duplicates, the normal result.",
+        "sync_policy": "Let N equal the number of structurally completed Artistly designs for this run. The timeline must contain exactly N ordered video clips and its endpoint must exactly match the music endpoint. Each scene has exactly one normal-or-boosted clip in its own slot; a boosted result replaces, never duplicates, the normal result.",
         "project_save_name_source": "inputs.project_name"
       },
       "duration_matching": {
@@ -798,7 +859,7 @@
         "gate": "string",
         "status": "pass|fail|pending",
         "evidence": "string",
-        "method": "api|dom|document_title|screenshot",
+        "method": "api|dom|document_title",
         "timestamp": "ISO",
         "artifact_ids": [
           "…"
@@ -815,11 +876,11 @@
         },
         {
           "gate": "identity_gate",
-          "verify": "lyrics identity-consistent (she/her/girl throughout) AND montage screenshot QC of all N designs — the image-consistency validation"
+          "verify": "lyrics and submitted prompts are identity-consistent; generated media is not visually inspected"
         },
         {
           "gate": "storyboard_gate",
-          "verify": "designs API: tool_used+created_at batch, all status private, N counted, page_number->design_id recorded, aspect_ratio correct; attempt validation passed: full multi-scene storyboard matching the music theme (never a single image), N >= ceil(audio_seconds/8.0417); agent attempt history recorded (Nursery Rhymes HIGH priority <=3 attempts, then Music Storyboard LOW-priority fallback <=3 attempts) with every failed attempt logged in error_history; open-mouth stills recorded per affected scene in open_mouth_flagged_scenes (record-only, never an attempt-fail)"
+          "verify": "designs API: matching tool_used+created_at batch, all status private, N counted, sequential page_number->design_id recorded, aspect_ratio correct, multi-scene count, and N >= ceil(audio_seconds/8.0417); structurally failed attempts logged; no generated-media preview"
         },
         {
           "gate": "import_gate",
@@ -835,7 +896,7 @@
         },
         {
           "gate": "no_speech_gate",
-          "verify": "STRICT v2.6.0 authoritative rule: every submitted prompt was composed no_speech_prompt_prefix + sanitized base (zero no_trigger_regex matches) + no_speech_prompt_suffix + terminal_tail_override when present (this run ends exactly with 'no mouth movement no lypsync'), with mouth_close_opening included for every open-mouth-flagged scene; native setter input/change plus blur/settle/re-read passed before Create Video; completed media metadata was audited; automatic prompt enhancement OFF and lip sync OFF; style '3d'; mouth_qc_verdicts_by_scene covers ALL N scenes; any fail_shipped exception is listed in the final report"
+          "verify": "Before each submission: no_speech_prompt_prefix + universal mouth_close_opening + sanitized base (zero no_trigger_regex matches) + no_speech_prompt_suffix + terminal_tail_override, ending exactly with 'no mouth movement no lypsync'; native setter input/change and one re-read passed; enhancement OFF, lip sync OFF, style 3d. No completed-prompt audit or mouth-motion QC."
         },
         {
           "gate": "timeline_gate",
@@ -892,7 +953,6 @@
         "stale_success_toast": "toast read 'success' from a prior job; verified real result via API/title instead.",
         "wrong_agent_or_ratio": "Nursery Rhymes used with default 1:1; corrected dimension to selected ratio before generating.",
         "nursery_rhymes_error_or_single_image": "Nursery Rhymes attempt returned an error or a single image instead of a full storyboard; logged the attempt in error_history, abandoned the batch, retried (maximum 3 validated attempts), then fell back to Music Storyboard (also maximum 3 validated attempts) with the character-lock prompt.",
-        "talking_lips_root_cause_2026_08_14": "Verified failed run (Bella): every sampled storyboard still had a wide-open toothy mouth, so Image-To-Video animated speech no matter what the appended suffix said - frame 0 wins. Compounding factors: vocal/open-mouth wording in the action prompts ('huge, bright smile'), automatic prompt enhancement enabled (can rewrite away the no-speech language), and sample-only clip QC. Fixed in v2.4.0: closed-mouth storyboard gate (>ceil(0.10*N) flagged stills fails the attempt), trigger-word sanitizer + prefix/opening/suffix composition, enhancement forced off, per-clip mouth QC with recorded verdicts. (v2.4.2: the storyboard mouth gate is demoted to record-only - live runs showed regeneration cannot beat the agent's open-mouth house style; affected scenes are recorded and closed at the video stage.)",
         "jquery_ui_resize_no_op": "clip resize-handle drag ignored; used playhead+cut exact-trim instead.",
         "first_half_out_of_sync_with_lyrics": "Root cause: boosted clips were clustered at the end ('boost the last K') so short clips front-loaded and the picture ran ahead of the lyrics through the first half (endpoints were still equal). Fix: distribute boosted clips evenly (booster_math.placement_strategy) so each clip's cumulative end tracks k*(A/N); re-plan and re-assemble if the pacing_sync_gate fails."
       }
@@ -998,13 +1058,13 @@
         "step": 17,
         "phase": "artistly_storyboard",
         "action": "verify_storyboard",
-        "details": "Wait for generation to finish, identify this attempt's batch (designs API: tool_used + created_at cluster), load all pages, and run inputs.artistly.storyboard_attempt_validation: the batch must be a full multi-scene storyboard - exactly one image is the known Nursery Rhymes failure and always fails; require N >= ceil(audio_seconds/8.0417); visually verify the scenes match the music theme (the lyrics' protagonist and story arc), the locked identity, and the selected ratio. PASS: set N to the verified count and record all N scene IDs in ascending page_number story order; during montage QC also record (never fail on) open-mouth stills - write ONLY the affected scene numbers to open_mouth_flagged_scenes for the video stage (v2.4.2 record-only policy). FAIL: append {agent, attempt, symptom, designs_returned, design_ids} to RUNTIME_STATE.json error_history for later debugging, abandon the batch (never import or mix it), then retry Nursery Rhymes from step 13 while it has had fewer than 3 attempts; after the third Nursery Rhymes failure run steps 13-17 with Music Storyboard (LOW priority) and the character-lock prompt, also up to 3 validated attempts with the same validation and error_history logging; if Music Storyboard also fails 3 validated attempts, stop and report a true blocker with the error_history evidence."
+        "details": "Wait for generation to finish and identify this attempt's batch by designs API tool_used + created_at cluster. Validate metadata only: all status private, selected aspect ratio, sequential page_number values, more than one image, and N >= ceil(audio_seconds/8.0417). Do not open, screenshot, montage, or visually judge designs. PASS: accept the first take, set N, and record IDs in ascending page_number order. FAIL: log the structural symptom and IDs, abandon the batch, retry Nursery Rhymes up to 3 attempts, then Music Storyboard up to 3 attempts; after 6 structural failures report a blocker."
       },
       {
         "step": 18,
         "phase": "videoexpress_import",
         "action": "import_artistly_storyboard",
-        "details": "In VideoExpress open Import Media Text to Speech, choose Import from Artistly, load all pages with More, select all N recorded and visually verified Music Storyboard scenes, click Import, and verify those N scene IDs appear in My Artistly Images. Do not select older boy-character designs."
+        "details": "In VideoExpress open Import Media Text to Speech, choose Import from Artistly, load all pages with More, select exactly the N recorded IDs from the accepted batch, click Import, and verify those IDs appear in My Artistly Images. Do not select older or unrelated designs."
       },
       {
         "step": 19,
@@ -1198,7 +1258,7 @@
       "use CloneVoice New and AI-Generated to create the nursery-rhyme song",
       "download the completed song only for Artistly's audio-upload step",
       "upload the song to Artistly Nursery Rhymes (HIGH priority; up to 3 validated attempts, logging every failure to RUNTIME_STATE.json, then fall back to Music Storyboard, also up to 3 validated attempts, with the immutable character lock)",
-      "validate every attempt as a full on-theme storyboard (never a single image) and visually verify all N scenes with the locked identity consistent throughout",
+      "validate every storyboard attempt by API metadata only: completed multi-scene batch, viable count, correct ratio, sequential page numbers; never preview generated media",
       "import all N verified storyboard images into VideoExpress through the Artistly integration",
       "animate scenes through Image To Video (Old Algorithm) in batches of five",
       "after each batch completes, assemble that batch sequentially before starting the next batch",
@@ -1278,7 +1338,7 @@
       "integration_missing": "Stop without modifying API keys. Report the exact missing integration field or unavailable import action.",
       "lyrics_generation_timeout": "Keep CloneVoice open, wait one additional soft-timeout period, and inspect for an explicit error before stopping.",
       "music_generation_timeout": "Keep My Audio open and continue polling the exact named item while Processing remains visible.",
-      "music_download_blocked": "Keep the completed CloneVoice item open and request a manual download to inputs.audio.download_directory. Resume from the recorded absolute path without regenerating the song.",
+      "music_download_blocked": "Retry the exact completed CloneVoice source through the authenticated browser and documented FilePond/DataTransfer path. If the browser rejects it after the retry ladder, checkpoint and report the exact blocker; never delegate the download to the user.",
       "artistly_upload_failed": "Verify the local file exists and is a supported audio type, then retry the upload once. Never substitute a different track silently.",
       "storyboard_generation_slow": "Continue polling while scene cards show Processing. Active generation is not a blocker and has no hard deadline.",
       "unacceptable_storyboard_scene": "Regenerate before importing scenes. If the protagonist is a boy or violates the locked girl identity, reject the entire affected storyboard set; do not animate, silently omit, or rationalize the mismatch.",
@@ -1310,15 +1370,12 @@
       "never_submit_a_video_prompt_without_the_no_speech_prefix_and_suffix": true,
       "never_submit_a_video_prompt_that_does_not_end_with_no_mouth_movement_or_lip_sync": true,
       "never_submit_a_base_prompt_containing_vocal_or_open_mouth_trigger_words": true,
-      "never_discard_the_auto_filled_action_prompt_sanitize_it_instead_except_mouth_qc_retry_2": true,
-      "never_fail_or_regenerate_a_storyboard_attempt_for_mouth_pose_record_affected_scenes_instead": true,
-      "never_animate_a_flagged_open_mouth_scene_without_mouth_close_opening_in_its_prompt": true,
-      "never_skip_the_per_clip_mouth_motion_qc": true,
-      "never_ship_a_talking_clip_without_error_history_and_final_report_entry": true,
+      "never_discard_the_auto_filled_action_prompt_sanitize_it_instead": true,
+      "never_preview_or_visually_inspect_generated_media": true,
+      "never_regenerate_for_cosmetic_or_visually_perceived_defects": true,
+      "always_include_mouth_close_opening_in_every_video_prompt": true,
       "never_select_human_animation_style_for_a_character_montage": true,
-      "never_ship_a_clip_whose_character_visibly_talks_or_sings": true,
       "never_add_processing_scene_videos_to_timeline": true,
-      "never_add_a_clip_before_persisted_prompt_metadata_audit": true,
       "never_treat_render_queue_pending_as_final_delivery": true,
       "never_submit_a_prompt_without_exact_terminal_tail_override_when_present": true,
       "never_use_newest_sort_order_as_storyboard_order": true,
@@ -1365,9 +1422,6 @@
         "artistly_scenes_imported",
         "videoexpress_scene_videos_submitted",
         "videoexpress_scene_video_ids_in_order",
-        "open_mouth_flagged_scenes",
-        "mouth_qc_verdicts_by_scene",
-        "mouth_qc_exceptions",
         "timeline_scene_count",
         "timeline_scene_order_verified",
         "clonevoice_import_status",

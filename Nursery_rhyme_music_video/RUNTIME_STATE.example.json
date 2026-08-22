@@ -1,5 +1,8 @@
 {
   "run_id": "ripa-first-day-2026-08-13",
+  "workflow_config_version": "2.7.0",
+  "authorization_mode": "standing_authorization_for_all_in_scope_workflow_actions",
+  "validation_mode": "minimal_signal_only_no_generated_media_preview",
   "phase": "clonevoice_music",
   "step": "DONE",
   "status": "complete",

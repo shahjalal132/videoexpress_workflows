@@ -37,9 +37,9 @@ Everything else — song title, lyrics, music style/language, protagonist identi
 ## 🚀 How to use
 
 1. Make sure **CloneVoice.ai, Artistly.ai, and VideoExpress.ai are already signed in** in the browser the agent controls. (The workflow never handles credentials or API keys.)
-2. Start the agent with the system prompt in [`SYSTEM_PROMPT.md`](SYSTEM_PROMPT.md) (or trigger phrase **"Generate nursery rhymes music video"**).
+2. Start the agent with the system prompt in [`SYSTEM_PROMPT.md`](SYSTEM_PROMPT.md) (or trigger phrase **"Generate nursery rhymes music video"**). Receiving the prompt starts the run; it is not a document-review request.
 3. Answer the **two questions**: your idea, and **Landscape (16:9)** or **Vertical (9:16)**.
-4. The agent presents a short production brief and then runs to completion on its own — it never asks you to say "ready"/"continue".
+4. The agent presents a short production brief and then runs to completion on its own. Normal workflow actions are pre-authorized, so it does not ask for permission, credit confirmation, or a “ready”/“continue” response.
 5. It finishes when VideoExpress shows **"Your movie creation is currently number N in the queue."** The MP4 appears under **My Videos** once background rendering completes.
 
 Typical wall‑clock: a few minutes for the song, a few for the storyboard, then batched video generation (5 concurrent) — most of the time is the render queue, not interaction.
@@ -51,7 +51,7 @@ Typical wall‑clock: a few minutes for the song, a few for the storyboard, then
 | File | Purpose |
 |---|---|
 | [`SYSTEM_PROMPT.md`](SYSTEM_PROMPT.md) | The agent's operating instructions. **§0** is the mandatory device‑agnostic interaction contract; **§17** is the exact DOM/API selector reference; **§18–19** cover validation checkpoints, support investigation, and the golden invariants. |
-| [`WORKFLOW.json`](WORKFLOW.json) | Machine‑readable config (v2.0.0): inputs, 38 ordered steps, `execution_mechanics`, `dom_api_contract`, `validation_checkpoints`, `support_investigation`, gates, and safety rules. |
+| [`WORKFLOW.json`](WORKFLOW.json) | Machine‑readable config (v2.7.0): start contract, standing authorization, minimal validation, ordered steps, execution mechanics, APIs, checkpoints, recovery, and safety rules. |
 | [`RUNTIME_STATE.example.json`](RUNTIME_STATE.example.json) | A **real completed‑run** checkpoint file — a worked example of the resumable, human‑readable state the agent maintains. |
 | `README.md` | This file. |
 
@@ -60,9 +60,11 @@ Typical wall‑clock: a few minutes for the song, a few for the storyboard, then
 ## 🔒 Key requirements & guarantees
 
 - **Ratio is a project‑wide invariant** — every image, clip, canvas, and the export use the one chosen orientation; landscape and vertical are never mixed.
-- **Identity lock** — the protagonist's gender, age, face, hair, core clothing, and visual medium stay consistent across all scenes; a wrong‑character storyboard is rejected and regenerated, never animated.
-- **Storyboard agent priority & fallback** — Artistly **Nursery Rhymes** always runs first (high priority). It sometimes errors or returns a **single image instead of a full storyboard**, so every attempt is validated (multi-scene, matches the music theme, identity intact) with up to **3 attempts**; each failure is logged to `RUNTIME_STATE.json` `error_history` for later debugging, and only after the third failure does the run fall back to **Music Storyboard** (low priority) with the character-lock prompt — validated the same way, also with up to 3 attempts.
-- **Narration-style, no lip-sync (v2.5.0)** — the only vocal is the CloneVoice track, so characters act but never mouth words. Mouth control lives **entirely at the video stage**: open-mouth stills are accepted and merely **recorded per scene** (`open_mouth_flagged_scenes`) — a storyboard is **never** regenerated, retried or failed for mouth pose, at any count, because the Nursery Rhymes house style is open-mouthed on nearly every still and that loop is unwinnable. Each video prompt is sanitized of vocal trigger words ("singing", "laughing"…), opens with narration framing ("Narration-style scene with no lip-sync…"), adds an explicit close-mouth instruction for flagged scenes, and ends with the literal phrase **"No lip-sync or mouth movement"** — asserted in the textarea before Create Video. Prompt enhancement and lip sync stay off, the style dropdown (which defaults to Human) is always set to 3D, and every clip gets a recorded mouth-QC verdict from ~6 sampled frames before it reaches the timeline — with **one** bounded repair per scene, so QC can never become its own regeneration loop (a static grin is a pass; only rhythmic articulation fails).
+- **Identity lock at input/prompt level** — gender, age, hair, clothing, and visual medium are resolved once and repeated consistently in lyrics and prompts. Generated media is accepted without visual review.
+- **Storyboard agent priority & fallback** — Artistly **Nursery Rhymes** runs first. Every attempt receives cheap API-only structural validation: completed multi-scene batch, viable count, correct ratio, and sequential page numbers. It gets up to three attempts before the same three-attempt fallback to **Music Storyboard**. Failed batches are logged and never mixed.
+- **Narration-style, no lip-sync (v2.7.0)** — every VideoExpress prompt is sanitized and universally wrapped with narration/no-speech/close-mouth instructions, ending exactly with **`no mouth movement no lypsync`**. Prompt enhancement and lip sync remain off, and style is explicitly set to 3D. The prompt is checked once before submission; completed prompt metadata and mouth motion are not inspected.
+- **Minimal validation for speed** — generated images and videos are never previewed, played, downloaded for review, screenshot, montaged, or frame-sampled. The first take is accepted from application completion signals and source-ID mapping. Validation is limited to acceptance, completion, structure, project-save persistence, and export confirmation.
+- **Standing authorization** — navigation, named controls, generations, normal retries, working-timeline cleanup, save, and export are authorized when the run starts. The agent stops only for a true blocker such as login/CAPTCHA, visible app refusal, exhausted unrecoverable error, uncontrollable browser, vanished job, out-of-scope destruction, or unsafe ambiguity.
 - **Exact sync** — the final video endpoint equals the audio endpoint with **zero‑pixel tolerance** (achieved by the playhead‑set + cut + tail‑delete method).
 - **`N` is dynamic** — however many storyboard scenes are produced, exactly that many timeline clips are made (no fixed count).
 - **≤ 5 concurrent generations**, batched, with a completion barrier between batches.
@@ -72,7 +74,7 @@ Typical wall‑clock: a few minutes for the song, a few for the storyboard, then
 
 ## 🛠️ Resumability & support
 
-The agent writes a durable **`RUNTIME_STATE.json`** (see the `.example` file) after every verified side effect, with a per‑gate checkpoint `{gate, status, evidence, method, timestamp, artifact_ids}`.
+The agent writes a durable **`RUNTIME_STATE.json`** (see the `.example` file) after every verified side effect, with a per‑gate checkpoint `{gate, status, evidence, method, timestamp, artifact_ids}`. Evidence is signal-based (`api`, `dom`, or `document_title`), never generated-media inspection.
 
 If a run fails and a user reports it, follow **`support_investigation`** in `WORKFLOW.json`:
 
@@ -82,6 +84,6 @@ If a run fails and a user reports it, follow **`support_investigation`** in `WOR
 4. Re‑verify that gate live via the matching read API in `dom_api_contract` (auth, folder contents, job status, endpoints, queue) — app state is authoritative.
 5. Resume from that gate's `next_safe_action` idempotently — never repeat a verified side effect.
 
-Gates cover: **auth · CloneVoice · identity/image‑consistency · storyboard · import · batch submission · batch completion · timeline · audio · sync · ratio · save · export.**
+Gates cover: **auth · CloneVoice · input/prompt identity · storyboard structure · import · batch submission · batch completion · no-speech pre-submit configuration · timeline · audio · sync · ratio · save · export.**
 
-Known non‑blockers (do **not** stop): visible spinners/percentages, a stale success toast, or an MCP/API `419` (use the browser DOM instead). Real blockers: authentication, CAPTCHA, credits/payment, unavailable account access, or an explicit unrecoverable error.
+Known non‑blockers (do **not** stop): visible spinners/percentages, a stale success toast, normal credit consumption, phase boundaries, or an MCP/API `419` (use the browser DOM instead). Real blockers: login/CAPTCHA, a visible app refusal, an exhausted unrecoverable error, an uncontrollable session, a vanished job after recovery, an out-of-scope destructive action, or unsafe ambiguity.
