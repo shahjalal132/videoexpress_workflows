@@ -1,6 +1,7 @@
 ﻿{
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "config_version": "2.8.2",
+  "config_version": "2.8.3",
+  "config_changelog_v2_8_3": "Make unsaved timeline duplicate cleanup explicitly pre-authorized for low-model compatibility. After mapping the extra brick by prompt-book scene ID/generated-video ID, delete only that unsaved duplicate with ctxmenu:delete, recount to exactly N, checkpoint, and continue. Never ask for deletion confirmation, never describe preserved source media as a prelude to permission, and never emit a Resume wake-up phrase.",
   "config_changelog_v2_8_2": "Remove stale hardcoded human/girl/boy storyboard checks and prohibit semantic generated-media rejection. Artistly batches are accepted from structural API metadata only: completion, multi-scene count, selected ratio, sequential page numbers, and duration viability. Design descriptions, names, prompts, thumbnails, species, gender, theme, and appearance are never inspected for QC and can never trigger retry or Music Storyboard fallback. A user-approved batch or explicit Design-ID list is authoritative and continues immediately. The agent must never ask the user to repeat an audio upload.",
   "config_changelog_v2_8_1": "Harden the CloneVoice-to-Artistly audio handoff. The primary path now fetches the exact completed CloneVoice CDN source, validates HTTP success, byte size, MIME/signature, constructs a deterministic File, and injects it into Artistly FilePond. A Download click or guessed path is never proof. Local download is a verified fallback only, and source-transfer failures do not consume Artistly storyboard retry attempts. The intake-to-execution transition also explicitly forbids credit or saved-project confirmation questions.",
   "config_changelog_v2_8_0": "Create prompt_book.json after the accepted Artistly storyboard and before VideoExpress generation. The prompt book stores one ordered image/design mapping, final transformed prompt, and planned 3-10 second duration per scene. VideoExpress generation now uses Create with AI > Create Video From Prompt with Image Type 3D, both prompt-enhancement toggles off, Video Only on, Advanced Mode on, and manual duration from the prompt book. Image To Video (Old Algorithm) and Video Length Booster are retired from this workflow.",
@@ -43,6 +44,8 @@
         "Let me know if you want"
       ],
       "credits_are_never_a_question": "Normal generation credits or quota are expected. Mention them only if the app visibly refuses the action.",
+      "unsaved_timeline_duplicate_cleanup_is_preapproved": "A verified extra timeline brick is working-state cleanup, not deletion of generated media, source media, or a saved project. Delete only the extra brick immediately, recount to N, checkpoint, and continue without asking.",
+      "forbidden_duplicate_cleanup_question": "Never ask or paraphrase: 'Please confirm deletion of only that duplicate timeline brick in VideoExpress.'",
       "never_delete": [
         "saved projects",
         "library or source media",
@@ -366,7 +369,7 @@
       "scene_batch_partially_completed": "Wait for remaining submitted scenes. Add no partial batch to the timeline unless the runtime checkpoint explicitly records each completed insertion position and idempotency can be guaranteed.",
       "scene_added_before_checkpoint_write": "Inspect timeline_scene_ids_in_order. If the scene already occupies the intended slot, record it and do not add it again.",
       "scene_missing_from_timeline": "Restore only the exact missing clip at its original sequential position. Do not remove or shift other video clips.",
-      "scene_duplicate_on_timeline": "Identify duplicates by scene-to-video mapping and remove only the extra duplicate after confirming the correct copy and position. Never delete an adjacent nonmatching clip.",
+      "scene_duplicate_on_timeline": "Identify the extra brick by prompt-book scene ID/generated-video ID mapping, preserve the correctly ordered copy and every nonmatching neighbor, immediately delete only the verified extra unsaved brick via ctxmenu:delete without asking, recount to exactly N, checkpoint, and continue. Timeline-brick deletion does not delete generated/library media or a saved project.",
       "scene_order_uncertain": "Stop timeline mutation, compare stable IDs, prompt titles, thumbnails, and neighboring scenes, then persist the resolved order before continuing.",
       "audio_imported_before_checkpoint_write": "Inspect My CloneVoice.ai Audio for the exact title. Mark it imported when present; do not import it again.",
       "audio_misplaced_or_duplicated": "Remove only misplaced or duplicate audio bricks, never video bricks. Drag one exact music item to track 2 at 00:00:00 and verify the audio-brick count is exactly one.",
@@ -1458,6 +1461,8 @@
       "never_accept_rounded_duration_labels_as_exact_endpoint_proof": true,
       "never_save_or_export_with_a_timeline_gap_or_overlap": true,
       "never_leave_duplicate_music_bricks_on_the_timeline": true,
+      "never_ask_permission_to_delete_a_verified_extra_unsaved_timeline_brick": true,
+      "never_emit_a_resume_wakeup_phrase_after_timeline_cleanup": true,
       "never_place_music_on_the_video_track": true,
       "never_delete_the_pre_cut_audio_segment": true,
       "never_export_before_timeline_and_sync_verification": true,
