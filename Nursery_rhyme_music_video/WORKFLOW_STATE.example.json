@@ -1,6 +1,6 @@
 {
   "run_id": "example-run",
-  "workflow_config_version": "2.8.3",
+  "workflow_config_version": "2.9.0",
   "authorization_mode": "standing_authorization_for_all_in_scope_workflow_actions",
   "validation_mode": "minimal_signal_only_no_generated_media_preview",
   "current_phase": "videoexpress_animation",
@@ -45,14 +45,16 @@
   },
   "prompt_book": {
     "path": "prompt_book.json",
-    "schema_version": "1.0.0",
+    "schema_version": "1.1.0",
     "scene_count": 5,
     "global_settings": {
       "animation_style": "3D",
       "automatically_enhance_image_prompt": false,
       "automatically_enhance_video_prompt": false,
       "video_only_no_sound": true,
-      "advanced_mode": true
+      "advanced_mode": true,
+      "prompt_architecture": "mouth_locked_best_practice_v1",
+      "obsolete_wrapper_and_terminal_tail_forbidden": true
     },
     "planned_scene_durations_seconds": [6, 6, 6, 6, 6],
     "gate": "pass"
@@ -72,7 +74,7 @@
     "prompt_book_gate": {
       "gate": "prompt_book_gate",
       "status": "pass",
-      "evidence": "N ordered mappings; unique Design IDs and VideoExpress image IDs; prompts end with exact terminal tail; durations total audio ceiling",
+      "evidence": "N ordered mappings; unique Design IDs and VideoExpress image IDs; every prompt passes the protected-opening, unchanged-lower-face, safe-emotion, and no-obsolete-wrapper/tail gates; durations total audio ceiling",
       "method": "filesystem+dom",
       "timestamp": "<ISO timestamp>",
       "artifact_ids": ["prompt_book.json"]
