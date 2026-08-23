@@ -1,6 +1,7 @@
 ﻿{
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "config_version": "2.9.0",
+  "config_version": "2.10.0",
+  "config_changelog_v2_10_0": "Make the mouth-locked prompt method a HARD RULE bound to an explicit guide artifact. PROMPT_GUIDE.md is added beside the workflow and reproduced in SYSTEM_PROMPT.md 3.1; it is the ONLY permitted source for final_videoexpress_prompt and may not be substituted, invented, or recalled from a previous run. Reusable no_speech_constants / prefix / suffix / terminal_tail objects are banned outright. Every prompt_book scene must now carry a written nine-item mouth_lock_check (guide section 8 checklist) with all items true before that scene may be submitted; a missing, incomplete, or failing check blocks Create Video. A prompt book below schema 1.1.0, containing no_speech_constants, or containing any REJECTED-reference string is void: prompts are discarded and rebuilt from the guide template while scene mappings and durations are carried over. Post-opening forbidden regex extends to animatedly/enthusiastically, and the identity block must live inside the wardrobe slot rather than as a repeated trailing paragraph.",
   "config_changelog_v2_9_0": "Replace the failed generic no-speech prefix/suffix/tail wrapper with the strict mouth-locked best-practice architecture. Every final prompt is transformed—not wrapped—into one duration-independent continuous shot: mouth-set once at the beginning, expression held perfectly unchanged, lips sealed, jaw/chin/cheeks/lower face still, physical action, emotion only through safe non-mouth channels, then environment/camera. Later smile/facial-expression/vocal cues, duplicated negative lists, hard-coded prose durations, and the obsolete 'no mouth movement no lypsync' tail are forbidden. prompt_book schema advances to 1.1.0 with machine-checkable architecture gates.",
   "config_changelog_v2_8_3": "Make unsaved timeline duplicate cleanup explicitly pre-authorized for low-model compatibility. After mapping the extra brick by prompt-book scene ID/generated-video ID, delete only that unsaved duplicate with ctxmenu:delete, recount to exactly N, checkpoint, and continue. Never ask for deletion confirmation, never describe preserved source media as a prelude to permission, and never emit a Resume wake-up phrase.",
   "config_changelog_v2_8_2": "Remove stale hardcoded human/girl/boy storyboard checks and prohibit semantic generated-media rejection. Artistly batches are accepted from structural API metadata only: completion, multi-scene count, selected ratio, sequential page numbers, and duration viability. Design descriptions, names, prompts, thumbnails, species, gender, theme, and appearance are never inspected for QC and can never trigger retry or Music Storyboard fallback. A user-approved batch or explicit Design-ID list is authoritative and continues immediately. The agent must never ask the user to repeat an audio upload.",
@@ -440,6 +441,14 @@
         "automatically_enhance_image_prompt": false,
         "automatically_enhance_video_prompt": false,
         "automatically_enhance_video_prompt_note": "MUST stay false - the enhancer can rewrite or dilute the protected mouth-lock architecture. Assert every enhancement toggle is unchecked before submission.",
+        "prompt_guide": {
+          "path": "PROMPT_GUIDE.md",
+          "also_embedded_in": "SYSTEM_PROMPT.md section 3.1",
+          "binding": true,
+          "rule": "HARD RULE. PROMPT_GUIDE.md is the single authoritative method for writing every final_videoexpress_prompt. It is binding, not advisory. Never use, invent, adapt, recall, or improve on any other prompt style, any style from an earlier run, or any remembered style. A prompt that did not come out of the guide fill-in template is invalid.",
+          "no_substitution": true,
+          "no_reusable_prompt_constants": true
+        },
         "prompt_architecture_version": "mouth_locked_best_practice_v1",
         "mouth_lock_template": "Single continuous [VISUAL STYLE] shot. At the very beginning, [CHARACTER] gently brings the lips together into a small closed-lip smile, then holds that expression perfectly unchanged for the remainder of the clip. The lips stay sealed; the jaw, chin, cheeks, and lower face remain still, with no speaking, lip-sync, mouth opening, or visible teeth. [WARDROBE/APPEARANCE]. [PRIMARY PHYSICAL ACTION]. [EMOTION] is expressed only through [EYES/EYEBROWS/BLINKS/HEAD/HANDS/POSTURE]. [ENVIRONMENTAL MOTION]. [LIGHTING/LENS/FRAMING/CAMERA MOVE].",
         "prompt_architecture_order": [
@@ -476,7 +485,7 @@
           "speaking, singing, chanting, mouthing, calling out, or microphone performance",
           "emotion described as a look on the face instead of safe channels"
         ],
-        "post_opening_forbidden_regex": "\\b(smile|smiling|grin|grinning|laugh|laughing|giggle|giggling|cheer|cheering|sing|singing|talk|talking|speak|speaking|chant|chanting|mouth|lips?|teeth|jaw|chin|expression)\\b|look (on|across) (his|her|their|the) face",
+        "post_opening_forbidden_regex": "\\b(smile|smiling|grin|grinning|laugh|laughing|giggle|giggling|cheer|cheering|sing|singing|talk|talking|speak|speaking|chant|chanting|mouth|lips?|teeth|jaw|chin|expression|animatedly|enthusiastically)\\b|look (on|across) (his|her|their|the) face",
         "numeric_prose_duration_regex": "\\b\\d+(?:[ -]second|s\\b)",
         "obsolete_wrapper_regex": "Narration-style scene with no lip-sync:|Mouth closed and lips together for the entire clip\\.|no mouth movement no lypsync$",
         "regex_scope_rule": "Apply post_opening_forbidden_regex only after the protected opening paragraph. Apply numeric_prose_duration_regex and obsolete_wrapper_regex to the full prompt. All three match counts must be zero.",
@@ -508,7 +517,16 @@
         "next_batch_barrier": "all_current_batch_jobs_completed_and_verified",
         "duration_matching_batch_size": 5,
         "duration_match_tolerance_timeline_pixels": 0,
-        "prompt_validation_rule": "Abort and rewrite before submission unless the protected opening is complete, the architecture order is correct, emotion is reassigned to safe channels, later contradiction count is zero, prose duration is absent, and obsolete wrapper/tail count is zero."
+        "prompt_validation_rule": "Blocking gate. Abort and rewrite before submission unless the protected opening is complete, the architecture order is correct, emotion is reassigned to safe channels, later contradiction count is zero, prose duration is absent, obsolete wrapper/tail count is zero, and the scene mouth_lock_check exists with all nine items true. Never click Create Video for a scene whose check is missing, incomplete, fabricated, or failing.",
+        "identity_placement_rule": "Integrate the protagonist identity into the [WARDROBE / APPEARANCE] slot of the second block. Never append a repeated identity paragraph after the action and never repeat an identical identity sentence verbatim across scenes.",
+        "forbidden_prompt_book_keys": [
+          "no_speech_constants",
+          "prefix",
+          "suffix",
+          "mouth_close_opening",
+          "terminal_tail"
+        ],
+        "void_and_rebuild_rule": "A prompt_book.json whose schema_version is below 1.1.0, or which contains any forbidden_prompt_book_keys entry, or which contains any obsolete_prompt_patterns_forbidden string, is VOID. Do not patch it, reuse its prompts, or generate from it. Discard every final_videoexpress_prompt and rebuild all N scenes from the guide template. design_id, artistly_image_url, videoexpress_image_id, and duration_seconds may be carried over; prompt text may not."
       },
       "export": {
         "file_name": "{{EXPORT_FILE_NAME}}",
@@ -638,7 +656,10 @@
           "video_only_no_sound": true,
           "advanced_mode": true,
           "prompt_architecture": "mouth_locked_best_practice_v1",
-          "obsolete_wrapper_and_terminal_tail_forbidden": true
+          "prompt_guide": "PROMPT_GUIDE.md",
+          "prompt_guide_binding": true,
+          "obsolete_wrapper_and_terminal_tail_forbidden": true,
+          "no_speech_constants_forbidden": true
         },
         "scene_fields": [
           "artistly_scene",
@@ -646,9 +667,22 @@
           "artistly_image_url",
           "videoexpress_image_id",
           "final_videoexpress_prompt",
-          "duration_seconds"
+          "duration_seconds",
+          "mouth_lock_check"
         ],
-        "prompt_rule": "Read the Artistly Design Prompt text without inspecting the image. Transform—never wrap—it into mouth_locked_best_practice_v1: single continuous shot; mouth-set once at the beginning; expression perfectly unchanged; lips sealed; jaw/chin/cheeks/lower face still; action; emotion only via safe non-mouth channels; environment/camera. Reject later mouth/facial-expression/vocal cues, hard-coded prose durations, obsolete generic wrappers, duplicated negatives, and the no mouth movement no lypsync tail. Store no raw prompt.",
+        "mouth_lock_check_fields": [
+          "single_continuous_opening_no_fixed_duration",
+          "mouth_settles_once_at_beginning",
+          "pose_held_unchanged_for_remainder",
+          "lips_jaw_chin_cheeks_lower_face_locked",
+          "concise_exclusions_present",
+          "emotion_reassigned_to_safe_channels",
+          "scene_identity_action_camera_lighting_preserved",
+          "no_later_contradiction_of_mouth_lock",
+          "no_redundant_negatives_or_misspellings"
+        ],
+        "mouth_lock_check_rule": "Blocking. Evaluate the guide section 8 checklist against the exact finished prompt string and write the result into the scene entry. All nine fields must be true. Never record an unevaluated or fabricated check. A scene without a complete passing mouth_lock_check may not be submitted to VideoExpress.",
+        "prompt_rule": "Read the Artistly Design Prompt text without inspecting the image. Write the prompt ONLY from the binding PROMPT_GUIDE.md fill-in template (HARD RULE; no substitute style). Transform—never wrap—it into mouth_locked_best_practice_v1: single continuous shot; mouth-set once at the beginning; expression perfectly unchanged; lips sealed; jaw/chin/cheeks/lower face still; action; emotion only via safe non-mouth channels; environment/camera. Reject later mouth/facial-expression/vocal cues, hard-coded prose durations, obsolete generic wrappers, duplicated negatives, reusable no_speech_constants, and the no mouth movement no lypsync tail. Store no raw prompt. Record the nine-item mouth_lock_check per scene and rewrite from the guide template before storing if any item fails.",
         "duration_rule": "Use integer durations 3-10 seconds. Distribute them so cumulative endpoints track k*(audio_seconds/N) and total duration is ceil(audio_seconds). Require 3N <= ceil(audio_seconds) <= 10N.",
         "authoritative_generation_source": true
       },
@@ -1160,7 +1194,7 @@
         "step": 19,
         "phase": "videoexpress_animation",
         "action": "create_prompt_book_and_initialize_scene_loop",
-        "details": "Create prompt_book.json schema 1.1.0 with prompt_architecture=mouth_locked_best_practice_v1 and exactly N ordered scene entries. Read each Artistly Design Prompt as text and transform—never wrap—it into the strict ordered architecture: single continuous shot; mouth-set once at the beginning; expression perfectly unchanged; lips sealed; jaw/chin/cheeks/lower face still; physical action; emotion only through safe non-mouth channels; environment/camera. Remove later smile/facial-expression/vocal cues, numeric prose durations, obsolete wrappers, duplicated negative lists, and the no mouth movement no lypsync tail. Map Design ID/image URL and plan integer 3-10 second duration so cumulative endpoints track k*(A/N) and total is ceil(A). After import, fill every videoexpress_image_id. Require the complete prompt-book gate before batching."
+        "details": "Create prompt_book.json schema 1.1.0 with prompt_architecture=mouth_locked_best_practice_v1, prompt_guide=PROMPT_GUIDE.md, and exactly N ordered scene entries. PROMPT_GUIDE.md is the binding, only permitted prompt method. Read each Artistly Design Prompt as text and transform—never wrap—it into the strict ordered architecture: single continuous shot; mouth-set once at the beginning; expression perfectly unchanged; lips sealed; jaw/chin/cheeks/lower face still; physical action; emotion only through safe non-mouth channels; environment/camera. Remove later smile/facial-expression/vocal cues, numeric prose durations, obsolete wrappers, duplicated negative lists, and the no mouth movement no lypsync tail. Never create a no_speech_constants block. Write a passing nine-item mouth_lock_check into every scene. Map Design ID/image URL and plan integer 3-10 second duration so cumulative endpoints track k*(A/N) and total is ceil(A). After import, fill every videoexpress_image_id. Require the complete prompt-book gate before batching."
       },
       {
         "step": 20,
@@ -1471,6 +1505,10 @@
       "never_submit_a_video_prompt_without_the_complete_mouth_locked_best_practice_architecture": true,
       "never_wrap_raw_artistly_text_with_generic_no_speech_prefix_or_suffix": true,
       "never_append_no_mouth_movement_no_lypsync": true,
+      "never_use_a_prompt_style_other_than_prompt_guide_md": true,
+      "never_create_no_speech_constants_or_shared_prompt_strings": true,
+      "never_submit_a_scene_without_a_passing_mouth_lock_check": true,
+      "never_reuse_prompts_from_a_void_prompt_book": true,
       "never_submit_a_prompt_with_later_smile_face_expression_mouth_or_vocal_cues": true,
       "never_submit_a_prompt_with_a_numeric_duration_in_prose": true,
       "never_compose_or_improvise_prompts_inside_videoexpress_use_prompt_book": true,

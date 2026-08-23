@@ -1,6 +1,6 @@
 {
   "schema_version": "1.1.0",
-  "workflow_config_version": "2.9.0",
+  "workflow_config_version": "2.10.0",
   "run_id": null,
   "project_title": null,
   "ratio": null,
@@ -11,7 +11,29 @@
     "video_only_no_sound": true,
     "advanced_mode": true,
     "prompt_architecture": "mouth_locked_best_practice_v1",
-    "obsolete_wrapper_and_terminal_tail_forbidden": true
+    "prompt_guide": "PROMPT_GUIDE.md",
+    "prompt_guide_binding": true,
+    "obsolete_wrapper_and_terminal_tail_forbidden": true,
+    "no_speech_constants_forbidden": true
+  },
+  "_scene_template_do_not_generate_from": {
+    "artistly_scene": 1,
+    "design_id": "<Artistly design id>",
+    "artistly_image_url": "<images[0]>",
+    "videoexpress_image_id": null,
+    "final_videoexpress_prompt": "<transformed per PROMPT_GUIDE.md copy-and-adapt template; never a wrapper>",
+    "duration_seconds": 5,
+    "mouth_lock_check": {
+      "single_continuous_opening_no_fixed_duration": true,
+      "mouth_settles_once_at_beginning": true,
+      "pose_held_unchanged_for_remainder": true,
+      "lips_jaw_chin_cheeks_lower_face_locked": true,
+      "concise_exclusions_present": true,
+      "emotion_reassigned_to_safe_channels": true,
+      "scene_identity_action_camera_lighting_preserved": true,
+      "no_later_contradiction_of_mouth_lock": true,
+      "no_redundant_negatives_or_misspellings": true
+    }
   },
   "scenes": []
 }
