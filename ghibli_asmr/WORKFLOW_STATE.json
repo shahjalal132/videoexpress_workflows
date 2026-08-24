@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0.0",
+  "workflow": "ghibli_asmr",
+  "run_id": null,
+  "started_at": null,
+  "updated_at": null,
+  "status": "ready",
+  "current_phase": "preflight",
+  "current_step": 0,
+  "last_verified_checkpoint": null,
+  "next_safe_action": "Load prompt_book.json, verify the VideoExpress session is authenticated, open the creator tab, and reconcile any existing scene media before submitting new work.",
+  "authorization_mode": "standing_authorization_for_all_in_scope_workflow_actions",
+  "validation_mode": "minimal_signal_only_no_generated_media_preview",
+  "project": {
+    "title": "Roadside Tea Stop - Consistent Anime Story",
+    "export_name": "Roadside Tea Stop - Consistent Anime Story",
+    "aspect_ratio": "16:9",
+    "image_type": "2D",
+    "quality": "High",
+    "resolution": "FullHD",
+    "format": "mp4"
+  },
+  "common_permissions": {
+    "source": "../common_permissions/README.md",
+    "receiving_system_prompt_starts_run": true,
+    "routine_workflow_actions_pre_authorized": true,
+    "credit_confirmation_required": false,
+    "phase_boundary_confirmation_required": false,
+    "generated_media_preview_for_qc": false,
+    "resume_rule": "Reconcile saved state with live application IDs and continue from the smallest missing action; never repeat a verified side effect.",
+    "true_blockers": [
+      "login page, expired session, or CAPTCHA",
+      "visible application refusal such as payment-required or out-of-credits",
+      "unrecoverable application error after the retry ladder",
+      "browser session cannot be controlled",
+      "submitted job remains missing after one refresh and three inspections",
+      "destructive action outside workflow scope",
+      "genuine ambiguity that would make proceeding unsafe or waste the run"
+    ]
+  },
+  "auth_gate": {
+    "gate": "videoexpress_auth",
+    "status": "pending",
+    "evidence": null,
+    "checked_at": null
+  },
+  "creator_gate": {
+    "gate": "creator_configuration",
+    "status": "pending",
+    "creator_tab_id": null,
+    "monitor_tab_id": null,
+    "evidence": null,
+    "checked_at": null
+  },
+  "scenes": [
+    {"shot": 1, "title": "The Countryside Ride", "duration_seconds": 7, "image_status": "pending", "image_id": null, "video_status": "pending", "video_id": null, "submitted_at": null, "completed_at": null},
+    {"shot": 2, "title": "A Tea Stall Beside the Road", "duration_seconds": 7, "image_status": "pending", "image_id": null, "video_status": "pending", "video_id": null, "submitted_at": null, "completed_at": null},
+    {"shot": 3, "title": "Parking at the Tea Stall", "duration_seconds": 7, "image_status": "pending", "image_id": null, "video_status": "pending", "video_id": null, "submitted_at": null, "completed_at": null},
+    {"shot": 4, "title": "A Fresh Cup of Tea", "duration_seconds": 7, "image_status": "pending", "image_id": null, "video_status": "pending", "video_id": null, "submitted_at": null, "completed_at": null},
+    {"shot": 5, "title": "Tea and the Open Road", "duration_seconds": 7, "image_status": "pending", "image_id": null, "video_status": "pending", "video_id": null, "submitted_at": null, "completed_at": null}
+  ],
+  "generation_gate": {
+    "gate": "all_scene_videos_complete",
+    "status": "pending",
+    "expected_count": 5,
+    "completed_video_ids_in_scene_order": [],
+    "evidence": null
+  },
+  "timeline_gate": {
+    "gate": "timeline_structure",
+    "status": "pending",
+    "track": 1,
+    "expected_count": 5,
+    "video_ids_in_order": [],
+    "auto_align_clicked_after_final_add": false,
+    "clip_geometry": [],
+    "order_verified": false,
+    "no_real_gaps_or_overlaps": false,
+    "evidence": null
+  },
+  "save_gate": {
+    "gate": "project_saved",
+    "status": "pending",
+    "project_name": "Roadside Tea Stop - Consistent Anime Story",
+    "confirmed_via": null,
+    "saved_at": null
+  },
+  "export_gate": {
+    "gate": "export_submitted",
+    "status": "pending",
+    "file_name": "Roadside Tea Stop - Consistent Anime Story",
+    "quality": "High",
+    "resolution": "FullHD",
+    "format": "mp4",
+    "queue_text": null,
+    "queue_position": null,
+    "submitted_at": null
+  },
+  "completed_steps": [],
+  "external_side_effects": [],
+  "error_history": []
+}
