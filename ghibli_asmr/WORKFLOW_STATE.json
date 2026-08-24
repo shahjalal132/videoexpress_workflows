@@ -5,16 +5,25 @@
   "started_at": null,
   "updated_at": null,
   "status": "ready",
-  "current_phase": "preflight",
+  "current_phase": "intake",
   "current_step": 0,
   "last_verified_checkpoint": null,
-  "next_safe_action": "Load prompt_book.json, verify the VideoExpress session is authenticated, open the creator tab, and reconcile any existing scene media before submitting new work.",
+  "next_safe_action": "Ask the user the two intake questions together: (1) Idea/Prompt, and (2) Ratio: Landscape or Vertical.",
   "authorization_mode": "standing_authorization_for_all_in_scope_workflow_actions",
   "validation_mode": "minimal_signal_only_no_generated_media_preview",
+  "intake": {
+    "status": "pending",
+    "idea_prompt": null,
+    "ratio_answer": null,
+    "ratio_label": null,
+    "aspect_ratio": null,
+    "answered_at": null
+  },
   "project": {
-    "title": "Roadside Tea Stop - Consistent Anime Story",
-    "export_name": "Roadside Tea Stop - Consistent Anime Story",
-    "aspect_ratio": "16:9",
+    "title": null,
+    "export_name": null,
+    "ratio_label": null,
+    "aspect_ratio": null,
     "image_type": "2D",
     "quality": "High",
     "resolution": "FullHD",
@@ -23,6 +32,11 @@
   "common_permissions": {
     "source": "../common_permissions/README.md",
     "receiving_system_prompt_starts_run": true,
+    "allowed_questions": [
+      "Initial intake question 1: Idea/Prompt",
+      "Initial intake question 2: Ratio, Landscape or Vertical",
+      "One concise request for the single user action required by a true blocker"
+    ],
     "routine_workflow_actions_pre_authorized": true,
     "credit_confirmation_required": false,
     "phase_boundary_confirmation_required": false,
@@ -52,13 +66,18 @@
     "evidence": null,
     "checked_at": null
   },
-  "scenes": [
-    {"shot": 1, "title": "The Countryside Ride", "duration_seconds": 7, "image_status": "pending", "image_id": null, "video_status": "pending", "video_id": null, "submitted_at": null, "completed_at": null},
-    {"shot": 2, "title": "A Tea Stall Beside the Road", "duration_seconds": 7, "image_status": "pending", "image_id": null, "video_status": "pending", "video_id": null, "submitted_at": null, "completed_at": null},
-    {"shot": 3, "title": "Parking at the Tea Stall", "duration_seconds": 7, "image_status": "pending", "image_id": null, "video_status": "pending", "video_id": null, "submitted_at": null, "completed_at": null},
-    {"shot": 4, "title": "A Fresh Cup of Tea", "duration_seconds": 7, "image_status": "pending", "image_id": null, "video_status": "pending", "video_id": null, "submitted_at": null, "completed_at": null},
-    {"shot": 5, "title": "Tea and the Open Road", "duration_seconds": 7, "image_status": "pending", "image_id": null, "video_status": "pending", "video_id": null, "submitted_at": null, "completed_at": null}
-  ],
+  "prompt_book_gate": {
+    "gate": "prompt_book_generated",
+    "status": "pending",
+    "path": "prompt_book.json",
+    "scene_count": null,
+    "ratio_matches_intake": false,
+    "all_scenes_have_background_audio_and_sfx": false,
+    "continuity_contract_present": false,
+    "evidence": null,
+    "generated_at": null
+  },
+  "scenes": [],
   "generation_gate": {
     "gate": "all_scene_videos_complete",
     "status": "pending",
@@ -81,14 +100,14 @@
   "save_gate": {
     "gate": "project_saved",
     "status": "pending",
-    "project_name": "Roadside Tea Stop - Consistent Anime Story",
+    "project_name": null,
     "confirmed_via": null,
     "saved_at": null
   },
   "export_gate": {
     "gate": "export_submitted",
     "status": "pending",
-    "file_name": "Roadside Tea Stop - Consistent Anime Story",
+    "file_name": null,
     "quality": "High",
     "resolution": "FullHD",
     "format": "mp4",

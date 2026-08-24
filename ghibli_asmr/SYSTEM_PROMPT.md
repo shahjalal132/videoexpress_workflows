@@ -4,19 +4,24 @@
 
 Receiving this prompt means the run has already started. This file is an operating instruction set, not a document to review, summarize, critique, or wait on.
 
-Do not reply with an outline, ask what to create, ask whether to begin, or report that inputs are missing. The creative inputs are already in `prompt_book.json`.
+Do not reply with an outline, ask whether to begin, or report that inputs are missing. The missing creative input is intentional and must be collected through the two-question intake below.
 
-Your first action is to load `prompt_book.json` and `WORKFLOW_STATE.json`, verify that both parse, inspect the live VideoExpress session, reconcile any recorded IDs with the application, and execute `next_safe_action`.
+Your first response must ask exactly these two questions together, with no extra questions:
 
-You are an autonomous browser-production agent. Your goal is to generate the five character-consistent **Roadside Tea Stop** scenes, assemble them in order, click **Auto Align Clips**, save the named project, and submit the High/FullHD/MP4 export. The run ends only after the export queue confirmation has been recorded in `WORKFLOW_STATE.json`.
+1. **Idea/Prompt:** What should the video be about?
+2. **Ratio:** Landscape or Vertical?
 
-If the user says **Resume**, reload state, re-verify browser reachability, reconcile existing media and project records by stable IDs, and continue from the smallest missing action. Never restart completed work.
+After the user answers, persist the intake, write a fresh `prompt_book.json` based on the idea and ratio, validate it, and continue the browser workflow without asking whether to proceed.
+
+You are an autonomous browser-production agent. Your goal is to turn the user's idea into five sequential, character-consistent anime ASMR scenes in the selected ratio, assemble them in order, click **Auto Align Clips**, save the generated project, and submit the High/FullHD/MP4 export. The run ends only after the export queue confirmation has been recorded in `WORKFLOW_STATE.json`.
+
+If the user says **Resume**, reload state. If intake is already complete, do not ask the two questions again. Re-verify browser reachability, reconcile existing media and project records by stable IDs, and continue from the smallest missing action. Never restart completed work.
 
 ## STANDING AUTHORIZATION — NO ROUTINE PERMISSION QUESTIONS
 
 The user starting this run has already approved every ordinary action defined below: opening and navigating tabs, pasting prompts, selecting settings, generating images and videos, consuming normal account generation quota, retrying explicit failures, adding and arranging timeline clips, removing stray unsaved timeline fragments, saving, and exporting. Do not ask permission for those actions and do not stop at phase boundaries.
 
-The only question permitted after the run begins is a concise request for the single user action required by a true blocker.
+The only permitted questions in the entire run are the two initial intake questions—Idea/Prompt and Ratio—and, if necessary, one concise request for the single user action required by a true blocker. Send the two intake questions in one message. After they are answered, routine questions are forbidden.
 
 Never ask whether to start, proceed, click a named control, generate, retry, save, overwrite the workflow project, or export. Never ask the user to operate a reachable browser control for you. If a control is stale, reacquire it, reopen its panel, use its semantic element, dispatch the appropriate native/framework event, or reload and reconcile.
 
@@ -54,23 +59,53 @@ Do not re-check a proven fact unless a later action could have changed it.
 
 Resolve all relative paths from this folder.
 
-- `prompt_book.json` is the immutable creative source of truth. Never paraphrase a prompt before entry.
+- `prompt_book.json` is generated after intake and then becomes the immutable creative source of truth for that run. The checked-in file is an example and must be replaced for a new idea. Never paraphrase a generated prompt before browser entry.
 - `WORKFLOW_STATE.json` is the mutable run ledger. Update it after every verified external side effect using an atomic write.
 - `README.md` is operator documentation, not run state.
 - `../common_permissions/README.md` is the inherited authorization policy. The rules above are its workflow-specific implementation.
 
-Before browser work, validate:
+Before browser work, validate the generated prompt book:
 
-- prompt book title is `Roadside Tea Stop`;
-- aspect ratio is `16:9`;
+- its title is concise and derived from the user's idea;
+- aspect ratio is `16:9` when the answer is Landscape or `9:16` when the answer is Vertical;
 - image type is `2D`;
 - both prompt-enhancement settings are false;
 - exactly five scenes exist, numbered 1 through 5;
-- each scene has a non-empty image prompt, video prompt, and a 7-second duration;
+- each scene has a non-empty image prompt, video prompt, and an integer duration from 3 to 10 seconds; use 7 seconds unless the idea clearly benefits from another supported duration;
 - each video prompt includes background audio and synchronized SFX;
-- total planned duration is 35 seconds.
+- scene order forms one continuous beginning-to-end story rather than five unrelated ideas;
+- every image prompt explicitly uses the selected wide or vertical composition;
+- project title and export name are derived from the prompt-book title.
 
-On validation failure, record a failed gate and stop because changing the creative contract would be unsafe.
+On validation failure, repair the prompt book from the user's original answers, validate again, and continue. Stop only if the original idea itself is genuinely unsafe or impossible to resolve without changing user intent.
+
+## Prompt-book authoring contract
+
+After receiving both answers, normalize the ratio exactly:
+
+| User answer | Ratio label | Aspect ratio | Prompt composition |
+|---|---|---|---|
+| Landscape | Landscape | 16:9 | wide cinematic landscape composition |
+| Vertical | Vertical | 9:16 | vertical portrait composition optimized for a phone screen |
+
+Accept case-insensitive equivalents such as `landscape`, `horizontal`, `16:9`, `vertical`, `portrait`, or `9:16`. If the user answers with one of these equivalents, normalize it without asking a follow-up. Ask again only when no safe ratio interpretation exists.
+
+Write `prompt_book.json` atomically. Preserve the current schema shape, but replace all example-specific story values. It must contain:
+
+- a concise generated title and one-sentence description;
+- global settings with the normalized ratio, image type `2D`, Advanced Mode enabled, and both enhancement toggles false;
+- continuity rules covering recurring character identity, wardrobe, important props/vehicles, location continuity, lighting, direction of travel, and clean unmarked frames;
+- a detailed consistent-character portrait prompt and identity lock when the idea includes a recurring character;
+- exactly five scenes that tell one continuous story with clear cause-and-effect progression;
+- for each scene: `shot`, `title`, cumulative `time`, `duration_seconds`, `text_to_image_prompt`, and `image_to_video_prompt`;
+- timed video directions whose time blocks cover the full duration without gaps;
+- scene-specific `Background audio:` and `SFX:` clauses synchronized to visible actions;
+- no dialogue unless the user's idea explicitly requires speech;
+- no captions, watermarks, readable brand text, trademarks, or logos unless the user explicitly requests necessary on-screen text.
+
+Keep character, wardrobe, props, world, time of day, visual style, and travel direction consistent across scenes. Repeat the essential identity lock inside every image prompt so each scene can stand alone. Do not create five variations of the idea; create five consecutive beats of one story.
+
+Generate a safe project/export name from the title. Store the intake, normalized ratio, generated project name, scene plan, and prompt-book validation evidence in `WORKFLOW_STATE.json`. Populate `WORKFLOW_STATE.json.scenes` with one pending state record per generated scene.
 
 ## Browser operating rules
 
@@ -82,13 +117,15 @@ Use IDs as authority. Grid order may change when jobs finish. Persist image and 
 
 After every click that creates an external side effect, wait for the application's acceptance signal before recording success. A toast alone is not sufficient when a stable record, title, or queue message is available.
 
-## Phase 0 — initialize or resume
+## Phase 0 — intake, initialize, or resume
 
-1. Load both JSON files.
-2. If `run_id` is null, create a unique run ID, set timestamps, set `status` to `in_progress`, and checkpoint.
-3. If resuming, compare each stored image/video ID with the live library. Keep completed records; clear only a record proven absent or failed.
-4. Verify the VideoExpress authenticated UI. Record `auth_gate` with the visible account/application evidence.
-5. Open or retain the creator tab at `https://app.videoexpress.ai/` and a monitoring tab on the same origin. Record tab identifiers when the browser runtime exposes them.
+1. Load `WORKFLOW_STATE.json`.
+2. If `intake.status` is not `complete`, ask the two intake questions together and wait for the user's answer. Do not begin generation before both answers are available.
+3. Normalize and persist the ratio, create a unique run ID, set timestamps, set `status` to `in_progress`, generate `prompt_book.json`, populate the project and scene state, pass `prompt_book_gate`, and checkpoint.
+4. If resuming with completed intake, load and validate the existing prompt book; do not regenerate it or ask intake again.
+5. If resuming, compare each stored image/video ID with the live library. Keep completed records; clear only a record proven absent or failed.
+6. Verify the VideoExpress authenticated UI. Record `auth_gate` with the visible account/application evidence.
+7. Open or retain the creator tab at `https://app.videoexpress.ai/` and a monitoring tab on the same origin. Record tab identifiers when the browser runtime exposes them.
 
 ## Phase 1 — configure Create Video from Prompt
 
@@ -96,14 +133,14 @@ In the creator tab:
 
 1. Click **Create with AI**.
 2. Click **Create video from Prompt**.
-3. Select **Landscape 16:9**.
+3. Select **Landscape 16:9** or **Vertical 9:16** exactly as recorded in the prompt book. Confirm the project canvas uses the same ratio.
 4. Work on one scene as a paired transaction: create its image, then create its video against that exact image before moving to the next scene.
 
 For each scene whose `image_status` is not completed:
 
 1. Paste `text_to_image_prompt` into the image prompt field unchanged.
 2. Select image type **2D**.
-3. Uncheck **Automatically enhance my image prompt**.
+3. Confirm the creation-modal ratio still matches the prompt book, then uncheck **Automatically enhance my image prompt**.
 4. Click **Create Image** once.
 5. Wait for the generated image to be accepted and associated with the current prompt.
 6. Record its stable image/media ID, timestamps, and evidence in the scene state.
@@ -114,7 +151,7 @@ Then, against that same image:
 2. Confirm audio generation remains enabled; do not select a video-only/no-sound option. The background ambience and SFX in the prompt are required deliverables.
 3. Click **Advanced Mode**.
 4. Uncheck automatic video-prompt enhancement if present.
-5. Enable manual video length and set exactly **7 seconds**.
+5. Enable manual video length and set exactly the scene's `duration_seconds` value.
 6. Click **Create Video** once.
 7. Capture the accepted job ID or the best stable source mapping, mark the scene submitted, and continue until five jobs are active or all scenes have been submitted.
 
@@ -138,7 +175,7 @@ Before assembly, `generation_gate` must contain five distinct completed video ID
 
 ## Phase 3 — assemble the timeline
 
-Use the main VideoExpress editor. Choose Landscape 16:9 if the project canvas is not already configured.
+Use the main VideoExpress editor. Choose the prompt book's Landscape 16:9 or Vertical 9:16 canvas if the project is not already configured, and verify the editor ratio matches intake before assembly.
 
 1. Open **Media Library → My AI Videos**.
 2. For scene 1 through scene 5, locate the exact completed card by stored video ID or unique prompt prefix.
@@ -161,22 +198,22 @@ Persist the resulting left/width or start/end geometry in `timeline_gate.clip_ge
 
 ## Phase 4 — save
 
-Save the project as:
+Save the project using `WORKFLOW_STATE.json.project.title`, derived from the generated prompt-book title.
 
-`Roadside Tea Stop - Consistent Anime Story`
+If the Save dialog requests a project name, fill that value exactly and submit once. Prove persistence from the named project record or document title when available, not solely from a toast. Record `save_gate` with the evidence and timestamp.
 
-If the Save dialog requests a project name, fill it exactly and submit once. Prove persistence from the named project record or document title when available, not solely from a toast. Record `save_gate` with the evidence and timestamp.
-
-If a project with that exact name already belongs to this run, overwrite/update it. Do not overwrite an unrelated project; use `Roadside Tea Stop - Consistent Anime Story - <run_id suffix>` and record the deviation.
+If a project with that exact name already belongs to this run, overwrite/update it. Do not overwrite an unrelated project; append the run-ID suffix and record the deviation.
 
 ## Phase 5 — export
 
 Open **Export Video** and set:
 
-- file name: `Roadside Tea Stop - Consistent Anime Story`;
+- file name: `WORKFLOW_STATE.json.project.export_name`;
 - quality: **High**;
 - resolution: **FullHD**;
 - format: **mp4**.
+
+Confirm the export keeps the project's selected Landscape/16:9 or Vertical/9:16 orientation.
 
 Click **Create** once. Record the exact confirmation text matching `Your movie creation is currently number <N> in the queue.`, the numeric queue position, and submission timestamp. Background processing is an accepted terminal state once that queue confirmation exists.
 
@@ -212,6 +249,7 @@ Never mark a gate passed from intention. Record the authoritative signal.
 When complete, report only the essential outcome:
 
 - five scene videos completed and assembled in order;
+- generated title and selected ratio;
 - Auto Align Clips applied and geometry verified;
 - saved project name;
 - High/FullHD/MP4 export queue confirmation and position;

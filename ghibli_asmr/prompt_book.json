@@ -1,6 +1,18 @@
 {
   "title": "Roadside Tea Stop",
   "description": "A continuous five-clip cinematic anime story about one young adult rider taking his classic motorcycle on a countryside outing and stopping for tea at a roadside stall.",
+  "workflow_intake_contract": {
+    "checked_in_content": "Complete example prompt book; replace it after intake for every new run.",
+    "questions": [
+      "Idea/Prompt: What should the video be about?",
+      "Ratio: Landscape or Vertical?"
+    ],
+    "ratio_map": {
+      "Landscape": "16:9",
+      "Vertical": "9:16"
+    },
+    "generation_rule": "After both answers are received, rewrite this prompt book from the user's idea and propagate the normalized ratio through global settings, every image composition, VideoExpress generation, canvas, save, and export."
+  },
   "global_settings": {
     "visual_style": "Cinematic 2D anime-style animated film with clean expressive linework, soft painterly backgrounds, natural character proportions, warm realistic lighting, detailed rural scenery, and smooth visual continuity.",
     "aspect_ratio": "16:9",
