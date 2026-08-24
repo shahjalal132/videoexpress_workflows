@@ -8,7 +8,7 @@
   "current_phase": "intake",
   "current_step": 0,
   "last_verified_checkpoint": null,
-  "next_safe_action": "Ask the user the two intake questions together: (1) Idea/Prompt, and (2) Ratio: Landscape or Vertical.",
+  "next_safe_action": "Ask the user the three intake questions together: (1) Idea/Prompt, (2) Ratio: Landscape or Vertical, and (3) Duration, maximum 5 minutes.",
   "authorization_mode": "standing_authorization_for_all_in_scope_workflow_actions",
   "validation_mode": "minimal_signal_only_no_generated_media_preview",
   "intake": {
@@ -17,6 +17,9 @@
     "ratio_answer": null,
     "ratio_label": null,
     "aspect_ratio": null,
+    "duration_answer": null,
+    "requested_duration_seconds": null,
+    "duration_limit_seconds": 300,
     "answered_at": null
   },
   "project": {
@@ -24,6 +27,10 @@
     "export_name": null,
     "ratio_label": null,
     "aspect_ratio": null,
+    "total_duration_seconds": null,
+    "clip_count": null,
+    "clip_duration_plan_seconds": [],
+    "max_clip_duration_seconds": 10,
     "image_type": "2D",
     "quality": "High",
     "resolution": "FullHD",
@@ -35,6 +42,7 @@
     "allowed_questions": [
       "Initial intake question 1: Idea/Prompt",
       "Initial intake question 2: Ratio, Landscape or Vertical",
+      "Initial intake question 3: Duration, maximum 5 minutes",
       "One concise request for the single user action required by a true blocker"
     ],
     "routine_workflow_actions_pre_authorized": true,
@@ -72,6 +80,9 @@
     "path": "prompt_book.json",
     "scene_count": null,
     "ratio_matches_intake": false,
+    "duration_matches_intake": false,
+    "all_scene_durations_at_most_10_seconds": false,
+    "scene_durations_total_seconds": null,
     "all_scenes_have_background_audio_and_sfx": false,
     "continuity_contract_present": false,
     "evidence": null,
@@ -81,7 +92,7 @@
   "generation_gate": {
     "gate": "all_scene_videos_complete",
     "status": "pending",
-    "expected_count": 5,
+    "expected_count": null,
     "completed_video_ids_in_scene_order": [],
     "evidence": null
   },
@@ -89,7 +100,7 @@
     "gate": "timeline_structure",
     "status": "pending",
     "track": 1,
-    "expected_count": 5,
+    "expected_count": null,
     "video_ids_in_order": [],
     "auto_align_clicked_after_final_add": false,
     "clip_geometry": [],

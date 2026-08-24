@@ -5,13 +5,22 @@
     "checked_in_content": "Complete example prompt book; replace it after intake for every new run.",
     "questions": [
       "Idea/Prompt: What should the video be about?",
-      "Ratio: Landscape or Vertical?"
+      "Ratio: Landscape or Vertical?",
+      "Duration: How long should the finished video be? Maximum 5 minutes."
     ],
     "ratio_map": {
       "Landscape": "16:9",
       "Vertical": "9:16"
     },
-    "generation_rule": "After both answers are received, rewrite this prompt book from the user's idea and propagate the normalized ratio through global settings, every image composition, VideoExpress generation, canvas, save, and export."
+    "duration_planner": {
+      "maximum_total_seconds": 300,
+      "minimum_clip_seconds": 3,
+      "maximum_clip_seconds": 10,
+      "default_clip_count_formula": "ceil(total_seconds / 10)",
+      "balanced_duration_formula": "base=floor(total_seconds/clip_count); first remainder clips use base+1 seconds; all remaining clips use base seconds",
+      "adjustable_pacing": "The agent may increase clip_count for story pacing while every clip remains 3-10 seconds and all clip durations sum exactly to the requested duration."
+    },
+    "generation_rule": "After all three answers are received, rewrite this prompt book from the user's idea, calculate scene count and per-scene durations from the requested duration, and propagate the normalized ratio and duration plan through global settings, every image composition, VideoExpress generation, canvas, timeline, save, and export."
   },
   "global_settings": {
     "visual_style": "Cinematic 2D anime-style animated film with clean expressive linework, soft painterly backgrounds, natural character proportions, warm realistic lighting, detailed rural scenery, and smooth visual continuity.",
@@ -20,7 +29,13 @@
     "automatically_enhance_image_prompt": false,
     "advanced_mode": true,
     "automatically_enhance_video_prompt": false,
-    "manual_video_length_seconds": 7,
+    "manual_video_length_mode": "per_scene_from_duration_plan",
+    "requested_duration_seconds": 35,
+    "clip_count": 5,
+    "clip_duration_plan_seconds": [7, 7, 7, 7, 7],
+    "maximum_total_duration_seconds": 300,
+    "maximum_clip_duration_seconds": 10,
+    "duration_plan_note": "This checked-in example uses five equal 7-second story beats. New runs default to ceil(total/10) clips, but may use more shorter clips when pacing benefits.",
     "continuity_rules": [
       "Use Actor 1's consistent-character portrait reference for every scene.",
       "Keep Actor 1's face, age, hairstyle, skin tone, body proportions, mustard-yellow windbreaker, charcoal T-shirt, dark blue jeans, brown riding boots, and matte-black open-face helmet identical across all five clips.",
