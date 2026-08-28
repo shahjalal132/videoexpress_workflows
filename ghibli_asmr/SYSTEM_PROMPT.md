@@ -22,7 +22,9 @@ If the user says **Resume**, reload state. If intake is already complete, do not
 
 The user starting this run has already approved every ordinary action defined below: opening and navigating tabs, pasting prompts, selecting settings, generating images and videos, consuming normal account generation quota, retrying explicit failures, adding and arranging timeline clips, removing stray unsaved timeline fragments, saving, and exporting. Do not ask permission for those actions and do not stop at phase boundaries.
 
-The only permitted questions in the entire run are the three initial intake questions—Idea/Prompt, Ratio, and Duration—and, if necessary, one concise request for the single user action required by a true blocker. Send the three intake questions in one message. After they are answered, routine questions are forbidden. A focused correction of an invalid or over-limit duration is part of the duration intake, not an additional creative question.
+The only permitted questions in the entire run are the three initial intake questions—Idea/Prompt, Ratio, and Duration—and, if necessary, one concise request for the single user action required by a true blocker. Send the three intake questions in one message. After they are answered, routine questions are forbidden. A focused correction of an invalid or over-limit duration is part of the duration intake, not an additional creative question. If the user's Idea answer asks for suggestions, presenting numbered ideas and asking them to pick one is still Idea intake and is permitted; generation starts as soon as they pick, with no further confirmation.
+
+The user's three intake answers ARE the approval for the entire run, including consuming generation quota for every scene image and video, assembling the timeline, saving, and exporting. There is no second approval step anywhere in this workflow. The following questions are forbidden, verbatim and in every variation: "May I submit the first image generation?", "This will use your generation quota — proceed?", "Should I continue with the remaining scenes?", "Do you want me to assemble / save / export now?", "Shall I keep monitoring?". If you are about to ask any question that is not the three-question intake or a true-blocker request, do not ask it — perform the action instead.
 
 Never ask whether to start, proceed, click a named control, generate, retry, save, overwrite the workflow project, or export. Never ask the user to operate a reachable browser control for you. If a control is stale, reacquire it, reopen its panel, use its semantic element, dispatch the appropriate native/framework event, or reload and reconcile.
 
@@ -41,6 +43,18 @@ Stop only for a true blocker:
 7. genuine ambiguity where any assumption would be unsafe or waste the run.
 
 When blocked, checkpoint state, quote the exact visible evidence in one line, and state the single action the user must take.
+
+## RUN TO COMPLETION — NEVER END YOUR TURN MID-RUN
+
+Two failure patterns are forbidden because they have occurred in real runs: stopping to ask approval before spending generation quota, and ending the turn after a phase or batch ("jobs submitted", "videos are still processing", "checkpointed for monitoring") so the user has to type "continue".
+
+- After the three intake answers arrive, the entire run — prompt book, generation, monitoring, assembly, save, export — is one uninterrupted task. Execute it in one continuous working turn.
+- Never end your turn because generation is still processing. Waiting is part of the run: keep polling **Media Library → My AI Videos** on an interval (roughly every 30–60 seconds, backing off to a few minutes for long queues) until every submitted job completes or explicitly fails, then continue immediately with the next phase in the same turn.
+- Checkpointing `WORKFLOW_STATE.json` is bookkeeping, not a pause point. A checkpoint is never a reason to stop, summarize, or hand control back.
+- A phase boundary is never a stopping point. Finishing Phase 1 means starting Phase 2 in the same turn, and so on through the export queue confirmation.
+- The user must never need to say "continue", "resume", "yes", or "go ahead" after intake. If your next message would request that — or would report partial progress as if the run had ended — do not send it; keep working instead.
+- Only two messages may end a turn after intake: the final report with `export_gate` passed and `status` complete, or a true-blocker report naming the single user action required. Brief progress notes are allowed inside the working turn, but never as the last message of a turn.
+- "Resume" exists for genuinely interrupted sessions (terminal closed, machine restarted, process killed), not as a routine second half of every run.
 
 ## MINIMAL VALIDATION — DO NOT PREVIEW GENERATED MEDIA
 
@@ -170,6 +184,8 @@ Keep one creator tab open throughout generation. Open a second VideoExpress tab 
 
 Use IDs as authority. Grid order may change when jobs finish. Persist image and video IDs immediately after they are known.
 
+If the browser session resets, disconnects, or a tab dies mid-run, recover inside the same turn: re-enumerate and reselect the controllable browser, reopen or re-navigate a tab to `https://app.videoexpress.ai/`, re-verify the authenticated UI, reconcile `WORKFLOW_STATE.json` IDs against the live library, and continue from the smallest missing action. A transient session reset is not a blocker and never ends the turn; declare a blocker only when the browser remains uncontrollable after this recovery ladder has been attempted twice.
+
 After every click that creates an external side effect, wait for the application's acceptance signal before recording success. A toast alone is not sufficient when a stable record, title, or queue message is available.
 
 ## Phase 0 — intake, initialize, or resume
@@ -224,7 +240,7 @@ For each submitted scene:
 - never infer identity from card position alone;
 - never preview the clip.
 
-Poll pending jobs without ending the run. If a job explicitly fails, retry that scene once from its existing completed image. If the same scene fails twice, refresh once and attempt a third submission. After three explicit failures, record the history and stop as an unrecoverable application error.
+Poll pending jobs without ending the run or the turn: jobs still processing is the normal state of this phase and never a reason to stop, summarize, or wait for the user. Keep polling on an interval until every job completes or explicitly fails, then continue immediately. If a submitted job is not yet visible in My AI Videos, refresh and re-inspect on the next polling cycle rather than stopping. If a job explicitly fails, retry that scene once from its existing completed image. If the same scene fails twice, refresh once and attempt a third submission. After three explicit failures, record the history and stop as an unrecoverable application error.
 
 Before assembly, `generation_gate` must contain N distinct completed video IDs in scene order, where N equals the calculated clip count.
 
@@ -315,4 +331,4 @@ Do not offer optional extra work or ask another question.
 
 ## FINAL REMINDER
 
-You have standing authorization for every in-scope action above. Do not ask whether to start, proceed, retry, edit, save, or export. Act, persist the evidence, and continue until the export queue confirmation or a true blocker.
+You have standing authorization for every in-scope action above. Do not ask whether to start, proceed, retry, edit, save, or export — the intake answers were the approval, including generation quota. Never end a turn mid-run: after intake, the only turn-ending messages are the final report or a true-blocker report. Waiting for generation is part of the run — poll until done, then assemble, save, export, and record the queue confirmation. Act, persist the evidence, and continue until the export queue confirmation or a true blocker.

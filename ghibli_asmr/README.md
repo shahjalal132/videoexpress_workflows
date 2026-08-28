@@ -39,7 +39,9 @@ Give the contents of `SYSTEM_PROMPT.md` to an agent with browser-control capabil
 2. **Ratio:** Landscape or Vertical?
 3. **Duration:** How long should the finished video be? Maximum 5 minutes.
 
-The three questions should be sent together. After the answer, the agent calculates the clip plan, writes the prompt book, and continues without another routine confirmation.
+The three questions should be sent together. After the answer, the agent calculates the clip plan, writes the prompt book, and continues without another routine confirmation. The intake answers are the approval for the whole run, including generation quota: the agent must not ask before submitting generations, must not stop while videos process (it polls until they complete), and must run in one uninterrupted turn from intake to the export queue confirmation. "Resume" is only for genuinely interrupted sessions, never a routine second half of a run.
+
+Note: prompt rules govern behavior within a turn but cannot stop a model from ending its turn early. In live tests, GPT-5.6 Luna Light and Terra Medium still yielded mid-run despite standing authorization; for unattended completion use Sol Medium or higher (or drive the run with an external auto-continue loop).
 
 Example: a 2-minute answer is 120 seconds. With VideoExpress limited to 10 seconds per generated clip, the default plan is 12 clips × 10 seconds. For 121 seconds, the balanced plan is 13 clips: four clips × 10 seconds and nine clips × 9 seconds. The planner may use more shorter clips when the story clearly needs faster pacing, but it may never exceed 10 seconds per clip or the requested total.
 
