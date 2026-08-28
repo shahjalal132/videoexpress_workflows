@@ -77,7 +77,12 @@ Before browser work, validate the generated prompt book:
 - all scene durations sum exactly to the normalized requested duration;
 - scene order forms one continuous beginning-to-end story rather than unrelated ideas;
 - every image prompt explicitly uses the selected wide or vertical composition;
-- project title and export name are derived from the prompt-book title.
+- project title and export name are derived from the prompt-book title;
+- `world_lock` and `lighting_lock` exist in global settings and appear verbatim in every image prompt;
+- every scene has a non-empty `start_state` and `end_state`, and every scene after the first restates the previous scene's `end_state` in its `start_state` (same location, pose, prop states, and heading);
+- no image prompt depicts a transitional or unsupported pose (boarding, dismounting, mounting, jumping, stepping between supports, or a foot over open water or air), and every water/height/vehicle scene carries its impossibility guard sentence in both prompts;
+- every directional action names its frame-relative direction and its landing point, and the still pose, the timed beats, and the landing point all agree;
+- the final time block of every video prompt ends settled in that scene's `end_state`, with no object mid-air and no transition mid-motion at the cut.
 
 On validation failure, repair the prompt book from the user's original answers, validate again, and continue. Stop only if the original idea itself is genuinely unsafe or impossible to resolve without changing user intent.
 
@@ -115,17 +120,47 @@ Write `prompt_book.json` atomically. Preserve the current schema shape, but repl
 - a concise generated title and one-sentence description;
 - global settings with the normalized ratio, image type `2D`, Advanced Mode enabled, both enhancement toggles false, requested total seconds, calculated clip count, and the per-scene duration plan;
 - continuity rules covering recurring character identity, wardrobe, important props/vehicles, location continuity, lighting, direction of travel, and clean unmarked frames;
+- a `world_lock` paragraph and a `lighting_lock` sentence in global settings, as defined in the prompt-quality contract below;
 - a detailed consistent-character portrait prompt and identity lock when the idea includes a recurring character;
 - exactly N scenes, where N is the calculated clip count, telling one continuous story with clear cause-and-effect progression;
-- for each scene: `shot`, `title`, cumulative `time`, `duration_seconds`, `text_to_image_prompt`, and `image_to_video_prompt`;
+- for each scene: `shot`, `title`, cumulative `time`, `duration_seconds`, `start_state`, `end_state`, `text_to_image_prompt`, and `image_to_video_prompt`;
 - timed video directions whose time blocks cover the full duration without gaps;
 - scene-specific `Background audio:` and `SFX:` clauses synchronized to visible actions;
 - no dialogue unless the user's idea explicitly requires speech;
 - no captions, watermarks, readable brand text, trademarks, or logos unless the user explicitly requests necessary on-screen text.
 
-Keep character, wardrobe, props, world, time of day, visual style, and travel direction consistent across scenes. Repeat the essential identity lock inside every image prompt so each scene can stand alone. Do not create N variations of the idea; create N consecutive beats of one story.
+Keep character, wardrobe, props, world, time of day, visual style, and travel direction consistent across scenes. Repeat the essential identity lock inside every image prompt so each scene can stand alone. Do not create N variations of the idea; create N consecutive beats of one story. The prompt-quality contract below turns these requirements into hard, checkable rules; a prompt book that violates any of them fails `prompt_book_gate` and must be repaired before browser work.
 
 Generate a safe project/export name from the title. Store the intake, normalized ratio, requested duration, calculated N, duration plan, generated project name, scene plan, and prompt-book validation evidence in `WORKFLOW_STATE.json`. Set both generation and timeline `expected_count` values to N. Populate `WORKFLOW_STATE.json.scenes` with one pending state record per generated scene.
+
+## Prompt-quality contract — physics, world lock, and sequential flow
+
+These three rule groups exist because their violations are the observed failure modes of real runs: a character walking across open water while boarding a boat, a net cast forward that lands behind the character, lighting and tone jumping between clips, and clips that restart or re-stage the story instead of continuing it. Every generated prompt book must obey all three groups.
+
+### 1. Physical grounding — no impossible actions
+
+- Every `text_to_image_prompt` depicts a stable, fully supported pose: feet, seat, or knees resting on one named solid support (jetty boards, boat floorboards, ground, saddle, stool). Never prompt a still of a transitional pose — boarding, dismounting, mounting, jumping, climbing, or stepping between two supports — and never a foot over open water or open air. The still generator resolves ambiguous transitions by inventing impossible physics; deny it the ambiguity.
+- Perform transitions inside video beats with the receiving support named: "he steps down onto the boat's floorboards and sits on the center thwart." When a transition is risky to render (jetty into boat, ground onto saddle), prefer skipping it entirely: end one scene just before it and start the next scene just after it is complete.
+- In any water, height, or vehicle setting, append the matching impossibility guard sentence to both prompts of every affected scene, for example: "His feet never touch or stand on the water; he is always either on the jetty boards or inside the boat." / "He is always either fully seated on the saddle or standing with both boots on the ground."
+- Every directional action (cast, throw, pour, point, row, ride) must state its direction relative to the frame and a named landmark, and state where the object ends up: "he casts the net forward over the bow, toward the open water at the left of frame and away from the dead tree; the net lands on the water ahead of the bow." The still's pose must aim in the same direction as the described action, and the landing point must agree with the throw in every beat. An object may never land behind, beside, or opposite its stated direction of travel.
+- Keep prop counts small, named, and stable (two oars, one net, one basket). Props never appear, vanish, duplicate, or change hands between beats without an explicit on-screen handling action.
+- Each timed beat must be physically reachable from the end of the previous beat within its seconds. Do not pack stand-up plus walk plus a complex action into one short beat.
+
+### 2. World, weather, lighting, and tone lock
+
+- Define one `world_lock` paragraph in global settings: the fixed location set with screen-side anchors that never flip ("the jetty is always at the left shore; the half-sunken dead tree stands at the right of the fishing spot; layered forested mountains close the far shore"), one season, one weather state, and one named palette/tone ("cool misty blue-green palette with soft warm accents").
+- Define one `lighting_lock` sentence that holds for the whole video ("constant early-morning light: low warm sun just above the horizon behind thin mist, soft shadows, no visible sun disc"). The default is identical lighting in every scene. A progression is allowed only when the story genuinely requires it, and then only as one short scripted delta appended to the same verbatim sentence ("…; the mist is slightly thinner than in the previous scene") — never a rewritten lighting description and never a jump such as pre-dawn blue → washed white → golden hour.
+- Paste the `world_lock` and `lighting_lock` sentences verbatim into every `text_to_image_prompt`, and repeat the palette, weather, and lighting words inside every `image_to_video_prompt`. Verbatim means the same words in the same order: paraphrase is drift, and drift compounds across scenes.
+- Repeat the character identity lock and the prop/vehicle sheet verbatim in every image prompt, and describe how each garment is worn ("moss-green sash tied at the waist and hanging as a short apron over the trousers") so clothing cannot migrate or reinterpret between scenes.
+
+### 3. Sequential flow — the hard handoff chain (most important)
+
+- The N clips are one continuous take cut into N pieces, not N related shots. By default, zero story time passes between consecutive clips.
+- Every scene defines `start_state` and `end_state`, one to three sentences each, naming: the character's position and pose plus the support under them; the state of every key prop (net stowed / cast / being hauled; basket empty / full); the vehicle or boat position and heading relative to the `world_lock` landmarks; and the travel direction across the frame.
+- Chain rule: scene 1's `start_state` establishes the story. For every later scene, its `start_state` must restate the previous scene's `end_state` — same location, same pose, same prop states, same heading. Only the camera angle and distance may change between clips.
+- The `text_to_image_prompt` of each scene depicts exactly its `start_state`, because that still is the first frame of the clip. Describe the state itself; never write meta-language such as "continuing from the previous clip" into a prompt — the generator cannot see the previous clip.
+- The final time block of every `image_to_video_prompt` must land and settle in that scene's `end_state`: a stable supported pose or a steady ongoing motion state (cruising, rowing at rhythm) — never an object mid-air, a foot mid-step, a mount mid-swing, or a cast mid-flight at the cut. End the final beat with a settling clause ("…and he holds still as the ripples fade").
+- Location may only change through movement shown on screen. If a scene ends mid-lake, the next scene begins mid-lake. A clip may never restart from the shore, jump ahead to the destination, or teleport the character, props, or vehicle.
 
 ## Browser operating rules
 

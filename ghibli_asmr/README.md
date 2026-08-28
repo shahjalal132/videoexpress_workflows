@@ -19,7 +19,7 @@ The agent controls an already signed-in VideoExpress browser session and perform
 1. Ask the user, in one intake message, for **Idea/Prompt**, **Ratio: Landscape or Vertical**, and **Duration**.
 2. Normalize Landscape to 16:9 and Vertical to 9:16. Parse duration into whole seconds and reject values above 300 seconds.
 3. Calculate `clip_count = ceil(total_seconds / 10)`. Distribute the seconds as evenly as possible so every clip is an integer duration no longer than 10 seconds and the sum equals the requested duration.
-4. Generate and validate a continuous `prompt_book.json` with exactly the calculated number of scenes.
+4. Generate and validate a continuous `prompt_book.json` with exactly the calculated number of scenes, a `world_lock` and `lighting_lock` pasted verbatim into every image prompt, per-scene `start_state`/`end_state` fields forming an unbroken handoff chain (each clip begins exactly where the previous one ended), and physically grounded action beats — stable supported poses in every still, no walking on water or mid-mount stills, and frame-relative directions whose landing points agree with the action.
 5. Propagate the selected ratio and duration plan to global settings, every image composition, the VideoExpress creation modal, project canvas, timeline, and export.
 6. Keep one **creator tab** open with the configured Create Video from Prompt panel.
 7. For each scene, select the chosen ratio, paste the scene's image prompt, select **2D**, disable automatic image-prompt enhancement, and create the image.
