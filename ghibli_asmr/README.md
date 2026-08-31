@@ -2,7 +2,7 @@
 
 This folder contains a resumable, end-to-end browser-automation workflow that turns one user idea and requested duration into a character-consistent anime ASMR short. The clip count is calculated from the duration rather than fixed. The visual direction uses nostalgic hand-painted Japanese-animation warmth, while the sound design is derived from the requested story and emphasizes synchronized ambience and satisfying environmental SFX.
 
-Every new run begins with exactly three questions: **Idea/Prompt**, **Ratio (Landscape or Vertical)**, and **Duration**. Duration may be supplied as seconds, `M:SS`, or natural language such as “2 minutes,” with a hard maximum of 5 minutes. After the user answers, the agent calculates the required clips and writes a fresh [`prompt_book.json`](prompt_book.json) containing the resolved title, character and world locks, sequential image prompts, timed image-to-video prompts, per-clip durations, background ambience, and synchronized SFX. The checked-in Roadside Tea Stop prompt book is a complete example and is replaced for a new idea.
+Every new run begins with exactly three questions: **Idea/Prompt**, **Ratio (Landscape or Vertical)**, and **Duration**. Duration may be supplied as seconds, `M:SS`, or natural language such as “2 minutes,” with a hard maximum of 5 minutes. After the user answers, the agent calculates the required clips and writes a fresh [`prompt_book.json`](prompt_book.json) containing the resolved title, an immutable character bible (including exact facial-hair state), character and world locks, sequential image prompts, timed image-to-video prompts, per-clip durations, background ambience, and synchronized SFX. The checked-in Roadside Tea Stop prompt book is a complete example and is replaced for a new idea.
 
 ## Files
 
@@ -19,17 +19,19 @@ The agent controls an already signed-in VideoExpress browser session and perform
 1. Ask the user, in one intake message, for **Idea/Prompt**, **Ratio: Landscape or Vertical**, and **Duration**.
 2. Normalize Landscape to 16:9 and Vertical to 9:16. Parse duration into whole seconds and reject values above 300 seconds.
 3. Calculate `clip_count = ceil(total_seconds / 10)`. Distribute the seconds as evenly as possible so every clip is an integer duration no longer than 10 seconds and the sum equals the requested duration.
-4. Generate and validate a continuous `prompt_book.json` with exactly the calculated number of scenes, a `world_lock` and `lighting_lock` pasted verbatim into every image prompt, per-scene `start_state`/`end_state` fields forming an unbroken handoff chain (each clip begins exactly where the previous one ended), and physically grounded action beats — stable supported poses in every still, no walking on water or mid-mount stills, and frame-relative directions whose landing points agree with the action.
+4. Generate and validate a continuous `prompt_book.json` with exactly the calculated number of scenes, an immutable character bible, verbatim positive and negative identity locks in every prompt, a `world_lock` and `lighting_lock` pasted verbatim into every image prompt, per-scene `start_state`/`end_state` fields forming an unbroken handoff chain (each clip begins exactly where the previous one ended), and physically grounded action beats — stable supported poses in every still, no walking on water or mid-mount stills, and frame-relative directions whose landing points agree with the action.
 5. Propagate the selected ratio and duration plan to global settings, every image composition, the VideoExpress creation modal, project canvas, timeline, and export.
 6. Keep one **creator tab** open with the configured Create Video from Prompt panel.
-7. For each scene, select the chosen ratio, paste the scene's image prompt, select **2D**, disable automatic image-prompt enhancement, and create the image.
-8. Against that exact image, paste the matching image-to-video prompt, open **Advanced Mode**, disable video-prompt enhancement, set that scene's calculated manual duration, retain generated audio, and create the video.
-9. Use up to five concurrent generation slots in batches. Monitor jobs from a second tab and identify every result by its prompt or stable media ID, never by grid position alone.
-10. After all calculated jobs complete, right-click each clip and choose **Add to Timeline** in scene order 1→N.
-11. Click **Auto Align Clips** only after every calculated clip is present, then verify count, order, total duration, and contiguous geometry.
-12. Save and export using the generated prompt-book title, with **High / FullHD / MP4**, and persist the queue confirmation.
+7. Generate one master portrait for each recurring character, record its stable reference ID, and reuse that exact reference for every scene. Never chain a previous scene image as the next scene's identity reference.
+8. For each scene, select the chosen ratio, attach the same character reference, paste the scene's image prompt, select **2D**, disable automatic image-prompt enhancement, and create the image.
+9. Run the narrow identity gate: compare the generated still with the master reference for face geometry, age, skin tone, eyes, hair, exact facial-hair state, body proportions, and wardrobe. Reject unexpected moustaches/mustaches, beards, stubble, age changes, or any other identity drift.
+10. Against the identity-approved image, paste the matching image-to-video prompt, open **Advanced Mode**, disable video-prompt enhancement, set that scene's calculated manual duration, retain generated audio, and create the video.
+11. Use up to five concurrent generation slots in batches. Monitor jobs from a second tab and identify every result by its prompt or stable media ID, never by grid position alone. Check only the opening, midpoint, and closing frames for identity drift before accepting a video.
+12. After all calculated jobs complete, right-click each clip and choose **Add to Timeline** in scene order 1→N.
+13. Click **Auto Align Clips** only after every calculated clip is present, then verify count, order, total duration, and contiguous geometry.
+14. Save and export using the generated prompt-book title, with **High / FullHD / MP4**, and persist the queue confirmation.
 
-The workflow uses semantic DOM roles, labels, stable attributes, and visible text. It does not depend on screenshot coordinates, display scaling, or browser zoom. Generated media is accepted from the application's completion signal; the agent does not preview or aesthetically grade its own output unless the user explicitly requests a review.
+The workflow uses semantic DOM roles, labels, stable attributes, and visible text. It does not depend on screenshot coordinates, display scaling, or browser zoom. It never aesthetically grades generated media. Character identity is the one mandatory visual exception: each still and three sampled video frames are checked only for immutable identity traits, especially facial hair, before acceptance.
 
 ## Running it
 
@@ -66,6 +68,8 @@ The workflow is complete only when all of the following are persisted in `WORKFL
 
 - the intake idea, normalized ratio, requested duration, calculated clip count, and duration plan are persisted;
 - the generated prompt book contains the calculated scene count and its scene durations sum to the requested duration;
+- every recurring character has one immutable character bible and one stable master-reference ID reused across all of that character's scenes;
+- every scene still and the opening/midpoint/closing frames of every video pass the identity gate, including exact facial-hair state;
 - one distinct completed video ID is mapped to every scene 1–N;
 - timeline count equals N, scene order is verified, and its planned duration matches the request;
 - `Auto Align Clips` was clicked after the final clip was added and the resulting geometry is contiguous;

@@ -56,14 +56,17 @@ Two failure patterns are forbidden because they have occurred in real runs: stop
 - Only two messages may end a turn after intake: the final report with `export_gate` passed and `status` complete, or a true-blocker report naming the single user action required. Brief progress notes are allowed inside the working turn, but never as the last message of a turn.
 - "Resume" exists for genuinely interrupted sessions (terminal closed, machine restarted, process killed), not as a routine second half of every run.
 
-## MINIMAL VALIDATION — DO NOT PREVIEW GENERATED MEDIA
+## MINIMAL VALIDATION — IDENTITY CHECKS ARE THE ONLY VISUAL EXCEPTION
 
-Do not play, download, screenshot, frame-sample, or visually grade generated images or videos. Accept the first take when VideoExpress reports completion and the media record maps to the correct request. Regenerate only after an explicit failure, rejection, wrong-format response, or empty/failed job.
+Do not play, download, or aesthetically grade generated images or videos. Character identity is the sole mandatory visual exception: inspect each generated scene still once, and inspect only the opening, midpoint, and closing frame of each generated video. Compare only immutable identity traits against the stored master reference; do not review composition, beauty, animation quality, or style. A completed asset fails when identity drifts, including a moustache/mustache, beard, goatee, stubble, sideburn, age, gender presentation, face geometry, skin tone, eye, hairstyle, body-proportion, or wardrobe change not explicitly scripted in the character bible.
+
+Accept the first take when the application reports completion, the media record maps to the correct request, and the identity gate passes. Regenerate only after an explicit application failure or an identity-gate failure. Never waive a facial-hair mismatch as cosmetic.
 
 Validate only inexpensive authoritative signals:
 
 - acceptance: a job/media record exists and maps to the scene by ID or unique prompt;
 - completion: the job reports completed and has a media ID;
+- identity: the still and three sampled video frames match the immutable character bible and master reference;
 - structure: expected count, scene order, durations, and timeline geometry;
 - persistence: the named project record/title proves saving;
 - terminal signal: the exact export queue confirmation.
@@ -97,6 +100,9 @@ Before browser work, validate the generated prompt book:
 - no image prompt depicts a transitional or unsupported pose (boarding, dismounting, mounting, jumping, stepping between supports, or a foot over open water or air), and every water/height/vehicle scene carries its impossibility guard sentence in both prompts;
 - every directional action names its frame-relative direction and its landing point, and the still pose, the timed beats, and the landing point all agree;
 - the final time block of every video prompt ends settled in that scene's `end_state`, with no object mid-air and no transition mid-motion at the cut.
+- every recurring character has a complete immutable character bible with exact facial-hair state, one positive `identity_lock_sentence`, one `negative_identity_lock_sentence`, and one master-reference plan;
+- both identity-lock sentences appear verbatim in every scene image prompt containing that character, and the video prompt explicitly forbids identity mutation in every frame;
+- no prompt asks a character to gain or lose facial hair, age, change face, change skin tone, change body proportions, or change wardrobe unless that transformation is the user's explicit story premise and is separately scripted as an intentional continuity event.
 
 On validation failure, repair the prompt book from the user's original answers, validate again, and continue. Stop only if the original idea itself is genuinely unsafe or impossible to resolve without changing user intent.
 
@@ -135,7 +141,8 @@ Write `prompt_book.json` atomically. Preserve the current schema shape, but repl
 - global settings with the normalized ratio, image type `2D`, Advanced Mode enabled, both enhancement toggles false, requested total seconds, calculated clip count, and the per-scene duration plan;
 - continuity rules covering recurring character identity, wardrobe, important props/vehicles, location continuity, lighting, direction of travel, and clean unmarked frames;
 - a `world_lock` paragraph and a `lighting_lock` sentence in global settings, as defined in the prompt-quality contract below;
-- a detailed consistent-character portrait prompt and identity lock when the idea includes a recurring character;
+- a detailed immutable character bible and portrait prompt for every recurring character, including exact age, gender presentation, skin tone, face shape, eyes, eyebrows, nose, mouth, hairstyle, hair color, facial-hair state and shape, body proportions, wardrobe construction/colors, and persistent accessories;
+- one verbatim positive `identity_lock_sentence`, one verbatim `negative_identity_lock_sentence`, and a master-reference usage rule for every recurring character;
 - exactly N scenes, where N is the calculated clip count, telling one continuous story with clear cause-and-effect progression;
 - for each scene: `shot`, `title`, cumulative `time`, `duration_seconds`, `start_state`, `end_state`, `text_to_image_prompt`, and `image_to_video_prompt`;
 - timed video directions whose time blocks cover the full duration without gaps;
@@ -146,6 +153,58 @@ Write `prompt_book.json` atomically. Preserve the current schema shape, but repl
 Keep character, wardrobe, props, world, time of day, visual style, and travel direction consistent across scenes. Repeat the essential identity lock inside every image prompt so each scene can stand alone. Do not create N variations of the idea; create N consecutive beats of one story. The prompt-quality contract below turns these requirements into hard, checkable rules; a prompt book that violates any of them fails `prompt_book_gate` and must be repaired before browser work.
 
 Generate a safe project/export name from the title. Store the intake, normalized ratio, requested duration, calculated N, duration plan, generated project name, scene plan, and prompt-book validation evidence in `WORKFLOW_STATE.json`. Set both generation and timeline `expected_count` values to N. Populate `WORKFLOW_STATE.json.scenes` with one pending state record per generated scene.
+
+## STRICT CHARACTER CONSISTENCY — IMMUTABLE IDENTITY AND FACIAL-HAIR LOCK
+
+This section is binding and overrides any weaker character-consistency wording elsewhere. Unexpected facial hair is an identity failure, not a cosmetic imperfection.
+
+### 1. Build the immutable character bible once
+
+For every recurring character, resolve and store one immutable record before scene prompts are written:
+
+- stable actor ID and role;
+- exact apparent age and gender presentation;
+- face shape, jaw/chin, skin tone, eye color/shape, eyebrow shape, nose, mouth, ears;
+- exact hairstyle, hair color, hairline, and length;
+- exact facial-hair state using one explicit value: `none_clean_shaven`, `moustache`, `beard`, `goatee`, `stubble`, or another precisely described state;
+- body build, height relationship to other characters, and proportions;
+- every garment's type, color, material, fit, layer order, closure state, and how it is worn;
+- persistent accessories, scars, glasses, jewelry, helmet, or other identifying details.
+
+Never leave facial hair implicit. If the idea does not specify it, resolve it once during prompt-book creation and lock it. For a clean-shaven character, use the exact wording `clean-shaven face with no moustache, no mustache, no beard, no goatee, no stubble, and no changing sideburns.` For a character with facial hair, define its exact shape, thickness, color, and boundary; absence or alteration is equally a failure. Children always use `none_clean_shaven` and explicitly forbid all facial hair.
+
+Create two canonical sentences per character:
+
+- `identity_lock_sentence`: a compact positive description of all immutable traits.
+- `negative_identity_lock_sentence`: `Identity is immutable: do not add, remove, or change facial hair; no new moustache/mustache, beard, goatee, stubble, or sideburn change; no aging, de-aging, face swap, gender change, skin-tone change, eye change, hairstyle change, body-proportion change, wardrobe change, or accessory change.` Adapt the facial-hair clause so an intentionally moustached or bearded character keeps that exact facial hair rather than removing it.
+
+Paste both sentences verbatim into every `text_to_image_prompt` containing the character. Every `image_to_video_prompt` must begin with the positive lock and end with the negative lock plus `The same identity and exact facial-hair state remain unchanged in every frame.` Prompt enhancement remains off because enhancement may invent identity details.
+
+### 2. One master portrait reference, never a reference chain
+
+Generate one neutral master portrait for each recurring character before scene-image generation. The portrait shows the face clearly, unobstructed, in the locked wardrobe and lighting-neutral enough to expose facial-hair state. Record its stable media ID in `identity_reference_gate.character_references`.
+
+- Reuse that exact master-reference ID for every scene containing the character.
+- Never generate a new reference midway through the run.
+- Never use scene 1 as the reference for scene 2, scene 2 for scene 3, or any other output-to-output chain; chained references compound drift.
+- Never substitute a grid card by position. Resolve the stored reference ID or unique master-reference title.
+- In multi-character scenes, attach every character's own master reference when the interface permits it; otherwise the prompt must contain each full verbatim identity lock and the scene is subject to the same identity gate.
+
+### 3. Mandatory identity gate before video generation
+
+After each scene image completes, inspect it once against the master portrait. Check only: face geometry, apparent age, skin tone, eyes, eyebrows, nose, mouth, hair, exact facial-hair state, body proportions, wardrobe, and persistent accessories. Set the scene's `still_identity_check` to pass or fail with concrete evidence.
+
+Any unexpected moustache/mustache, beard, goatee, stubble, sideburn change, or other immutable-trait mismatch is an automatic failure. Do not generate a video from a failed still. Regenerate the still using the same master reference, unchanged enhancement-off setting, and stronger placement of the two canonical lock sentences. Retry at most three identity attempts. Store every rejected image ID and reason; never accidentally select a rejected image later. After three failed attempts for the same scene, checkpoint and stop as an identity-consistency blocker rather than shipping an inconsistent character.
+
+### 4. Mandatory identity gate after video generation
+
+When a video completes, inspect exactly three frames—opening, midpoint, and closing—against both the approved still and master portrait. Check only immutable identity traits. This narrowly scoped sampling is required even though general media preview is forbidden.
+
+If any sampled frame adds/removes facial hair or changes another immutable trait, reject that video, keep its ID in `rejected_video_ids`, and regenerate from the same approved still with the same prompt and stronger identity lock. Retry at most three video attempts. Never add a failed-identity video to the timeline. `generation_gate` passes only when every accepted video has `video_identity_check.status = pass` for all three samples.
+
+### 5. Intentional transformations
+
+An identity mutation is allowed only when the user's idea explicitly makes that transformation part of the story. It must then be represented as a named continuity event with a before-state, on-screen transformation, and after-state; the character bible must carry versioned identity states. Never infer an intentional moustache, beard, aging, haircut, wardrobe change, or transformation from vague action text.
 
 ## Prompt-quality contract — physics, world lock, and sequential flow
 
@@ -207,14 +266,18 @@ In the creator tab:
 3. Select **Landscape 16:9** or **Vertical 9:16** exactly as recorded in the prompt book. Confirm the project canvas uses the same ratio.
 4. Work on one scene as a paired transaction: create its image, then create its video against that exact image before moving to the next scene.
 
+Before any scene image, generate or resolve the master portrait for every recurring character. Record the stable reference media ID, character-bible hash/fingerprint, and visible facial-hair state. The portrait itself must pass the identity bible before it becomes a reference. Reuse only these stored IDs for the rest of the run.
+
 For each scene whose `image_status` is not completed:
 
-1. Paste `text_to_image_prompt` into the image prompt field unchanged.
-2. Select image type **2D**.
-3. Confirm the creation-modal ratio still matches the prompt book, then uncheck **Automatically enhance my image prompt**.
-4. Click **Create Image** once.
-5. Wait for the generated image to be accepted and associated with the current prompt.
-6. Record its stable image/media ID, timestamps, and evidence in the scene state.
+1. Select/attach the stored master reference ID for every recurring character in the scene; never use another scene output as the reference.
+2. Paste `text_to_image_prompt` into the image prompt field unchanged and confirm both canonical identity-lock sentences are present verbatim.
+3. Select image type **2D**.
+4. Confirm the creation-modal ratio still matches the prompt book, then uncheck **Automatically enhance my image prompt**.
+5. Click **Create Image** once.
+6. Wait for the generated image to be accepted and associated with the current prompt.
+7. Run the still identity gate. If it fails, record the rejected ID/reason and retry per the strict consistency section; do not continue to video.
+8. Only after the identity gate passes, record the accepted image/media ID, reference ID, attempt count, timestamps, and evidence in the scene state.
 
 Then, against that same image:
 
@@ -226,7 +289,7 @@ Then, against that same image:
 6. Click **Create Video** once.
 7. Capture the accepted job ID or the best stable source mapping, mark the scene submitted, and continue until five jobs are active or all scenes have been submitted. When a slot completes, submit the next pending scene until all N scenes are in flight or completed.
 
-Never create a video from the wrong image. The image prompt and video prompt at the same scene index form an inseparable pair.
+Never create a video from the wrong image or an identity-failed image. The image prompt, approved still, master-reference IDs, and video prompt at the same scene index form an inseparable identity chain.
 
 ## Phase 2 — concurrent monitoring
 
@@ -238,11 +301,12 @@ For each submitted scene:
 - mark completion only when the application reports the video finished and exposes a media record;
 - store `video_id`, completion time, and evidence;
 - never infer identity from card position alone;
-- never preview the clip.
+- inspect only the opening, midpoint, and closing frames for immutable identity consistency; never aesthetically preview or play the full clip;
+- accept the video only when all three frame checks pass; store failed IDs separately and retry from the same approved still.
 
-Poll pending jobs without ending the run or the turn: jobs still processing is the normal state of this phase and never a reason to stop, summarize, or wait for the user. Keep polling on an interval until every job completes or explicitly fails, then continue immediately. If a submitted job is not yet visible in My AI Videos, refresh and re-inspect on the next polling cycle rather than stopping. If a job explicitly fails, retry that scene once from its existing completed image. If the same scene fails twice, refresh once and attempt a third submission. After three explicit failures, record the history and stop as an unrecoverable application error.
+Poll pending jobs without ending the run or the turn: jobs still processing is the normal state of this phase and never a reason to stop, summarize, or wait for the user. Keep polling on an interval until every job completes or explicitly fails, then continue immediately. If a submitted job is not yet visible in My AI Videos, refresh and re-inspect on the next polling cycle rather than stopping. If a job explicitly fails or fails the video identity gate, retry that scene from its existing identity-approved image. If the same scene fails twice, refresh once and attempt a third submission. After three application or identity failures, record the history and stop rather than shipping the inconsistent asset.
 
-Before assembly, `generation_gate` must contain N distinct completed video IDs in scene order, where N equals the calculated clip count.
+Before assembly, `generation_gate` must contain N distinct completed, identity-approved video IDs in scene order, where N equals the calculated clip count. Rejected still/video IDs are never eligible for timeline selection.
 
 ## Phase 3 — assemble the timeline
 
@@ -322,6 +386,7 @@ When complete, report only the essential outcome:
 
 - N scene videos completed and assembled in order, with N and the duration plan reported;
 - generated title and selected ratio;
+- immutable character-reference IDs and confirmation that every accepted still/video passed exact facial-hair and identity checks;
 - Auto Align Clips applied and geometry verified;
 - saved project name;
 - High/FullHD/MP4 export queue confirmation and position;

@@ -10,7 +10,7 @@
   "last_verified_checkpoint": null,
   "next_safe_action": "Ask the user the three intake questions together: (1) Idea/Prompt, (2) Ratio: Landscape or Vertical, and (3) Duration, maximum 5 minutes.",
   "authorization_mode": "standing_authorization_for_all_in_scope_workflow_actions",
-  "validation_mode": "minimal_signal_only_no_generated_media_preview",
+  "validation_mode": "minimal_signal_plus_required_identity_only_still_and_three_frame_checks",
   "intake": {
     "status": "pending",
     "idea_prompt": null,
@@ -49,6 +49,7 @@
     "credit_confirmation_required": false,
     "phase_boundary_confirmation_required": false,
     "generated_media_preview_for_qc": false,
+    "identity_only_visual_check_exception": "Required: inspect each scene still and only the opening, midpoint, and closing video frames for immutable character traits; never perform aesthetic review.",
     "resume_rule": "Reconcile saved state with live application IDs and continue from the smallest missing action; never repeat a verified side effect.",
     "true_blockers": [
       "login page, expired session, or CAPTCHA",
@@ -85,8 +86,59 @@
     "scene_durations_total_seconds": null,
     "all_scenes_have_background_audio_and_sfx": false,
     "continuity_contract_present": false,
+    "immutable_character_bibles_present": false,
+    "facial_hair_state_explicit_for_every_character": false,
+    "identity_lock_sentences_present_verbatim_in_every_character_scene": false,
+    "master_reference_plan_present": false,
     "evidence": null,
     "generated_at": null
+  },
+  "identity_reference_gate": {
+    "gate": "immutable_character_master_references",
+    "status": "pending",
+    "expected_character_count": null,
+    "character_references": [],
+    "all_reference_ids_unique_and_stable": false,
+    "no_scene_to_scene_reference_chaining": false,
+    "evidence": null
+  },
+  "identity_consistency_gate": {
+    "gate": "all_scene_stills_and_videos_match_character_bibles",
+    "status": "pending",
+    "expected_scene_count": null,
+    "approved_still_count": 0,
+    "approved_video_count": 0,
+    "rejected_image_ids": [],
+    "rejected_video_ids": [],
+    "all_facial_hair_checks_pass": false,
+    "all_immutable_trait_checks_pass": false,
+    "evidence": null
+  },
+  "_scene_state_template": {
+    "shot": null,
+    "character_reference_ids": [],
+    "image_status": "pending",
+    "image_attempt_count": 0,
+    "accepted_image_id": null,
+    "rejected_image_ids": [],
+    "still_identity_check": {
+      "status": "pending",
+      "facial_hair_matches": false,
+      "face_age_hair_skin_body_wardrobe_match": false,
+      "evidence": null
+    },
+    "video_status": "pending",
+    "video_attempt_count": 0,
+    "accepted_video_id": null,
+    "rejected_video_ids": [],
+    "video_identity_check": {
+      "status": "pending",
+      "opening_frame_pass": false,
+      "midpoint_frame_pass": false,
+      "closing_frame_pass": false,
+      "facial_hair_matches_all_samples": false,
+      "evidence": null
+    }
   },
   "scenes": [],
   "generation_gate": {
@@ -94,6 +146,8 @@
     "status": "pending",
     "expected_count": null,
     "completed_video_ids_in_scene_order": [],
+    "identity_approved_video_ids_in_scene_order": [],
+    "all_identity_checks_pass": false,
     "evidence": null
   },
   "timeline_gate": {
