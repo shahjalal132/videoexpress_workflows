@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.1.0",
+  "schema_version": "2.3.0",
   "is_example": true,
   "book_type": "videoexpress_slow_english_lipsync_hd_prompt_book",
   "project": {
@@ -9,6 +9,33 @@
     "runtime_seconds": 50,
     "aspect_ratio": "16:9",
     "tone": "Warm, soft, reassuring, and family-friendly"
+  },
+  "execution_policy": {
+    "nonstop_until_terminal": true,
+    "phase_completion_is_terminal": false,
+    "all_clips_complete_is_terminal": false,
+    "zero_active_jobs_is_terminal": false,
+    "browser_url_confidence_warning_is_terminal": false,
+    "timeline_insertion_must_resume_after_control_warning": true,
+    "execute_next_action_immediately_after_checkpoint": true,
+    "successful_terminal_status": "complete_exported",
+    "successful_terminal_requirement": "Verified completed export record in My Videos",
+    "allowed_unsuccessful_terminal_status": "blocked_<reason>",
+    "mandatory_phase_chain": [
+      "intake",
+      "prompt_book",
+      "character_references",
+      "generation_and_refill",
+      "voice_sample_extraction",
+      "timeline_assembly",
+      "auto_align_pass_1",
+      "voice_changer",
+      "auto_align_pass_2",
+      "save_project",
+      "export",
+      "verify_export",
+      "complete_exported"
+    ]
   },
   "v2_generation_policy": {
     "videoexpress_mode": "Create Video From Prompt",
@@ -83,6 +110,10 @@
       "speaking_actor_ids": ["Actor 1"],
       "speaking_character_ids": ["CHAR_ALEX"],
       "speaking_order": ["Actor 1"],
+      "canonical_voice_source": true,
+      "canonical_voice_source_order": 1,
+      "canonical_voice_lock_id": "VOICE_ALEX_01",
+      "canonical_voice_source_requirement": "Only CHAR_ALEX speaks; no overlapping, background, or second-character speech.",
       "lip_sync_hd_video": true,
       "narration_video": false,
       "public_gallery": false,
@@ -107,6 +138,10 @@
       "speaking_actor_ids": ["Actor 2"],
       "speaking_character_ids": ["CHAR_BOB"],
       "speaking_order": ["Actor 2"],
+      "canonical_voice_source": true,
+      "canonical_voice_source_order": 2,
+      "canonical_voice_lock_id": "VOICE_BOB_01",
+      "canonical_voice_source_requirement": "Only CHAR_BOB speaks; no overlapping, background, or second-character speech.",
       "lip_sync_hd_video": true,
       "narration_video": false,
       "public_gallery": false,
@@ -131,6 +166,8 @@
       "speaking_actor_ids": ["Actor 1"],
       "speaking_character_ids": ["CHAR_ALEX"],
       "speaking_order": ["Actor 1"],
+      "voice_changer_required": true,
+      "voice_changer_plan": [{ "character_id": "CHAR_ALEX", "voice_lock_id": "VOICE_ALEX_01", "target": "whole_clip" }],
       "lip_sync_hd_video": true,
       "narration_video": false,
       "public_gallery": false,
@@ -155,6 +192,8 @@
       "speaking_actor_ids": ["Actor 1"],
       "speaking_character_ids": ["CHAR_BOB"],
       "speaking_order": ["Actor 1"],
+      "voice_changer_required": true,
+      "voice_changer_plan": [{ "character_id": "CHAR_BOB", "voice_lock_id": "VOICE_BOB_01", "target": "whole_clip" }],
       "lip_sync_hd_video": true,
       "narration_video": false,
       "public_gallery": false,
@@ -179,6 +218,11 @@
       "speaking_actor_ids": ["Actor 1", "Actor 2"],
       "speaking_character_ids": ["CHAR_ALEX", "CHAR_BOB"],
       "speaking_order": ["Actor 1", "Actor 2"],
+      "voice_changer_required": true,
+      "voice_changer_plan": [
+        { "segment_order": 1, "character_id": "CHAR_ALEX", "voice_lock_id": "VOICE_ALEX_01", "target": "split_speaker_segment" },
+        { "segment_order": 2, "character_id": "CHAR_BOB", "voice_lock_id": "VOICE_BOB_01", "target": "split_speaker_segment" }
+      ],
       "lip_sync_hd_video": true,
       "narration_video": false,
       "public_gallery": false,
@@ -197,15 +241,35 @@
   ],
   "voice_workflow": {
     "save_audio_after_all_clips_generated": true,
-    "source_clip_requirement": "solo-speaking clip for the matching character",
+    "source_clip_policy": "S01 is the first recurring character's canonical voice source; S02 is the second recurring character's canonical voice source.",
+    "source_clip_requirement": "Each source clip has exactly one speaking character, one populated actor-script field, no background or overlapping speech, and at least two seconds of clean soft slow-English speech.",
+    "source_clip_failure_rule": "Regenerate the same S01 or S02 source shot with the same character mapping; do not substitute a later shot or the other character's voice.",
+    "save_order": ["S01", "S02"],
+    "save_method": "Right-click source clip > Save Audio > save to My AI Audio with stable character-specific name",
+    "verify_saved_assets_in_my_ai_audio": true,
     "planned_voice_assets": {
-      "CHAR_ALEX": "VOICE_ALEX_01",
-      "CHAR_BOB": "VOICE_BOB_01"
+      "CHAR_ALEX": {
+        "voice_lock_id": "VOICE_ALEX_01",
+        "source_shot_id": "S01",
+        "source_actor_field": "Actor 1",
+        "save_order": 1
+      },
+      "CHAR_BOB": {
+        "voice_lock_id": "VOICE_BOB_01",
+        "source_shot_id": "S02",
+        "source_actor_field": "Actor 2",
+        "save_order": 2
+      }
     },
     "voice_changer_mapping_source": "speaking_character_ids through shot_actor_map",
-    "one_speaker_clip_rule": "Apply the mapped character voice to the whole clip.",
-    "two_speaker_clip_rule": "Split at the speaker-change boundary and apply each mapped character voice only to that speaker's segment; never apply one voice to an unsplit two-speaker clip.",
+    "source_clip_rule": "Preserve S01 and S02 original canonical voices; record canonical_source_preserved instead of applying each sample to itself.",
+    "one_speaker_clip_rule": "For every eligible S03+ clip, right-click the timeline clip, choose Voice Changer, select the mapped stable voice asset from My AI Audio, click Apply, and verify the replacement result.",
+    "two_speaker_clip_rule": "For every eligible S03+ two-speaker clip, split at the speaker-change boundary and apply each mapped character voice only to that speaker's segment; never apply one voice to an unsplit two-speaker clip.",
     "unsplittable_two_speaker_rule": "Skip Voice Changer and preserve generated voices rather than applying the wrong character voice.",
+    "select_voice_by": ["character_id", "voice_lock_id", "my_ai_audio_asset_id"],
+    "select_voice_by_list_position": false,
+    "replacement_verification_required": true,
+    "continue_until_all_eligible_segments_processed": true,
     "auto_align_before_voice_changer": true,
     "auto_align_after_voice_changer": true
   },
@@ -220,6 +284,22 @@
   "timeline_plan": {
     "clip_order": ["S01", "S02", "S03", "S04", "S05"],
     "expected_duration_seconds": 50,
+    "primary_insertion_method": "Media Library > My AI Videos > right-click clip > Add to Timeline",
+    "insertion_interaction_scope": "browser_native_page_controls_only",
+    "windows_drag_and_drop_prohibited": true,
+    "os_level_mouse_automation_prohibited": true,
+    "url_confidence_warning_is_blocker": false,
+    "resume_from_next_missing_shot": true,
+    "recovery_order": [
+      "Read saved tab IDs, inserted shots, and next_timeline_shot_id from WORKFLOW_STATE.json",
+      "Reacquire the saved settings tab or the visible VideoExpress editor tab",
+      "Reopen Media Library > My AI Videos",
+      "Re-identify the next missing clip by video_job_id",
+      "Retry browser-native right-click > Add to Timeline once",
+      "Reopen My AI Videos and retry once",
+      "Reload only the settings tab, restore state, and retry once",
+      "After success continue remaining clips and Auto Align pass 1 without stopping"
+    ],
     "automatic_captions": false,
     "subtitle_and_text_tools_prohibited": true
   },

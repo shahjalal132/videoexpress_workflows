@@ -1,9 +1,38 @@
 {
-  "schema_version": "2.2.0",
+  "schema_version": "2.5.0",
   "is_example": true,
   "workflow": "videoexpress_slow_english_lipsync_hd_v2",
   "updated_at": "2026-09-02T12:00:00+06:00",
   "status": "monitoring_and_refilling",
+  "terminal": false,
+  "next_action": "Inspect S04 and S05 by saved job IDs; when both complete, immediately save S01 audio first as VOICE_ALEX_01 and S02 audio second as VOICE_BOB_01, verify both in My AI Audio, and continue into timeline assembly.",
+  "continuation_policy": {
+    "nonstop_until_terminal": true,
+    "phase_updates_are_commentary_only": true,
+    "execute_next_action_immediately_after_every_state_write": true,
+    "batch_completion_is_terminal": false,
+    "zero_active_jobs_is_terminal": false,
+    "browser_url_confidence_warning_is_terminal": false,
+    "timeline_control_failure_requires_automatic_recovery": true,
+    "saving_canonical_voices_is_terminal": false,
+    "partial_voice_changer_coverage_is_terminal": false,
+    "context_compaction_requires_automatic_resume": true,
+    "successful_terminal_status": "complete_exported",
+    "successful_terminal_requires_verified_export": true,
+    "only_other_terminal_status": "blocked_<reason>",
+    "final_response_allowed_only_when_terminal": true
+  },
+  "automatic_phase_transitions": {
+    "all_clips_complete": "extracting_voice_samples",
+    "extracting_voice_samples": "assembling_timeline",
+    "assembling_timeline": "auto_align_pass_1",
+    "auto_align_pass_1": "applying_voice_changer",
+    "applying_voice_changer": "auto_align_pass_2",
+    "auto_align_pass_2": "saving_project",
+    "saving_project": "exporting",
+    "exporting": "verifying_export",
+    "verifying_export": "complete_exported_after_verified_terminal_signal"
+  },
   "inputs": {
     "idea": "Two young brothers learn that safe cycling matters more than winning a race.",
     "ratio": "Landscape 16:9",
@@ -38,6 +67,49 @@
     "monitoring_tab_id": "example-monitoring-tab-id",
     "settings_tab_open": true,
     "monitoring_tab_open": true
+  },
+  "canonical_voice_policy": {
+    "source_order": ["S01", "S02"],
+    "source_mapping": {
+      "S01": {
+        "character_id": "CHAR_ALEX",
+        "actor_field": "Actor 1",
+        "voice_lock_id": "VOICE_ALEX_01",
+        "save_order": 1
+      },
+      "S02": {
+        "character_id": "CHAR_BOB",
+        "actor_field": "Actor 2",
+        "voice_lock_id": "VOICE_BOB_01",
+        "save_order": 2
+      }
+    },
+    "source_requirement": "Exactly one speaking character, one populated script field, no background or overlapping speech, and at least two seconds of clean soft slow-English speech.",
+    "unusable_source_recovery": "Regenerate the same source shot with the same mapping; never substitute a later shot or the other character's voice.",
+    "save_method": "Right-click source clip > Save Audio > stable character-specific name in My AI Audio",
+    "verify_both_assets_in_my_ai_audio": true,
+    "preserve_source_clips_without_self_conversion": true,
+    "apply_voice_changer_to": "Every eligible speaking clip or split speaker segment from S03 onward",
+    "select_sample_by_asset_id_not_position": true
+  },
+  "timeline_insertion_policy": {
+    "primary_method": "Media Library > My AI Videos > right-click clip > Add to Timeline",
+    "interaction_scope": "browser_native_page_controls_only",
+    "windows_drag_and_drop_allowed": false,
+    "os_level_mouse_automation_allowed": false,
+    "url_confidence_warning_is_blocker": false,
+    "resume_from_next_missing_shot": true,
+    "tab_reacquisition_order": [
+      "saved settings_tab_id",
+      "visible VideoExpress editor tab identified by page title, logo, and editor controls",
+      "saved monitoring_tab_id only if the settings tab is gone"
+    ],
+    "retry_order": [
+      "Re-query clip card and retry browser-native right-click Add to Timeline once",
+      "Reopen My AI Videos and retry once",
+      "Reload only the settings tab, restore state, and retry once"
+    ],
+    "forbidden_blocker_claim": "Timeline insertion is blocked because VideoExpress requires drag-and-drop."
   },
   "characters": {
     "CHAR_ALEX": { "name": "Alex" },
@@ -112,6 +184,10 @@
       "status": "completed_waiting_voice_sample_and_timeline",
       "timeline_added": false,
       "voice_lock_ids": ["VOICE_ALEX_01"],
+      "canonical_voice_source_for": "CHAR_ALEX",
+      "canonical_voice_source_order": 1,
+      "voice_changer_required": false,
+      "voice_changer_status": "pending_canonical_source_preserve_on_timeline",
       "voice_changer_applied": false,
       "errors": []
     },
@@ -146,6 +222,10 @@
       "status": "completed_waiting_voice_sample_and_timeline",
       "timeline_added": false,
       "voice_lock_ids": ["VOICE_BOB_01"],
+      "canonical_voice_source_for": "CHAR_BOB",
+      "canonical_voice_source_order": 2,
+      "voice_changer_required": false,
+      "voice_changer_status": "pending_canonical_source_preserve_on_timeline",
       "voice_changer_applied": false,
       "errors": []
     },
@@ -180,6 +260,8 @@
       "status": "completed_waiting_voice_sample_and_timeline",
       "timeline_added": false,
       "voice_lock_ids": ["VOICE_ALEX_01"],
+      "voice_changer_required": true,
+      "voice_changer_status": "pending",
       "voice_changer_applied": false,
       "errors": []
     },
@@ -214,6 +296,8 @@
       "status": "generating_55_percent",
       "timeline_added": false,
       "voice_lock_ids": ["VOICE_BOB_01"],
+      "voice_changer_required": true,
+      "voice_changer_status": "pending",
       "voice_changer_applied": false,
       "errors": []
     },
@@ -248,6 +332,8 @@
       "status": "generating_20_percent",
       "timeline_added": false,
       "voice_lock_ids": ["VOICE_ALEX_01", "VOICE_BOB_01"],
+      "voice_changer_required": true,
+      "voice_changer_status": "pending_split_into_two_speaker_segments",
       "voice_changer_applied": false,
       "errors": []
     }
@@ -255,6 +341,10 @@
   "saved_voices": {
     "VOICE_ALEX_01": {
       "character_id": "CHAR_ALEX",
+      "planned_source_shot_id": "S01",
+      "planned_source_video_job_id": "example-video-job-s01",
+      "source_actor_field": "Actor 1",
+      "save_order": 1,
       "source_shot_id": null,
       "source_video_job_id": null,
       "my_ai_audio_asset_id": null,
@@ -262,6 +352,10 @@
     },
     "VOICE_BOB_01": {
       "character_id": "CHAR_BOB",
+      "planned_source_shot_id": "S02",
+      "planned_source_video_job_id": "example-video-job-s02",
+      "source_actor_field": "Actor 2",
+      "save_order": 2,
       "source_shot_id": null,
       "source_video_job_id": null,
       "my_ai_audio_asset_id": null,
@@ -278,20 +372,26 @@
   ],
   "pending_steps": [
     "Monitor S04-S05",
-    "Save one clean solo-speaking audio sample for Actor 1 and Actor 2",
+    "Save S01 audio first as VOICE_ALEX_01 and S02 audio second as VOICE_BOB_01; verify both assets in My AI Audio",
     "Add S01-S05 to the timeline in exact order",
     "Run Auto Align pass 1",
-    "Apply Voice Changer according to speaking_character_ids; split two-speaker clips at the speaker boundary first",
+    "Preserve S01 and S02 canonical source voices; apply Voice Changer to every eligible S03+ speaking segment according to speaking_character_ids, splitting two-speaker clips first",
     "Run Auto Align pass 2",
     "Verify no text or subtitle layer exists",
-    "Save and export High FullHD MP4"
+    "Save the project, export High FullHD MP4, monitor the export, and verify the completed record in My Videos"
   ],
   "timeline": {
     "status": "not_started",
+    "insertion_method": "media_library_context_menu_add_to_timeline",
+    "next_timeline_shot_id": "S01",
+    "url_confidence_recovery_attempts": 0,
     "expected_order": ["S01", "S02", "S03", "S04", "S05"],
     "actual_order": [],
     "auto_align_pass_1": false,
     "voice_changed_clips": 0,
+    "eligible_voice_changer_segments": 4,
+    "verified_voice_changer_segments": 0,
+    "canonical_source_clips_to_preserve": ["S01", "S02"],
     "auto_align_pass_2": false,
     "text_layers": 0
   },
@@ -301,7 +401,9 @@
     "quality": "High",
     "resolution": "FullHD 1080p",
     "format": "mp4",
-    "subtitle_free_required": true
+    "subtitle_free_required": true,
+    "terminal_signal": null,
+    "verified_in_my_videos": false
   },
   "errors": [
     {
@@ -315,7 +417,13 @@
       "error": "The same 51-character line was duplicated in both fields, producing 102 combined characters and a 100-character rejection.",
       "recovery": "Cleared the unintended duplicate, preserved the correct actor mapping, and verified both per-field counts plus the combined live counter before resubmission.",
       "resolved": true
+    },
+    {
+      "phase": "Example timeline insertion control recovery",
+      "error": "Windows interaction stopped because it could not confidently verify the browser URL; no timeline change was made.",
+      "recovery": "Treated the warning as nonterminal, reacquired the saved VideoExpress settings tab, reopened My AI Videos, re-identified the next missing clip by video_job_id, and used the page-native right-click Add to Timeline command before continuing the remaining shots.",
+      "resolved": true
     }
   ],
-  "resume_from": "Inspect S04 and S05 by saved video job IDs. After all clips complete, save one solo-speaking voice sample per character, assemble the timeline, align, apply Voice Changer by speaking_character_ids, split two-speaker clips at speaker boundaries before per-character replacement, realign, save, and export."
+  "resume_from": "Execute next_action immediately. Never stop at batch completion, after saving S01/S02 voices, after a partial Voice Changer pass, or after a browser URL-confidence warning. Save S01 first for CHAR_ALEX and S02 second for CHAR_BOB, verify both in My AI Audio, preserve those two source clips, then apply the mapped voice to every eligible S03+ speaking segment. Continue through timeline assembly, both align passes, save, export, export monitoring, and verified completion in My Videos."
 }
