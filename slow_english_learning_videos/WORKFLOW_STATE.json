@@ -1,25 +1,32 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "is_example": true,
   "workflow": "videoexpress_slow_english_learning_video",
   "updated_at": "2026-09-02T12:00:00+06:00",
   "status": "monitoring_and_refilling",
-  "storage_policy": "Example only: create live run files in the agent's current authorized workspace or designated output directory, and record the actual locations in the live state.",
+  "storage_policy": "Example only: create live run files in the current authorized workspace or designated output directory and record actual locations in live state.",
   "inputs": {
-    "idea": "Two siblings learn that safe cycling matters more than winning a race.",
+    "idea": "Two young siblings learn that safe cycling matters more than winning a race.",
     "ratio": "Landscape 16:9",
     "duration_seconds": 40,
     "learner_level": "CEFR A2",
     "learner_age_range": "8-13",
-    "tone": "Warm, family-friendly, educational"
+    "tone": "Warm, soft, family-friendly, educational"
   },
   "character_policy": {
     "maximum_consistent_characters": 2,
-    "reason": "VideoExpress character consistency works best with no more than two recurring characters",
-    "consistent_characters": [
-      "Alex",
-      "Bob"
-    ]
+    "reference_framing": "full-body or three-quarter full-length",
+    "body_lock_required_in_every_shot": true,
+    "body_negative_constraints": [
+      "adult body",
+      "adult proportions",
+      "broad shoulders",
+      "muscular torso",
+      "tall adult height",
+      "mature face",
+      "beard or facial hair"
+    ],
+    "consistent_characters": ["Alex", "Bob"]
   },
   "workspace": {
     "account_label": "Example All Access Account",
@@ -37,13 +44,33 @@
   "references": {
     "alex": {
       "status": "saved_to_my_ai_images",
-      "asset_id": "example-alex-reference-id",
+      "asset_id": "example-alex-full-body-reference-id",
+      "framing": "full_body",
+      "exact_age": 12,
+      "child_body_lock_verified": true,
       "public_gallery": false
     },
     "bob": {
       "status": "saved_to_my_ai_images",
-      "asset_id": "example-bob-reference-id",
+      "asset_id": "example-bob-full-body-reference-id",
+      "framing": "full_body",
+      "exact_age": 14,
+      "child_body_lock_verified": true,
       "public_gallery": false
+    }
+  },
+  "voice_locks": {
+    "VOICE_ALEX_01": {
+      "character": "Alex",
+      "status": "saved_to_my_ai_audio",
+      "voice_sample_asset_id": "example-my-ai-audio-alex-01",
+      "exact_instruction": "12-year-old boy; soft warm youthful male voice; mid-high pitch; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone"
+    },
+    "VOICE_BOB_01": {
+      "character": "Bob",
+      "status": "saved_to_my_ai_audio",
+      "voice_sample_asset_id": "example-my-ai-audio-bob-01",
+      "exact_instruction": "14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone"
     }
   },
   "queue": {
@@ -51,126 +78,154 @@
     "active_video_jobs": 2,
     "completed_video_jobs": 3,
     "free_slots": 3,
-    "next_shots_to_submit": [
-      "S04",
-      "S05"
-    ]
+    "next_shots_to_submit": []
   },
   "shots": [
     {
       "shot_id": "S01",
       "duration_seconds": 8,
       "speaker": "Alex",
-      "dialogue": "What a beautiful day. Let us ride carefully.",
-      "image_jobs": [
-        "example-image-job-s01-a",
-        "example-image-job-s01-b"
-      ],
-      "selected_keyframe_id": "example-image-job-s01-a",
+      "dialogue": "What a beautiful day, Bob. Let us ride slowly and enjoy the park.",
+      "emotion": "peaceful curiosity to warm happiness",
+      "voice_lock_id": "VOICE_ALEX_01",
+      "reference_asset_ids": ["example-alex-full-body-reference-id", "example-bob-full-body-reference-id"],
+      "image_job_id": "example-image-job-s01",
+      "selected_keyframe_id": "example-image-job-s01",
       "video_job_id": "example-video-job-s01",
       "public_gallery": false,
       "video_only_no_sound": false,
       "status": "completed_waiting_timeline",
       "timeline_added": false,
+      "voice_changer_applied": false,
+      "voice_sample_asset_id": "example-my-ai-audio-alex-01",
+      "voice_changed_clip_id": null,
+      "caption_status": "pending",
       "errors": []
     },
     {
       "shot_id": "S02",
       "duration_seconds": 8,
       "speaker": "Bob",
-      "dialogue": "Race you to the big tree!",
-      "image_jobs": [
-        "example-image-job-s02-a",
-        "example-image-job-s02-b"
-      ],
-      "selected_keyframe_id": "example-image-job-s02-a",
+      "dialogue": "The big tree is ahead, Alex. Let us race there and have fun.",
+      "emotion": "playful excitement to confident eagerness",
+      "voice_lock_id": "VOICE_BOB_01",
+      "reference_asset_ids": ["example-alex-full-body-reference-id", "example-bob-full-body-reference-id"],
+      "image_job_id": "example-image-job-s02",
+      "selected_keyframe_id": "example-image-job-s02",
       "video_job_id": "example-video-job-s02",
       "public_gallery": false,
       "video_only_no_sound": false,
       "status": "completed_waiting_timeline",
       "timeline_added": false,
+      "voice_changer_applied": false,
+      "voice_sample_asset_id": "example-my-ai-audio-bob-01",
+      "voice_changed_clip_id": null,
+      "caption_status": "pending",
       "errors": []
     },
     {
       "shot_id": "S03",
       "duration_seconds": 8,
       "speaker": "Alex",
-      "dialogue": "I will ride slowly and watch the path.",
-      "image_jobs": [
-        "example-image-job-s03-a",
-        "example-image-job-s03-b"
-      ],
-      "selected_keyframe_id": "example-image-job-s03-a",
+      "dialogue": "I will not hurry. I will ride slowly and watch the path.",
+      "emotion": "quiet focus to calm determination",
+      "voice_lock_id": "VOICE_ALEX_01",
+      "reference_asset_ids": ["example-alex-full-body-reference-id", "example-bob-full-body-reference-id"],
+      "image_job_id": "example-image-job-s03",
+      "selected_keyframe_id": "example-image-job-s03",
       "video_job_id": "example-video-job-s03",
       "public_gallery": false,
       "video_only_no_sound": false,
       "status": "completed_waiting_timeline",
       "timeline_added": false,
+      "voice_changer_applied": false,
+      "voice_sample_asset_id": "example-my-ai-audio-alex-01",
+      "voice_changed_clip_id": null,
+      "caption_status": "pending",
       "errors": []
     },
     {
       "shot_id": "S04",
       "duration_seconds": 8,
-      "speaker": "Alex",
-      "dialogue": "There is a branch ahead. I will slow down.",
-      "image_jobs": [
-        "example-image-job-s04-a",
-        "example-image-job-s04-b"
-      ],
-      "selected_keyframe_id": "example-image-job-s04-a",
+      "speaker": "Bob",
+      "dialogue": "Oh no, there is a branch! I cannot stop in time.",
+      "emotion": "confident excitement to sudden fear and alarm",
+      "voice_lock_id": "VOICE_BOB_01",
+      "reference_asset_ids": ["example-bob-full-body-reference-id"],
+      "image_job_id": "example-image-job-s04",
+      "selected_keyframe_id": "example-image-job-s04",
       "video_job_id": "example-video-job-s04",
       "public_gallery": false,
       "video_only_no_sound": false,
       "status": "generating_55_percent",
       "timeline_added": false,
+      "voice_changer_applied": false,
+      "voice_sample_asset_id": "example-my-ai-audio-bob-01",
+      "voice_changed_clip_id": null,
+      "caption_status": "pending",
       "errors": []
     },
     {
       "shot_id": "S05",
       "duration_seconds": 8,
-      "speaker": "Alex",
-      "dialogue": "Next time, we ride slowly and safely together.",
-      "image_jobs": [
-        "example-image-job-s05-a",
-        "example-image-job-s05-b"
-      ],
-      "selected_keyframe_id": "example-image-job-s05-b",
+      "speaker": "Bob",
+      "dialogue": "My elbow hurts, Alex. I understand now. We must ride safely.",
+      "emotion": "soft crying and embarrassment to relief and understanding",
+      "voice_lock_id": "VOICE_BOB_01",
+      "reference_asset_ids": ["example-alex-full-body-reference-id", "example-bob-full-body-reference-id"],
+      "image_job_id": "example-image-job-s05",
+      "selected_keyframe_id": "example-image-job-s05",
       "video_job_id": "example-video-job-s05",
       "public_gallery": false,
       "video_only_no_sound": false,
       "status": "generating_20_percent",
       "timeline_added": false,
+      "voice_changer_applied": false,
+      "voice_sample_asset_id": "example-my-ai-audio-bob-01",
+      "voice_changed_clip_id": null,
+      "caption_status": "pending",
       "errors": []
     }
   ],
   "completed_steps": [
     "Validated the three intake answers",
-    "Created prompt_book.json",
+    "Created prompt_book.json with exact child-body, voice, emotion, dialogue, and caption policies",
     "Opened and retained settings and monitoring tabs",
-    "Created and saved Alex and Bob references",
+    "Created and saved full-body Alex and Bob references",
+    "Created and saved one canonical My AI Audio voice sample per character",
     "Submitted five shots without exceeding five active video jobs",
     "Verified S01-S03 completed by job ID"
   ],
   "pending_steps": [
     "Continue monitoring S04-S05",
     "Add S01-S05 to track 1 in exact order",
-    "Apply Auto Align Clips",
+    "Apply Auto Align Clips pass 1",
+    "Apply the mapped saved voice sample to every clip with Voice Changer",
+    "Apply Auto Align Clips pass 2 after voice replacement",
+    "Generate and correct Automatic Captions for every spoken clip",
     "Save the project",
-    "Export High / FullHD / MP4",
-    "Verify the movie appears in My Videos"
+    "Export captioned High / FullHD / MP4",
+    "Verify the captioned movie appears in My Videos"
   ],
   "timeline": {
     "status": "not_started",
-    "expected_clip_order": [
-      "S01",
-      "S02",
-      "S03",
-      "S04",
-      "S05"
-    ],
+    "expected_clip_order": ["S01", "S02", "S03", "S04", "S05"],
     "actual_clip_order": [],
     "track": 1,
-    "auto_align_applied": false
+    "auto_align_pass_1": false,
+    "voice_replacement_expected_clips": 5,
+    "voice_replacement_completed_clips": 0,
+    "auto_align_pass_2": false
+  },
+  "subtitles": {
+    "required": true,
+    "status": "pending",
+    "primary_route": "videoexpress_automatic_captions",
+    "fallback_route": "videoexpress_to_vidsubtitle",
+    "style": "Large white sentence-case text, dark outline or shadow, lower safe area, maximum two lines",
+    "expected_captioned_clips": 5,
+    "actual_captioned_clips": 0,
+    "text_verified_against_prompt_book": false
   },
   "project_save": {
     "status": "pending",
@@ -182,6 +237,7 @@
     "quality": "High",
     "resolution": "FullHD 1080p",
     "format": "mp4",
+    "captions_required": true,
     "terminal_signal": null
   },
   "errors": [
@@ -192,5 +248,5 @@
       "resolved": true
     }
   ],
-  "resume_from": "Inspect S04 and S05 by their saved video job IDs. When both are complete, assemble S01-S05 on track 1 in exact order."
+  "resume_from": "Inspect S04 and S05 by saved video job IDs. When both finish, assemble S01-S05, run Auto Align pass 1, apply saved voices to all clips, run Auto Align pass 2, generate and verify captions, save, and export."
 }

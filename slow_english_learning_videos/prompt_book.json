@@ -1,10 +1,10 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "is_example": true,
   "book_type": "videoexpress_slow_english_prompt_book",
   "project": {
     "title": "Ride Slowly, Ride Safely",
-    "logline": "Two siblings learn that safe cycling matters more than winning a race.",
+    "logline": "Two young brothers learn that safe cycling matters more than winning a race.",
     "purpose": "Slow-English learning video for children",
     "learner_level": "CEFR A2",
     "learner_age_range": "8-13",
@@ -13,48 +13,18 @@
     "runtime_seconds": 40,
     "aspect_ratio": "16:9",
     "resolution": "1920x1080",
-    "genre": [
-      "family",
-      "educational",
-      "safety lesson"
-    ],
-    "tone": "Warm, clear, reassuring, and family-friendly"
+    "tone": "Warm, soft, reassuring, and family-friendly"
   },
   "story": {
-    "idea": "Alex and Bob are brothers cycling in a park. Bob wants to race, but Alex rides carefully. Alex notices a branch, slows down, and helps Bob understand why safety matters.",
+    "idea": "Alex and Bob are young brothers cycling in a park. Bob races toward a branch and has a mild fall. Alex comforts him, and Bob learns to ride slowly and safely.",
     "theme": "Safety is more important than speed.",
     "moral": "Ride slowly, watch the path, and help each other.",
     "beats": [
-      {
-        "beat": "setup",
-        "shots": [
-          "S01"
-        ]
-      },
-      {
-        "beat": "challenge",
-        "shots": [
-          "S02"
-        ]
-      },
-      {
-        "beat": "careful_choice",
-        "shots": [
-          "S03"
-        ]
-      },
-      {
-        "beat": "hazard",
-        "shots": [
-          "S04"
-        ]
-      },
-      {
-        "beat": "resolution",
-        "shots": [
-          "S05"
-        ]
-      }
+      { "beat": "setup", "shots": ["S01"] },
+      { "beat": "challenge", "shots": ["S02"] },
+      { "beat": "careful_choice", "shots": ["S03"] },
+      { "beat": "consequence", "shots": ["S04"] },
+      { "beat": "comfort_and_moral", "shots": ["S05"] }
     ]
   },
   "generation_policy": {
@@ -65,12 +35,18 @@
     "public_gallery": false,
     "video_only_no_sound": false,
     "dialogue_required_in_every_clip": true,
+    "one_speaker_per_clip": true,
+    "dialogue_target_words_per_clip": "10-15 words for an 8-10 second clip",
+    "speech_rate_wpm": "90-100",
     "maximum_consistent_characters": 2,
-    "consistent_character_note": "VideoExpress works best with no more than two locked recurring characters.",
-    "dialogue_format": "Quotation marks appear only around the exact sentence to be spoken. Voice and performance instructions are unquoted.",
+    "character_reference_framing": "neutral full-body or three-quarter full-length; head-to-toe child proportions visible",
+    "body_lock_required_in_every_shot": true,
+    "voice_sample_required_per_character": true,
+    "voice_changer_required_per_timeline_clip": true,
     "maximum_active_video_jobs": 5,
+    "dialogue_format": "Quotation marks appear only around the exact sentence to be spoken. Voice and emotion instructions are unquoted.",
     "acceptance_policy": "Accept the first successfully completed take unless VideoExpress reports an explicit failure.",
-    "global_negative_prompt": "identity drift, age change, face swap, wardrobe change, helmet missing, bicycle color change, extra limbs, malformed hands, warped wheels, camera shake, extreme motion blur, text, captions, subtitles, logo, watermark, brand name, traffic, crowd, blood, gore, graphic injury"
+    "global_negative_prompt": "adult body, adult proportions, tall adult height, broad shoulders, muscular torso, mature face, beard, facial hair, identity drift, age change, face swap, wardrobe change, helmet missing, bicycle color change, extra limbs, malformed hands, warped wheels, extreme motion blur, generated text, captions, subtitles, logo, watermark, brand name, crowd, blood, gore, graphic injury"
   },
   "actor_mapping": {
     "Actor 1": "Alex",
@@ -82,41 +58,43 @@
       "name": "Alex",
       "age": 12,
       "role": "Careful younger brother",
-      "appearance_lock": "Warm medium skin, oval face, large brown eyes, short slightly wavy black hair, slim build",
+      "body_lock": "Exactly 12-year-old boy; short child height; narrow child shoulders; slim preteen torso; youthful face; child-sized hands, arms, and legs; no adult musculature; no facial hair; no tall adult proportions",
+      "appearance_lock": "Warm medium skin, oval youthful face, large brown eyes, short slightly wavy black hair",
       "wardrobe_lock": "Cobalt-blue cycling jersey, navy shorts, dark gloves, gray shoes, plain matte navy-blue helmet",
       "bicycle_lock": "Youth-size matte cobalt-blue bicycle with straight silver handlebar and no branding",
-      "voice": "Young male, calm, gentle, slow, and clearly articulated neutral American English",
-      "portrait_prompt": "Approved character reference portrait for Alex, Actor 1. Close-up three-quarter portrait of a 12-year-old boy with warm medium skin, oval face, large brown eyes, short slightly wavy black hair, slim build, cobalt-blue cycling jersey, dark gloves, and plain matte navy-blue helmet. Gentle attentive expression, premium stylized 3D realism, soft neutral studio lighting, centered identity-reference composition, pale gray background, wide 16:9, no text, logo, or watermark."
+      "voice_lock_id": "VOICE_ALEX_01",
+      "voice_sample_asset_id": "example-my-ai-audio-alex-01",
+      "voice_lock": "12-year-old boy; soft warm youthful male voice; mid-high pitch; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
+      "reference_asset_id": "example-alex-full-body-reference-id",
+      "portrait_prompt": "Approved full-body identity reference for Alex, Actor 1. Exactly 12-year-old boy; short child height; narrow child shoulders; slim preteen torso; youthful oval face; large brown eyes; child-sized hands, arms, and legs; no adult musculature; no facial hair; no tall adult proportions. Warm medium skin and short slightly wavy black hair. Head-to-toe standing neutral pose in full locked cobalt-blue cycling outfit, navy shorts, gray shoes, dark gloves, and plain matte navy-blue helmet. Premium stylized 3D animation, soft neutral studio light, pale gray background, wide 16:9, no text, logo, or watermark."
     },
     "bob": {
       "actor_id": "Actor 2",
       "name": "Bob",
       "age": 14,
       "role": "Energetic older brother",
-      "appearance_lock": "Warm medium skin, slightly angular face, dark brown eyes, short tousled black hair, lean build",
+      "body_lock": "Exactly 14-year-old boy; young-teen child height; narrow youthful shoulders; slim young-teen torso; youthful face; child-sized hands, arms, and legs; no adult musculature; no facial hair; no tall adult proportions",
+      "appearance_lock": "Warm medium skin, slightly angular youthful face, dark brown eyes, short tousled black hair",
       "wardrobe_lock": "Bright red cycling jersey, charcoal shorts, dark gloves, dark gray shoes, plain matte dark-red helmet",
       "bicycle_lock": "Youth-size matte deep-red bicycle with straight silver handlebar and no branding",
-      "voice": "Young male, slightly deeper than Alex, energetic, slow, and clearly articulated neutral American English",
-      "portrait_prompt": "Approved character reference portrait for Bob, Actor 2. Close-up front-facing portrait of a 14-year-old boy with warm medium skin, slightly angular face, dark brown eyes, short tousled black hair, lean build, bright red cycling jersey, dark gloves, and plain matte dark-red helmet. Confident cheerful expression, premium stylized 3D realism, soft neutral studio lighting, centered identity-reference composition, pale gray background, wide 16:9, no text, logo, or watermark."
+      "voice_lock_id": "VOICE_BOB_01",
+      "voice_sample_asset_id": "example-my-ai-audio-bob-01",
+      "voice_lock": "14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
+      "reference_asset_id": "example-bob-full-body-reference-id",
+      "portrait_prompt": "Approved full-body identity reference for Bob, Actor 2. Exactly 14-year-old boy; young-teen child height; narrow youthful shoulders; slim young-teen torso; youthful slightly angular face; dark brown eyes; child-sized hands, arms, and legs; no adult musculature; no facial hair; no tall adult proportions. Warm medium skin and short tousled black hair. Head-to-toe standing neutral pose in full locked bright-red cycling outfit, charcoal shorts, dark gray shoes, dark gloves, and plain matte dark-red helmet. Premium stylized 3D animation, soft neutral studio light, pale gray background, wide 16:9, no text, logo, or watermark."
     }
   },
   "locations": {
     "park_path": {
-      "description": "A peaceful neighborhood park with a broad dry asphalt cycling path, green grass, mature trees, flowers, wooden benches, and no traffic or crowds",
-      "landmarks": [
-        "Large oak tree at the far end of the path",
-        "Gentle right-hand bend",
-        "Low flower bed",
-        "Wooden bench"
-      ],
+      "description": "Peaceful neighborhood park with a broad dry asphalt cycling path, green grass, mature trees, flowers, wooden benches, and no traffic or crowds",
       "time_of_day": "Late afternoon",
       "weather": "Clear and dry with a light breeze"
     }
   },
   "props": {
     "fallen_branch": {
-      "description": "One small dry brown branch with two twigs, lying diagonally near the outer edge of the path",
-      "continuity": "Introduced in S04 and unchanged afterward"
+      "description": "One small dry brown branch with two twigs lying diagonally near the outer edge of the path",
+      "continuity": "Visible in S04 and near Bob in S05"
     }
   },
   "shots": [
@@ -125,127 +103,180 @@
       "shot_number": 1,
       "duration_seconds": 8,
       "location_id": "park_path",
-      "cast": [
-        "Actor 1",
-        "Actor 2"
-      ],
-      "story_function": "Introduce the brothers, bicycles, park, and careful-riding theme.",
+      "cast": ["Actor 1", "Actor 2"],
+      "story_function": "Introduce the brothers and the gentle safety theme.",
+      "emotion": {
+        "emotion_start": "peaceful curiosity",
+        "emotion_change": "warm happiness",
+        "facial_expression": "relaxed brows, bright eyes, small natural smiles",
+        "body_language": "relaxed shoulders and gentle movements beside the bicycles",
+        "voice_emotion": "soft, cheerful, and welcoming"
+      },
       "dialogue": {
         "speaker_actor_id": "Actor 1",
         "speaker": "Alex",
-        "start_second": 4.5,
+        "voice_lock_id": "VOICE_ALEX_01",
+        "start_second": 0.5,
         "end_second": 8.0,
-        "line": "What a beautiful day. Let us ride carefully.",
-        "voice_instruction": "Young male, warm, cheerful, slow, and clear neutral American English; pause briefly after day"
+        "line": "What a beautiful day, Bob. Let us ride slowly and enjoy the park.",
+        "voice_instruction": "12-year-old boy; soft warm youthful male voice; mid-high pitch; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
+        "emotional_delivery": "Soft, cheerful, and welcoming; pause gently after Bob."
       },
-      "text_to_image_prompt": "Cinematic premium stylized 3D animated film still. Alex in his locked blue cycling outfit and navy-blue helmet stands with his blue bicycle beside Bob in his locked red cycling outfit and dark-red helmet with his red bicycle. Stable eye-level waist-up two-shot on a broad park path, both handlebars visible, large oak tree in the distance, soft late-afternoon light, readable faces and mouths, wide 16:9, no text, logo, or watermark.",
-      "video_audio_prompt": "[0-2] seconds: Hold a stable eye-level waist-up two-shot as Alex checks one brake lever and Bob rests both hands on his handlebars. [2-4.5] seconds: Add a very slow push-in while leaves move gently and both boys smile. [4.5-8] seconds: Alex speaks while Bob listens with his mouth closed and then glances toward the oak tree. Dialogue: Alex says, \"What a beautiful day. Let us ride carefully.\" Voice: young male, warm, cheerful, slow, and clear neutral American English, with a short pause after day. Use restrained accurate lip sync for Alex only. Add gentle park ambience and subtle bicycle-chain sounds. Preserve identities, wardrobe, helmets, bicycles, geography, and lighting. No extra speech or subtitles.",
-      "negative_constraints": "Bob speaking, both mouths moving, racing already started, missing bicycle, traffic, crowd, generated text"
+      "text_to_image_prompt": "Premium stylized 3D animated film still. Alex is exactly a 12-year-old boy with short child height, narrow child shoulders, slim preteen torso, youthful face, and child-sized limbs in his locked blue outfit and helmet. Bob is exactly a 14-year-old boy with young-teen child height, narrow youthful shoulders, slim young-teen torso, youthful face, and child-sized limbs in his locked red outfit and helmet. Both stand with youth-size bicycles on the park path, relaxed brows, bright eyes, and small smiles. Stable full-body two-shot, wide 16:9, no generated text, captions, subtitles, logo, or watermark.",
+      "video_audio_prompt": "Hold a stable full-body two-shot as both boys prepare their bicycles. Alex smiles softly and speaks while Bob listens with his mouth closed. Keep relaxed brows, bright eyes, relaxed child shoulders, and gentle movements. Dialogue: Alex says, \"What a beautiful day, Bob. Let us ride slowly and enjoy the park.\" Voice: 12-year-old boy; soft warm youthful male voice; mid-high pitch; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone. Emotion: soft, cheerful, and welcoming; pause gently after Bob. Preserve both saved identity references, exact ages, youthful child proportions, wardrobe, helmets, bicycles, and lighting. No extra speech or generated text.",
+      "negative_constraints": "adult body, adult proportions, broad shoulders, muscular torso, tall adult height, mature face, facial hair, Bob speaking, both mouths moving, traffic, crowd, generated subtitles"
     },
     {
       "shot_id": "S02",
       "shot_number": 2,
       "duration_seconds": 8,
       "location_id": "park_path",
-      "cast": [
-        "Actor 1",
-        "Actor 2"
-      ],
-      "story_function": "Bob issues a playful race challenge.",
+      "cast": ["Actor 1", "Actor 2"],
+      "story_function": "Bob suggests a playful race.",
+      "emotion": {
+        "emotion_start": "playful excitement",
+        "emotion_change": "confident eagerness",
+        "facial_expression": "raised brows, bright eyes, eager childlike grin",
+        "body_language": "leans forward slightly while pointing toward the tree",
+        "voice_emotion": "soft, friendly, and excited without shouting"
+      },
       "dialogue": {
         "speaker_actor_id": "Actor 2",
         "speaker": "Bob",
-        "start_second": 5.5,
+        "voice_lock_id": "VOICE_BOB_01",
+        "start_second": 0.5,
         "end_second": 8.0,
-        "line": "Race you to the big tree!",
-        "voice_instruction": "Young male, playful, confident, slow, and clear neutral American English"
+        "line": "The big tree is ahead, Alex. Let us race there and have fun.",
+        "voice_instruction": "14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
+        "emotional_delivery": "Soft, playful excitement; never shout or rush."
       },
-      "text_to_image_prompt": "Cinematic premium stylized 3D animated film still. Bob in his locked red cycling outfit and dark-red helmet points toward the large oak tree with an excited grin while seated on his red bicycle. Alex in his locked blue outfit and navy-blue helmet remains beside him on his blue bicycle with a calm amused expression. Stable eye-level chest-up two-shot, both mouths visible, soft late-afternoon light, wide 16:9, no text, logo, or watermark.",
-      "video_audio_prompt": "[0-2] seconds: Hold the stable chest-up two-shot as Bob grips the handlebar and glances at the oak tree. [2-4] seconds: Bob raises his brows, smiles, and points toward the tree. [4-5.5] seconds: Alex looks toward the tree and then back to Bob. [5.5-8] seconds: Bob speaks while Alex listens with his mouth closed. Dialogue: Bob says, \"Race you to the big tree!\" Voice: young male, playful, confident, slow, and clear neutral American English. Use restrained accurate lip sync for Bob only. Add park ambience and subtle bicycle sounds. Preserve identities, bicycles, geography, and lighting. No extra speech or subtitles.",
-      "negative_constraints": "Alex speaking, both mouths moving, angry challenge, unsafe gesture, traffic, generated text"
+      "text_to_image_prompt": "Premium stylized 3D animated film still. Bob is exactly a 14-year-old boy with young-teen child height, narrow youthful shoulders, slim young-teen torso, youthful face, and child-sized limbs in his locked red outfit and helmet, pointing toward the oak tree with raised brows and an eager childlike grin. Alex is exactly 12 with short child height and slim preteen proportions in his locked blue outfit. Stable full-body two-shot with youth-size bicycles, wide 16:9, no generated text, captions, subtitles, logo, or watermark.",
+      "video_audio_prompt": "Bob points toward the tree, leans forward slightly, raises his brows, and smiles with playful excitement. Alex listens with his mouth closed. Dialogue: Bob says, \"The big tree is ahead, Alex. Let us race there and have fun.\" Voice: 14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone. Emotion: soft, friendly excitement without shouting or rushing. Preserve saved identity references, exact ages, child proportions, wardrobe, and bicycles. No extra speech or generated text.",
+      "negative_constraints": "adult body, adult proportions, broad shoulders, muscular torso, tall adult height, mature face, facial hair, Alex speaking, angry challenge, yelling, generated subtitles"
     },
     {
       "shot_id": "S03",
       "shot_number": 3,
       "duration_seconds": 8,
       "location_id": "park_path",
-      "cast": [
-        "Actor 1",
-        "Actor 2"
-      ],
-      "story_function": "Alex chooses a controlled speed while Bob moves ahead.",
+      "cast": ["Actor 1", "Actor 2"],
+      "story_function": "Alex chooses a controlled speed while Bob rides ahead.",
+      "emotion": {
+        "emotion_start": "quiet focus",
+        "emotion_change": "calm determination",
+        "facial_expression": "soft focused eyes, neutral brows, gentle closed-mouth smile",
+        "body_language": "upright child posture, relaxed shoulders, steady pedaling",
+        "voice_emotion": "soft, thoughtful, and confident"
+      },
       "dialogue": {
         "speaker_actor_id": "Actor 1",
         "speaker": "Alex",
-        "start_second": 4.5,
+        "voice_lock_id": "VOICE_ALEX_01",
+        "start_second": 0.5,
         "end_second": 8.0,
-        "line": "I will ride slowly and watch the path.",
-        "voice_instruction": "Young male, calm, thoughtful, slow, and clear neutral American English"
+        "line": "I will not hurry. I will ride slowly and watch the path.",
+        "voice_instruction": "12-year-old boy; soft warm youthful male voice; mid-high pitch; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
+        "emotional_delivery": "Soft, thoughtful, and calm; pause after hurry."
       },
-      "text_to_image_prompt": "Cinematic premium stylized 3D animated film still. Alex in his locked blue outfit and navy-blue helmet rides his blue bicycle slowly along the park path with relaxed shoulders and focused eyes. Bob in red rides slightly ahead but remains recognizable. Smooth side-tracking composition, faces and bicycles sharp, gentle background motion, wide 16:9, no text, logo, or watermark.",
-      "video_audio_prompt": "[0-2] seconds: Track parallel with Alex as he pedals at a steady cadence. [2-4.5] seconds: Sunlight flickers through leaves while Alex scans the path. [4.5-8] seconds: Alex speaks while Bob keeps his mouth closed and gradually moves farther ahead. Dialogue: Alex says, \"I will ride slowly and watch the path.\" Voice: young male, calm, thoughtful, slow, and clear neutral American English. Use restrained accurate lip sync for Alex only. Add quiet park, tire, and chain sounds. Keep travel screen-left to screen-right. No extra speech or subtitles.",
-      "negative_constraints": "Bob speaking, Alex accelerating, camera shake, warped bicycle, traffic, generated text"
+      "text_to_image_prompt": "Premium stylized 3D animated film still. Alex is exactly a 12-year-old boy with short child height, narrow child shoulders, slim preteen torso, youthful face, and child-sized limbs, riding his youth-size locked blue bicycle slowly with focused eyes, upright child posture, and relaxed shoulders. Bob, exactly 14 with youthful child proportions, rides slightly ahead. Side-tracking full-body composition, wide 16:9, no generated text, captions, subtitles, logo, or watermark.",
+      "video_audio_prompt": "Track gently beside Alex as he pedals steadily with relaxed child shoulders and scans the path. Bob rides slightly ahead and keeps his mouth closed. Dialogue: Alex says, \"I will not hurry. I will ride slowly and watch the path.\" Voice: 12-year-old boy; soft warm youthful male voice; mid-high pitch; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone. Emotion: soft, thoughtful, and calm; pause after hurry. Preserve saved identities, exact ages, child proportions, wardrobe, bicycles, and direction of travel. No extra speech or generated text.",
+      "negative_constraints": "adult body, adult proportions, broad shoulders, muscular torso, tall adult height, mature face, facial hair, Bob speaking, Alex accelerating, camera shake, generated subtitles"
     },
     {
       "shot_id": "S04",
       "shot_number": 4,
       "duration_seconds": 8,
       "location_id": "park_path",
-      "cast": [
-        "Actor 1"
-      ],
-      "story_function": "Alex notices a small branch and safely slows down.",
-      "dialogue": {
-        "speaker_actor_id": "Actor 1",
-        "speaker": "Alex",
-        "start_second": 4.0,
-        "end_second": 8.0,
-        "line": "There is a branch ahead. I will slow down.",
-        "voice_instruction": "Young male, alert but controlled, slow, and clear neutral American English; pause after ahead"
+      "cast": ["Actor 2"],
+      "story_function": "Bob sees the branch too late and has a mild non-graphic fall.",
+      "emotion": {
+        "emotion_start": "confident excitement",
+        "emotion_change": "sudden fear and alarm",
+        "facial_expression": "eyes widen, brows lift sharply, mouth opens in a small frightened gasp",
+        "body_language": "child shoulders tense, hands grip brakes, mild stumble and safe off-camera fall",
+        "voice_emotion": "soft but frightened, clear, and never screaming"
       },
-      "text_to_image_prompt": "Cinematic premium stylized 3D animated film still. Alex in his locked blue outfit and navy-blue helmet rides his blue bicycle carefully toward the park bend. Both hands are visible on the brake levers as he notices one small dry branch near the outer edge of the path. Concerned but controlled expression, flower bed and bench visible, wide 16:9, no text, logo, or watermark.",
-      "video_audio_prompt": "[0-2] seconds: Track backward gently as Alex pedals slowly and the small branch enters the foreground. [2-4] seconds: Use one restrained rack focus from Alex's eyes to the branch and back. [4-8] seconds: Alex speaks while squeezing both brakes, reducing speed, and steering toward the clear inner side. Dialogue: Alex says, \"There is a branch ahead. I will slow down.\" Voice: young male, alert but controlled, slow, and clear neutral American English, with a short pause after ahead. Use restrained accurate lip sync for Alex. Add park, tire, chain, and gentle brake sounds. Preserve identity, bicycle, branch position, geography, and lighting. No extra speech or subtitles.",
-      "negative_constraints": "panic, skid, fall, large log, branch changing position, traffic, generated text"
+      "dialogue": {
+        "speaker_actor_id": "Actor 2",
+        "speaker": "Bob",
+        "voice_lock_id": "VOICE_BOB_01",
+        "start_second": 0.5,
+        "end_second": 7.5,
+        "line": "Oh no, there is a branch! I cannot stop in time.",
+        "voice_instruction": "14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
+        "emotional_delivery": "Frightened and urgent but still soft; no screaming."
+      },
+      "text_to_image_prompt": "Premium stylized 3D animated film still. Bob is exactly a 14-year-old boy with young-teen child height, narrow youthful shoulders, slim young-teen torso, youthful face, and child-sized limbs in his locked red outfit and helmet, approaching the small branch on his youth-size red bicycle. His eyes are wide, brows raised, mouth slightly open, and child shoulders tense as both hands reach for the brakes. Safe family scene before a mild fall, wide 16:9, no generated text, captions, subtitles, blood, injury detail, logo, or watermark.",
+      "video_audio_prompt": "Bob rides toward the small branch. His expression changes from confident to frightened: eyes widen, brows rise sharply, mouth opens in a small gasp, child shoulders tense, and both hands squeeze the brakes. Dialogue: Bob says, \"Oh no, there is a branch! I cannot stop in time.\" Voice: 14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone. Emotion: frightened and urgent but still soft; no screaming. End with a mild stumble and imply the fall off camera. Preserve saved identity, exact age, youthful child proportions, outfit, bicycle, and branch. No extra speech or generated text.",
+      "negative_constraints": "adult body, adult proportions, broad shoulders, muscular torso, tall adult height, mature face, facial hair, graphic crash, blood, gore, broken bone, screaming, generated subtitles"
     },
     {
       "shot_id": "S05",
       "shot_number": 5,
       "duration_seconds": 8,
       "location_id": "park_path",
-      "cast": [
-        "Actor 1",
-        "Actor 2"
-      ],
-      "story_function": "Resolve the lesson with both brothers walking safely together.",
-      "dialogue": {
-        "speaker_actor_id": "Actor 1",
-        "speaker": "Alex",
-        "start_second": 4.5,
-        "end_second": 8.0,
-        "line": "Next time, we ride slowly and safely together.",
-        "voice_instruction": "Young male, warm, reassuring, slow, and clear neutral American English"
+      "cast": ["Actor 1", "Actor 2"],
+      "story_function": "Alex comforts Bob, who softly states the lesson.",
+      "emotion": {
+        "emotion_start": "tearful pain and embarrassment",
+        "emotion_change": "relief, trust, and understanding",
+        "facial_expression": "Bob has watery eyes, one soft tear, pinched brows, and a small wince; Alex has concerned eyes and a reassuring smile",
+        "body_language": "Bob sits safely on grass holding one elbow; Alex kneels nearby and offers a hand",
+        "voice_emotion": "soft crying at first, then relieved and sincere"
       },
-      "text_to_image_prompt": "Cinematic premium stylized 3D animated film still. Full-body side-front view of Alex in blue and Bob in red clearly walking on their own feet along the peaceful park path. Alex pushes his empty blue bicycle on his outer left and Bob pushes his empty red bicycle on his outer right. Both saddles are visibly empty and both boys' shoes touch the path. Warm golden late-afternoon light, no traffic or crowds, wide 16:9, no text, logo, or watermark.",
-      "video_audio_prompt": "[0-2] seconds: Dolly backward slowly as Alex and Bob walk side by side, each pushing his own bicycle. [2-4.5] seconds: Bob looks gratefully at Alex and Alex smiles. [4.5-8] seconds: Alex speaks while Bob listens with his mouth closed and nods once. Dialogue: Alex says, \"Next time, we ride slowly and safely together.\" Voice: young male, warm, reassuring, slow, and clear neutral American English. Use restrained accurate lip sync for Alex only. Add gentle park, tire, and chain sounds. Keep both saddles empty and never let either boy mount a bicycle. No extra speech or subtitles.",
-      "negative_constraints": "riding bicycles, feet on pedals, Bob speaking, both mouths moving, traffic, crowd, generated text"
+      "dialogue": {
+        "speaker_actor_id": "Actor 2",
+        "speaker": "Bob",
+        "voice_lock_id": "VOICE_BOB_01",
+        "start_second": 0.5,
+        "end_second": 8.0,
+        "line": "My elbow hurts, Alex. I understand now. We must ride safely.",
+        "voice_instruction": "14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
+        "emotional_delivery": "Begin with a soft tearful tremble, then sound relieved and sincere; no loud crying."
+      },
+      "text_to_image_prompt": "Premium stylized 3D animated family film still. Bob is exactly a 14-year-old boy with youthful young-teen proportions in his locked red outfit and helmet, sitting safely on grass beside the path and gently holding one elbow. He has watery eyes, one soft tear, pinched brows, and a small wince. Alex is exactly a 12-year-old boy with slim preteen child proportions in his locked blue outfit and helmet, kneeling nearby with concerned eyes and an offered hand. Both youth-size bicycles rest safely nearby. Wide 16:9, no generated text, captions, subtitles, blood, visible wound, logo, or watermark.",
+      "video_audio_prompt": "Hold a gentle full-body two-shot. Bob sits safely on the grass holding one elbow, with watery eyes, one soft tear, pinched brows, a small wince, and quiet childlike crying. Alex kneels nearby with concerned eyes and offers his hand, keeping his mouth closed. Bob breathes, looks at Alex, and becomes relieved. Dialogue: Bob says, \"My elbow hurts, Alex. I understand now. We must ride safely.\" Voice: 14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone. Emotion: begin with a soft tearful tremble, then sound relieved and sincere; no loud crying. Preserve both saved identities, exact ages, youthful child proportions, outfits, helmets, and bicycles. No extra speech or generated text.",
+      "negative_constraints": "adult body, adult proportions, broad shoulders, muscular torso, tall adult height, mature face, facial hair, Alex speaking, loud sobbing, screaming, blood, visible wound, gore, generated subtitles"
     }
   ],
+  "voice_replacement_plan": {
+    "stage": "after_timeline_insertion_before_final_captioning",
+    "method": "Right-click each timeline clip, select Voice Changer, choose the speaker's saved My AI Audio sample, and click Apply.",
+    "mapping": {
+      "S01": "VOICE_ALEX_01",
+      "S02": "VOICE_BOB_01",
+      "S03": "VOICE_ALEX_01",
+      "S04": "VOICE_BOB_01",
+      "S05": "VOICE_BOB_01"
+    },
+    "required_coverage": "5 of 5 clips"
+  },
+  "subtitle_policy": {
+    "required": true,
+    "primary_route": "VideoExpress Automatic Captions after all Voice Changer replacements",
+    "fallback_route": "Export voice-locked video, import through the VideoExpress VidSubtitle integration, generate and correct captions, then use that captioned output as final",
+    "burn_subtitles_during_ai_clip_generation": false,
+    "style": "Large readable white sentence-case text with dark outline or shadow, lower safe area, maximum two lines",
+    "content_source": "final voice-replaced timeline audio",
+    "coverage_requirement": "Every spoken clip and every dialogue line",
+    "verification": "Caption text and punctuation match each prompt-book dialogue line"
+  },
   "timeline_plan": {
     "track": 1,
-    "clip_order": [
-      "S01",
-      "S02",
-      "S03",
-      "S04",
-      "S05"
-    ],
-    "auto_align_after_insertion": true,
+    "clip_order": ["S01", "S02", "S03", "S04", "S05"],
+    "auto_align_passes": 2,
+    "first_auto_align_after_insertion": true,
+    "voice_changer_after_first_alignment": true,
+    "second_auto_align_after_voice_replacement": true,
+    "automatic_captions_after_final_alignment": true,
     "expected_duration_seconds": 40
   },
   "export_plan": {
     "filename": "Ride Slowly, Ride Safely",
     "quality": "High",
     "resolution": "FullHD 1080p",
-    "format": "mp4"
+    "format": "mp4",
+    "captions_required": true,
+    "voice_replacement_coverage_required": "5 of 5 clips"
   }
 }
