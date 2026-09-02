@@ -1,0 +1,233 @@
+{
+  "schema_version": "2.0.0",
+  "is_example": true,
+  "workflow": "videoexpress_slow_english_lipsync_hd_v2",
+  "updated_at": "2026-09-02T12:00:00+06:00",
+  "status": "monitoring_and_refilling",
+  "inputs": {
+    "idea": "Two young brothers learn that safe cycling matters more than winning a race.",
+    "ratio": "Landscape 16:9",
+    "duration_seconds": 50,
+    "learner_level": "CEFR A2"
+  },
+  "v2_mode": {
+    "create_mode": "Create Video From Prompt",
+    "lip_sync_hd_video_required": true,
+    "narration_video_required_state": false,
+    "public_gallery_required_state": false,
+    "one_speaking_actor_per_clip": true,
+    "script_separate_from_video_prompt": true,
+    "reserved_non_speech_seconds": 2,
+    "conservative_speech_rate_wpm": 90
+  },
+  "workspace": {
+    "account_label": "Example All Access Account",
+    "settings_tab_id": "example-settings-tab-id",
+    "monitoring_tab_id": "example-monitoring-tab-id",
+    "settings_tab_open": true,
+    "monitoring_tab_open": true
+  },
+  "actor_mapping": {
+    "Actor 1": "Alex",
+    "Actor 2": "Bob"
+  },
+  "references": {
+    "Actor 1": {
+      "front_asset_id": "example-alex-front-full-body-reference-id",
+      "three_quarter_asset_id": "example-alex-three-quarter-full-body-reference-id",
+      "scale_lock_id": "SCALE_ALEX_01",
+      "status": "saved"
+    },
+    "Actor 2": {
+      "front_asset_id": "example-bob-front-full-body-reference-id",
+      "three_quarter_asset_id": "example-bob-three-quarter-full-body-reference-id",
+      "scale_lock_id": "SCALE_BOB_01",
+      "status": "saved"
+    }
+  },
+  "environment_lock": {
+    "environment_lock_id": "ENV_PARK_01",
+    "reference_asset_id": "example-park-environment-reference-id",
+    "status": "saved_and_repeated_in_every_prompt"
+  },
+  "queue": {
+    "maximum_active_video_jobs": 5,
+    "active_video_jobs": 2,
+    "completed_video_jobs": 3,
+    "free_slots": 3
+  },
+  "shots": [
+    {
+      "shot_id": "S01",
+      "generation_duration_seconds": 10,
+      "script_duration_seconds": 8,
+      "maximum_script_words": 12,
+      "speaking_actor_id": "Actor 1",
+      "actor_1_script": "What a lovely day, Bob. Let us ride slowly together.",
+      "actor_2_script": "",
+      "actual_script_words": 10,
+      "actual_script_characters": 52,
+      "image_prompt_recorded": true,
+      "video_prompt_recorded": true,
+      "exact_script_absent_from_video_prompt": true,
+      "lip_sync_hd_video": true,
+      "narration_video": false,
+      "public_gallery": false,
+      "image_job_id": "example-image-job-s01",
+      "video_job_id": "example-video-job-s01",
+      "status": "completed_waiting_voice_sample_and_timeline",
+      "timeline_added": false,
+      "voice_lock_id": "VOICE_ALEX_01",
+      "voice_changer_applied": false,
+      "errors": []
+    },
+    {
+      "shot_id": "S02",
+      "generation_duration_seconds": 10,
+      "script_duration_seconds": 8,
+      "maximum_script_words": 12,
+      "speaking_actor_id": "Actor 2",
+      "actor_1_script": "",
+      "actor_2_script": "The big tree is ahead, Alex. I want to race there.",
+      "actual_script_words": 11,
+      "actual_script_characters": 50,
+      "image_prompt_recorded": true,
+      "video_prompt_recorded": true,
+      "exact_script_absent_from_video_prompt": true,
+      "lip_sync_hd_video": true,
+      "narration_video": false,
+      "public_gallery": false,
+      "image_job_id": "example-image-job-s02",
+      "video_job_id": "example-video-job-s02",
+      "status": "completed_waiting_voice_sample_and_timeline",
+      "timeline_added": false,
+      "voice_lock_id": "VOICE_BOB_01",
+      "voice_changer_applied": false,
+      "errors": []
+    },
+    {
+      "shot_id": "S03",
+      "generation_duration_seconds": 10,
+      "script_duration_seconds": 8,
+      "maximum_script_words": 12,
+      "speaking_actor_id": "Actor 1",
+      "actor_1_script": "I will ride carefully and keep my eyes on the path.",
+      "actor_2_script": "",
+      "actual_script_words": 11,
+      "actual_script_characters": 51,
+      "image_prompt_recorded": true,
+      "video_prompt_recorded": true,
+      "exact_script_absent_from_video_prompt": true,
+      "lip_sync_hd_video": true,
+      "narration_video": false,
+      "public_gallery": false,
+      "image_job_id": "example-image-job-s03",
+      "video_job_id": "example-video-job-s03",
+      "status": "completed_waiting_voice_sample_and_timeline",
+      "timeline_added": false,
+      "voice_lock_id": "VOICE_ALEX_01",
+      "voice_changer_applied": false,
+      "errors": []
+    },
+    {
+      "shot_id": "S04",
+      "generation_duration_seconds": 10,
+      "script_duration_seconds": 8,
+      "maximum_script_words": 12,
+      "speaking_actor_id": "Actor 2",
+      "actor_1_script": "",
+      "actor_2_script": "Oh no, a branch! I cannot stop my bicycle in time.",
+      "actual_script_words": 11,
+      "actual_script_characters": 50,
+      "image_prompt_recorded": true,
+      "video_prompt_recorded": true,
+      "exact_script_absent_from_video_prompt": true,
+      "lip_sync_hd_video": true,
+      "narration_video": false,
+      "public_gallery": false,
+      "image_job_id": "example-image-job-s04",
+      "video_job_id": "example-video-job-s04",
+      "status": "generating_55_percent",
+      "timeline_added": false,
+      "voice_lock_id": "VOICE_BOB_01",
+      "voice_changer_applied": false,
+      "errors": []
+    },
+    {
+      "shot_id": "S05",
+      "generation_duration_seconds": 10,
+      "script_duration_seconds": 8,
+      "maximum_script_words": 12,
+      "speaking_actor_id": "Actor 2",
+      "actor_1_script": "",
+      "actor_2_script": "My elbow hurts, Alex. I will ride slowly next time.",
+      "actual_script_words": 10,
+      "actual_script_characters": 51,
+      "image_prompt_recorded": true,
+      "video_prompt_recorded": true,
+      "exact_script_absent_from_video_prompt": true,
+      "lip_sync_hd_video": true,
+      "narration_video": false,
+      "public_gallery": false,
+      "image_job_id": "example-image-job-s05",
+      "video_job_id": "example-video-job-s05",
+      "status": "generating_20_percent",
+      "timeline_added": false,
+      "voice_lock_id": "VOICE_BOB_01",
+      "voice_changer_applied": false,
+      "errors": []
+    }
+  ],
+  "saved_voices": {
+    "VOICE_ALEX_01": {
+      "actor_id": "Actor 1",
+      "source_shot_id": null,
+      "source_video_job_id": null,
+      "my_ai_audio_asset_id": null,
+      "status": "pending_until_all_clips_complete"
+    },
+    "VOICE_BOB_01": {
+      "actor_id": "Actor 2",
+      "source_shot_id": null,
+      "source_video_job_id": null,
+      "my_ai_audio_asset_id": null,
+      "status": "pending_until_all_clips_complete"
+    }
+  },
+  "completed_steps": [
+    "Validated intake",
+    "Created V2 prompt book with separate image, video, and actor-script fields",
+    "Created character and environment references",
+    "Submitted five Lip Sync HD clips with exactly one speaking actor per clip",
+    "Verified S01-S03 completed"
+  ],
+  "pending_steps": [
+    "Monitor S04-S05",
+    "Save one clean solo-speaking audio sample for Actor 1 and Actor 2",
+    "Add S01-S05 to the timeline in exact order",
+    "Run Auto Align pass 1",
+    "Apply Voice Changer according to speaking_actor_id",
+    "Run Auto Align pass 2",
+    "Verify no text or subtitle layer exists",
+    "Save and export High FullHD MP4"
+  ],
+  "timeline": {
+    "status": "not_started",
+    "expected_order": ["S01", "S02", "S03", "S04", "S05"],
+    "actual_order": [],
+    "auto_align_pass_1": false,
+    "voice_changed_clips": 0,
+    "auto_align_pass_2": false,
+    "text_layers": 0
+  },
+  "export": {
+    "status": "pending",
+    "name": "Ride Slowly, Ride Safely",
+    "quality": "High",
+    "resolution": "FullHD 1080p",
+    "format": "mp4",
+    "subtitle_free_required": true
+  },
+  "errors": [],
+  "resume_from": "Inspect S04 and S05 by saved video job IDs. After all clips complete, save one solo-speaking voice sample per actor, assemble the timeline, align, apply Voice Changer by speaking_actor_id, realign, save, and export."
+}
