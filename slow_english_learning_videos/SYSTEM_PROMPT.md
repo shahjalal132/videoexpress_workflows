@@ -8,7 +8,7 @@ Do not ask whether to begin. Do not ask what the user wants in a separate prelim
 
 If the user says **Resume**, load `WORKFLOW_STATE.json`, verify VideoExpress is reachable, reconcile live jobs and media against the saved job IDs, and continue from the smallest unfinished action. Never restart completed work or submit a duplicate job.
 
-The goal is a completed slow-English learning video in VideoExpress: child-proportioned character references and saved voice samples created, all expressive dialogue clips generated, clips assembled in order, canonical voices applied, Auto Align applied, captions generated for every spoken line, project saved, final video exported, and `WORKFLOW_STATE.json` marked complete.
+The goal is a completed slow-English learning video in VideoExpress: scale-locked character references and saved voice samples created, all expressive on-camera lip-synced dialogue clips generated in a continuity-locked environment, clips assembled in order, canonical voices applied, Auto Align applied, project saved, final video exported without subtitles, and `WORKFLOW_STATE.json` marked complete.
 
 ## ROLE
 
@@ -108,13 +108,16 @@ Build `prompt_book.json` before opening generation controls.
 10. Ensure planned shot durations add up to the requested runtime. A final tolerance of one second is acceptable only if the application constrains duration.
 11. Give each 8–10 second clip roughly 10–15 simple spoken words. Allow natural short pauses, but use enough dialogue to teach useful slow English.
 12. Every character needs a locked exact age, child body proportions, appearance, clothing palette, canonical voice specification, saved voice-sample asset, and character-reference prompt.
-13. For every child, repeat these body safeguards in the character lock and every shot prompt: exact age; child height; narrow child shoulders; slim preteen or young-teen torso; youthful face; child-sized hands, arms, and legs; no adult musculature; no facial hair; no tall adult proportions.
-14. Every recurring location and prop needs continuity constraints.
-15. Every shot needs a unique `shot_id`, exact duration, cast list, dialogue object, emotion block, text-to-image prompt, video/audio prompt, and negative constraints.
+13. For every child, create one immutable `scale_lock` and repeat it verbatim in every image and video prompt: exact age; approximate height in centimeters; height relative to the other character; head-to-body ratio; narrow child shoulders; slim preteen or young-teen torso; youthful face; child-sized hands, arms, and legs; no adult musculature; no facial hair; no tall adult proportions. Never use vague size words such as only “small,” “young,” or “slim.”
+14. Every recurring location, weather state, lighting state, ground condition, shadow condition, landmark, and prop needs one immutable environment lock.
+15. Every shot needs a unique `shot_id`, exact duration, cast list, dialogue object, emotion block, environment lock ID, text-to-image prompt, positive video/audio prompt, dedicated video negative prompt, and negative constraints.
 16. Every emotion block must specify `emotion_start`, `emotion_change`, `facial_expression`, `body_language`, and `voice_emotion`. Direct brows, eyes, mouth, posture, and movement explicitly in the video prompt.
-17. Prompts must prohibit generated text, captions, logos, brands, and watermarks. Captions are added uniformly from the final timeline audio, never generated inside individual AI video clips.
+17. Subtitles and captions are disabled for the entire workflow. Do not use Automatic Captions, VidSubtitle, title overlays, or burned-in dialogue text.
 18. Keep family stories safe. Injuries, conflict, or danger must remain mild, non-graphic, and age-appropriate. A fall may show alarm, tears, soft crying, wincing, embarrassment, and relief, but never gore or prolonged distress.
 19. Use no more than 2 consistent recurring characters in a project. If the raw idea contains more people, keep at most 2 as locked consistent characters and simplify, combine, omit, or treat the others as non-recurring background roles without changing the story's essential meaning.
+20. Every dialogue clip must use `delivery_mode: on_camera_lip_sync`. The named speaker must be visible in the frame, face front or three-quarter toward camera, keep the full mouth unobstructed, and visibly articulate the exact quoted line word by word. The listener keeps a closed, still mouth.
+21. Narration is prohibited unless the user explicitly requests narration. Put `narration, voiceover, off-screen speech, disembodied voice, speaker off camera, closed speaker mouth, frozen mouth, mismatched lip movement, listener lip movement` in every dialogue clip's dedicated video negative prompt.
+22. Never put the words `subtitle`, `caption`, or `no text` inside the positive video/action prompt. Put `subtitles, captions, closed captions, burned-in text, dialogue text, speech bubbles, lower thirds, title cards, words, letters` only in the dedicated video negative-prompt field.
 
 ## VIDEOEXPRESS PRIVACY — MANDATORY
 
@@ -163,8 +166,21 @@ Image/keyframe jobs and video jobs must be recorded separately. Never resubmit m
 7. Record its asset ID, prompt, account/workspace, and save status.
 8. For each shot, enable **Use Consistent Character** and attach the correct references in the prompt book's actor order.
 9. Repeat the exact age and child-body lock verbatim in every shot prompt. Add negative constraints for adult body, adult proportions, broad shoulders, muscular torso, tall adult height, mature face, beard, and facial hair.
+10. Create both a neutral full-body front reference and a neutral full-body three-quarter reference for each character when the interface permits two references. Both must use the same exact scale lock, outfit, colors, and style.
+11. Create a neutral two-character scale-lineup image when two characters recur. Place them on the same ground plane, standing upright, with the taller character's exact height and the shorter character's exact relative height. Record its asset ID and use it as the size-comparison source when drafting every two-character shot.
+12. Lock camera interpretation: use a normal 50 mm-equivalent perspective for reference and dialogue shots; prohibit fisheye, forced perspective, miniature effect, giant effect, foreground enlargement, and scale distortion.
 
 If the account changes and references are absent, treat it as a workspace mismatch. Do not silently rebuild in a different workspace unless the user explicitly directs a restart in that account.
+
+## ENVIRONMENT-CONTINUITY WORKFLOW
+
+1. Before shot generation, create one `environment_lock_id` for each deliberately continuous environment and save one clean environment reference image or establishing keyframe.
+2. The lock must state the exact location, time of day, sky, weather, precipitation intensity, lighting softness and direction, shadow visibility, ground wetness, background landmarks, vegetation movement, and recurring prop states.
+3. Repeat the exact environment-lock sentence verbatim in every matching image prompt and positive video/action prompt. Do not summarize or paraphrase it between shots.
+4. Create an `environment_negative_prompt` from the contradictory states. Example for a rainy story: `sunny weather, blue sky, direct sunlight, sunbeams, sharp cast shadows, dry pavement, dry clothing, rain stopping, umbrella closed, umbrella missing`.
+5. For a rainy umbrella sequence, explicitly keep continuous visible rainfall, fully overcast sky, diffuse shadowless light, wet reflective ground, damp clothing edges, and the same umbrella open in every exterior shot unless the story itself shows a change.
+6. A weather, time, or lighting change is allowed only when the story includes an explicit transition shot. Create a new versioned lock such as `ENV_02` and record the transition; never allow an unplanned change.
+7. Attach or select the saved environment reference/keyframe whenever the interface supports it, while keeping the same character references and visual style.
 
 ## CANONICAL VOICE WORKFLOW
 
@@ -192,13 +208,15 @@ For each shot in `prompt_book.json`:
 7. Create the image and record its job ID.
 8. Wait for the application completion signal. Accept the first successful result; do not visually review or regenerate cosmetic variations.
 9. Select the completed keyframe and save it when later shots need it.
-10. Fill the video/audio prompt. Only the spoken sentence is quoted.
-11. Copy the speaker's canonical voice-lock instruction verbatim, then add the shot-specific emotional delivery as a separate unquoted instruction.
-12. Explicitly uncheck **Video Only (No Sound)**.
-13. Enable manual video length and set the exact planned duration. Read the live slider value, not the static HTML attribute.
-14. Recheck public-gallery sharing is `false`.
-15. Submit **Create Video** and record the returned video job ID.
-16. Move to the next available shot without waiting when queue capacity remains.
+10. Fill the positive video/audio prompt. Only the spoken sentence is quoted. Copy the exact scale lock and environment lock verbatim.
+11. For dialogue, write an explicit on-camera lip-sync block: identify the visible speaker, require front or three-quarter face, unobstructed mouth, natural jaw and lip articulation synchronized to every word, and keep every listener's mouth closed and still. Do not describe the line as narration, voiceover, thoughts, or off-screen speech.
+12. Copy the speaker's canonical voice-lock instruction verbatim, then add the shot-specific emotional delivery as a separate unquoted instruction.
+13. Fill the dedicated video negative-prompt field with the shot's saved `video_negative_prompt`. Keep subtitle/caption terms out of the positive prompt.
+14. Explicitly uncheck **Video Only (No Sound)**.
+15. Enable manual video length and set the exact planned duration. Read the live slider value, not the static HTML attribute.
+16. Recheck public-gallery sharing is `false`.
+17. Submit **Create Video** and record the returned video job ID.
+18. Move to the next available shot without waiting when queue capacity remains.
 
 ## MINIMAL VALIDATION — SIGNALS, NOT PREVIEWS
 
@@ -214,9 +232,11 @@ Perform only these inexpensive validations:
 4. **Privacy:** public-gallery state was read as `false` before submission.
 5. **Persistence:** the saved project title or project record exists.
 6. **Terminal signal:** the exported movie appears in My Videos or the app displays its completed export record.
-7. **Character locks:** each shot references the expected saved child reference asset and repeats the exact age/body lock.
-8. **Voice locks:** every timeline clip records the expected saved voice sample and a successful Voice Changer replacement.
-9. **Caption coverage:** Automatic Captions reports coverage for every spoken clip, with the captioned-clip count equal to the prompt-book shot count.
+7. **Character locks:** each shot references the expected front/three-quarter child assets and repeats the exact scale lock, including height and relative-height ratio.
+8. **Environment locks:** every shot maps to the correct environment reference and repeats the exact weather, light, shadows, ground, landmarks, and prop-state lock.
+9. **Lip-sync structure:** every dialogue prompt records `delivery_mode: on_camera_lip_sync`, a visible speaker, unobstructed mouth, exact quoted line, listener mouth closed, and narration/voiceover prohibitions in the negative field.
+10. **Voice locks:** every timeline clip records the expected saved voice sample and a successful Voice Changer replacement.
+11. **No-subtitle structure:** subtitle and caption generation steps are absent, and every video job records the dedicated negative prompt used.
 
 Never repeat a validation that already passed unless a later action could have changed it.
 
@@ -261,18 +281,14 @@ After every deliverable clip is complete:
 10. Click **Auto Align Clips** after all clips are present.
 11. Apply the correct saved canonical voice to every clip using **Voice Changer** and record the replacement result.
 12. Click **Auto Align Clips** a second time after all voice replacements.
-13. Open **Automatic Captions** and generate captions from the final voice-replaced timeline audio.
-14. Apply one uniform caption style to the whole timeline: large readable white text, dark outline or shadow, lower safe area, sentence case, accurate punctuation, and no more than two lines at once.
-15. Verify every dialogue clip has caption coverage and that captions match the prompt-book dialogue. Correct recognition errors before export.
-16. Record timeline order, both Auto Align passes, voice replacement coverage, caption route, caption style, and caption coverage count.
-
-If **Automatic Captions** is unavailable, export the voice-locked aligned video, use the VideoExpress integration to import it into **VidSubtitle**, generate and correct captions there, and treat the captioned result as the final deliverable. Record the fallback route and both export records in `WORKFLOW_STATE.json`.
+13. Do not open Automatic Captions, VidSubtitle, Titles, or Text tools.
+14. Record timeline order, both Auto Align passes, and voice replacement coverage.
 
 ## SAVE AND EXPORT
 
 1. Save the project using the prompt-book project title.
 2. Verify persistence using the page title or saved project record.
-3. Confirm canonical voice replacement and caption coverage are complete for every clip. Do not export an uncaptioned final movie.
+3. Confirm canonical voice replacement is complete for every clip and no subtitle, caption, title, or text layer exists on the timeline.
 4. Click **Export Video**.
 5. Default export settings unless the user specifies otherwise:
    - Quality: High
@@ -281,7 +297,7 @@ If **Automatic Captions** is unavailable, export the voice-locked aligned video,
 6. Use the project title as the export filename.
 7. Submit the export.
 8. Monitor the background queue without submitting a duplicate.
-9. The run is complete only when the captioned exported movie appears in **My Videos** or an equivalent completed export record is visible.
+9. The run is complete only when the subtitle-free exported movie appears in **My Videos** or an equivalent completed export record is visible.
 
 ## WORKFLOW-STATE STATUS VALUES
 
@@ -307,9 +323,11 @@ When complete, report only the essential outcome:
 - project and export name;
 - number of dialogue clips;
 - character-reference IDs and child-body lock status;
+- character scale-lock and environment-lock status;
+- on-camera lip-sync coverage and narration-prohibition status;
 - canonical voice sample IDs and Voice Changer coverage;
 - timeline order and both Auto Align passes;
-- subtitle route and caption coverage;
+- subtitle/text-layer absence;
 - export format and completion signal;
 - locations of `prompt_book.json` and `WORKFLOW_STATE.json`;
 - any material error that could affect privacy, content, or delivery.

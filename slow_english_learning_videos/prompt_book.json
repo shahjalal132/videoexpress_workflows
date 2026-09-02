@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1.0",
+  "schema_version": "1.2.0",
   "is_example": true,
   "book_type": "videoexpress_slow_english_prompt_book",
   "project": {
@@ -43,6 +43,11 @@
     "body_lock_required_in_every_shot": true,
     "voice_sample_required_per_character": true,
     "voice_changer_required_per_timeline_clip": true,
+    "dialogue_delivery_mode": "on_camera_lip_sync",
+    "narration_allowed": false,
+    "subtitles_enabled": false,
+    "environment_lock_required_in_every_shot": true,
+    "scale_lock_required_in_every_shot": true,
     "maximum_active_video_jobs": 5,
     "dialogue_format": "Quotation marks appear only around the exact sentence to be spoken. Voice and emotion instructions are unquoted.",
     "acceptance_policy": "Accept the first successfully completed take unless VideoExpress reports an explicit failure.",
@@ -59,6 +64,8 @@
       "age": 12,
       "role": "Careful younger brother",
       "body_lock": "Exactly 12-year-old boy; short child height; narrow child shoulders; slim preteen torso; youthful face; child-sized hands, arms, and legs; no adult musculature; no facial hair; no tall adult proportions",
+      "scale_lock_id": "SCALE_ALEX_01",
+      "scale_lock": "SCALE_ALEX_01: exactly 12-year-old boy, 150 cm tall, seven-head child proportion, slim preteen body, narrow shoulders, child-sized hands and limbs; Alex is exactly 94 percent of Bob's standing height",
       "appearance_lock": "Warm medium skin, oval youthful face, large brown eyes, short slightly wavy black hair",
       "wardrobe_lock": "Cobalt-blue cycling jersey, navy shorts, dark gloves, gray shoes, plain matte navy-blue helmet",
       "bicycle_lock": "Youth-size matte cobalt-blue bicycle with straight silver handlebar and no branding",
@@ -66,6 +73,10 @@
       "voice_sample_asset_id": "example-my-ai-audio-alex-01",
       "voice_lock": "12-year-old boy; soft warm youthful male voice; mid-high pitch; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
       "reference_asset_id": "example-alex-full-body-reference-id",
+      "reference_assets": {
+        "front_full_body": "example-alex-front-full-body-reference-id",
+        "three_quarter_full_body": "example-alex-three-quarter-full-body-reference-id"
+      },
       "portrait_prompt": "Approved full-body identity reference for Alex, Actor 1. Exactly 12-year-old boy; short child height; narrow child shoulders; slim preteen torso; youthful oval face; large brown eyes; child-sized hands, arms, and legs; no adult musculature; no facial hair; no tall adult proportions. Warm medium skin and short slightly wavy black hair. Head-to-toe standing neutral pose in full locked cobalt-blue cycling outfit, navy shorts, gray shoes, dark gloves, and plain matte navy-blue helmet. Premium stylized 3D animation, soft neutral studio light, pale gray background, wide 16:9, no text, logo, or watermark."
     },
     "bob": {
@@ -74,6 +85,8 @@
       "age": 14,
       "role": "Energetic older brother",
       "body_lock": "Exactly 14-year-old boy; young-teen child height; narrow youthful shoulders; slim young-teen torso; youthful face; child-sized hands, arms, and legs; no adult musculature; no facial hair; no tall adult proportions",
+      "scale_lock_id": "SCALE_BOB_01",
+      "scale_lock": "SCALE_BOB_01: exactly 14-year-old boy, 160 cm tall, seven-and-a-half-head young-teen proportion, lean young-teen body, narrow youthful shoulders, child-sized hands and limbs; Bob is exactly 106.7 percent of Alex's standing height",
       "appearance_lock": "Warm medium skin, slightly angular youthful face, dark brown eyes, short tousled black hair",
       "wardrobe_lock": "Bright red cycling jersey, charcoal shorts, dark gloves, dark gray shoes, plain matte dark-red helmet",
       "bicycle_lock": "Youth-size matte deep-red bicycle with straight silver handlebar and no branding",
@@ -81,11 +94,23 @@
       "voice_sample_asset_id": "example-my-ai-audio-bob-01",
       "voice_lock": "14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
       "reference_asset_id": "example-bob-full-body-reference-id",
+      "reference_assets": {
+        "front_full_body": "example-bob-front-full-body-reference-id",
+        "three_quarter_full_body": "example-bob-three-quarter-full-body-reference-id"
+      },
       "portrait_prompt": "Approved full-body identity reference for Bob, Actor 2. Exactly 14-year-old boy; young-teen child height; narrow youthful shoulders; slim young-teen torso; youthful slightly angular face; dark brown eyes; child-sized hands, arms, and legs; no adult musculature; no facial hair; no tall adult proportions. Warm medium skin and short tousled black hair. Head-to-toe standing neutral pose in full locked bright-red cycling outfit, charcoal shorts, dark gray shoes, dark gloves, and plain matte dark-red helmet. Premium stylized 3D animation, soft neutral studio light, pale gray background, wide 16:9, no text, logo, or watermark."
     }
   },
+  "scale_lineup": {
+    "asset_id": "example-alex-bob-scale-lineup-id",
+    "prompt": "Neutral full-body scale lineup on one flat ground plane with a normal 50 mm-equivalent perspective. Alex is exactly 150 cm tall and exactly 94 percent of Bob's standing height. Bob is exactly 160 cm tall. Both face forward with child proportions, identical camera distance, feet on the same baseline, and no forced perspective."
+  },
   "locations": {
     "park_path": {
+      "environment_lock_id": "ENV_PARK_01",
+      "environment_reference_asset_id": "example-park-environment-reference-id",
+      "environment_lock": "ENV_PARK_01: peaceful neighborhood park, late afternoon, clear pale-blue sky, dry weather, warm diffuse sunlight from camera-left, soft short shadows, completely dry asphalt path, green grass, fixed large oak tree, low flower bed, and wooden bench; no weather, lighting, shadow, ground, or landmark change",
+      "environment_negative_prompt": "rain, drizzle, storm, dark clouds, wet pavement, puddles, umbrella, night, changing light direction, hard long shadows, missing oak tree, missing flower bed, missing wooden bench",
       "description": "Peaceful neighborhood park with a broad dry asphalt cycling path, green grass, mature trees, flowers, wooden benches, and no traffic or crowds",
       "time_of_day": "Late afternoon",
       "weather": "Clear and dry with a light breeze"
@@ -103,6 +128,7 @@
       "shot_number": 1,
       "duration_seconds": 8,
       "location_id": "park_path",
+      "environment_lock_id": "ENV_PARK_01",
       "cast": ["Actor 1", "Actor 2"],
       "story_function": "Introduce the brothers and the gentle safety theme.",
       "emotion": {
@@ -115,22 +141,27 @@
       "dialogue": {
         "speaker_actor_id": "Actor 1",
         "speaker": "Alex",
+        "delivery_mode": "on_camera_lip_sync",
         "voice_lock_id": "VOICE_ALEX_01",
         "start_second": 0.5,
         "end_second": 8.0,
         "line": "What a beautiful day, Bob. Let us ride slowly and enjoy the park.",
         "voice_instruction": "12-year-old boy; soft warm youthful male voice; mid-high pitch; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
-        "emotional_delivery": "Soft, cheerful, and welcoming; pause gently after Bob."
+        "emotional_delivery": "Soft, cheerful, and welcoming; pause gently after Bob.",
+        "lip_sync_instruction": "Alex remains visible front or three-quarter with his complete mouth unobstructed and naturally articulates every word in exact sync; Bob's mouth remains closed and still."
       },
-      "text_to_image_prompt": "Premium stylized 3D animated film still. Alex is exactly a 12-year-old boy with short child height, narrow child shoulders, slim preteen torso, youthful face, and child-sized limbs in his locked blue outfit and helmet. Bob is exactly a 14-year-old boy with young-teen child height, narrow youthful shoulders, slim young-teen torso, youthful face, and child-sized limbs in his locked red outfit and helmet. Both stand with youth-size bicycles on the park path, relaxed brows, bright eyes, and small smiles. Stable full-body two-shot, wide 16:9, no generated text, captions, subtitles, logo, or watermark.",
-      "video_audio_prompt": "Hold a stable full-body two-shot as both boys prepare their bicycles. Alex smiles softly and speaks while Bob listens with his mouth closed. Keep relaxed brows, bright eyes, relaxed child shoulders, and gentle movements. Dialogue: Alex says, \"What a beautiful day, Bob. Let us ride slowly and enjoy the park.\" Voice: 12-year-old boy; soft warm youthful male voice; mid-high pitch; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone. Emotion: soft, cheerful, and welcoming; pause gently after Bob. Preserve both saved identity references, exact ages, youthful child proportions, wardrobe, helmets, bicycles, and lighting. No extra speech or generated text.",
-      "negative_constraints": "adult body, adult proportions, broad shoulders, muscular torso, tall adult height, mature face, facial hair, Bob speaking, both mouths moving, traffic, crowd, generated subtitles"
+      "text_to_image_prompt": "Premium stylized 3D animated film still. SCALE_ALEX_01: exactly 12-year-old boy, 150 cm tall, seven-head child proportion, slim preteen body, narrow shoulders, child-sized hands and limbs; Alex is exactly 94 percent of Bob's standing height. SCALE_BOB_01: exactly 14-year-old boy, 160 cm tall, seven-and-a-half-head young-teen proportion, lean young-teen body, narrow youthful shoulders, child-sized hands and limbs; Bob is exactly 106.7 percent of Alex's standing height. ENV_PARK_01: peaceful neighborhood park, late afternoon, clear pale-blue sky, dry weather, warm diffuse sunlight from camera-left, soft short shadows, completely dry asphalt path, green grass, fixed large oak tree, low flower bed, and wooden bench; no weather, lighting, shadow, ground, or landmark change. Both boys stand on the same ground plane with youth-size bicycles. Stable full-body two-shot, normal 50 mm-equivalent perspective.",
+      "image_negative_prompt": "adult body, adult proportions, size drift, height change, giant child, tiny child, forced perspective, foreground enlargement, rain, wet pavement, umbrella, changing light, generated text, subtitles, captions, logo, watermark",
+      "video_audio_prompt": "Hold a stable full-body two-shot with a normal 50 mm-equivalent perspective. SCALE_ALEX_01: exactly 12-year-old boy, 150 cm tall, seven-head child proportion, slim preteen body, narrow shoulders, child-sized hands and limbs; Alex is exactly 94 percent of Bob's standing height. SCALE_BOB_01: exactly 14-year-old boy, 160 cm tall, seven-and-a-half-head young-teen proportion, lean young-teen body, narrow youthful shoulders, child-sized hands and limbs; Bob is exactly 106.7 percent of Alex's standing height. ENV_PARK_01: peaceful neighborhood park, late afternoon, clear pale-blue sky, dry weather, warm diffuse sunlight from camera-left, soft short shadows, completely dry asphalt path, green grass, fixed large oak tree, low flower bed, and wooden bench; no weather, lighting, shadow, ground, or landmark change. Delivery mode: on-camera lip sync. Alex remains visible front or three-quarter with his complete mouth unobstructed and naturally articulates every word in exact sync; Bob's mouth remains closed and still. Dialogue: Alex says, \"What a beautiful day, Bob. Let us ride slowly and enjoy the park.\" Voice: 12-year-old boy; soft warm youthful male voice; mid-high pitch; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone. Emotion: soft, cheerful, and welcoming; pause gently after Bob.",
+      "video_negative_prompt": "narration, voiceover, off-screen speech, disembodied voice, speaker off camera, closed speaker mouth, frozen mouth, mismatched lip movement, Bob lip movement, both mouths moving, subtitles, captions, closed captions, burned-in text, dialogue text, speech bubbles, lower thirds, title cards, words, letters, adult body, size drift, height change, giant child, tiny child, forced perspective, fisheye, rain, wet pavement, umbrella, changing weather, changing light, hard long shadows",
+      "negative_constraints": "adult body, adult proportions, broad shoulders, muscular torso, tall adult height, mature face, facial hair, traffic, crowd"
     },
     {
       "shot_id": "S02",
       "shot_number": 2,
       "duration_seconds": 8,
       "location_id": "park_path",
+      "environment_lock_id": "ENV_PARK_01",
       "cast": ["Actor 1", "Actor 2"],
       "story_function": "Bob suggests a playful race.",
       "emotion": {
@@ -143,22 +174,27 @@
       "dialogue": {
         "speaker_actor_id": "Actor 2",
         "speaker": "Bob",
+        "delivery_mode": "on_camera_lip_sync",
         "voice_lock_id": "VOICE_BOB_01",
         "start_second": 0.5,
         "end_second": 8.0,
         "line": "The big tree is ahead, Alex. Let us race there and have fun.",
         "voice_instruction": "14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
-        "emotional_delivery": "Soft, playful excitement; never shout or rush."
+        "emotional_delivery": "Soft, playful excitement; never shout or rush.",
+        "lip_sync_instruction": "Bob remains visible front or three-quarter with his complete mouth unobstructed and naturally articulates every word in exact sync; Alex's mouth remains closed and still."
       },
-      "text_to_image_prompt": "Premium stylized 3D animated film still. Bob is exactly a 14-year-old boy with young-teen child height, narrow youthful shoulders, slim young-teen torso, youthful face, and child-sized limbs in his locked red outfit and helmet, pointing toward the oak tree with raised brows and an eager childlike grin. Alex is exactly 12 with short child height and slim preteen proportions in his locked blue outfit. Stable full-body two-shot with youth-size bicycles, wide 16:9, no generated text, captions, subtitles, logo, or watermark.",
-      "video_audio_prompt": "Bob points toward the tree, leans forward slightly, raises his brows, and smiles with playful excitement. Alex listens with his mouth closed. Dialogue: Bob says, \"The big tree is ahead, Alex. Let us race there and have fun.\" Voice: 14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone. Emotion: soft, friendly excitement without shouting or rushing. Preserve saved identity references, exact ages, child proportions, wardrobe, and bicycles. No extra speech or generated text.",
-      "negative_constraints": "adult body, adult proportions, broad shoulders, muscular torso, tall adult height, mature face, facial hair, Alex speaking, angry challenge, yelling, generated subtitles"
+      "text_to_image_prompt": "Premium stylized 3D animated film still. SCALE_ALEX_01: exactly 12-year-old boy, 150 cm tall, seven-head child proportion, slim preteen body, narrow shoulders, child-sized hands and limbs; Alex is exactly 94 percent of Bob's standing height. SCALE_BOB_01: exactly 14-year-old boy, 160 cm tall, seven-and-a-half-head young-teen proportion, lean young-teen body, narrow youthful shoulders, child-sized hands and limbs; Bob is exactly 106.7 percent of Alex's standing height. ENV_PARK_01: peaceful neighborhood park, late afternoon, clear pale-blue sky, dry weather, warm diffuse sunlight from camera-left, soft short shadows, completely dry asphalt path, green grass, fixed large oak tree, low flower bed, and wooden bench; no weather, lighting, shadow, ground, or landmark change. Bob points toward the oak tree while Alex listens. Both remain on the same ground plane with youth-size bicycles. Stable full-body two-shot, normal 50 mm-equivalent perspective.",
+      "image_negative_prompt": "adult body, adult proportions, size drift, height change, giant child, tiny child, forced perspective, foreground enlargement, rain, wet pavement, umbrella, changing light, generated text, subtitles, captions, logo, watermark",
+      "video_audio_prompt": "Bob points toward the tree and smiles with playful excitement in a stable normal 50 mm-equivalent two-shot. SCALE_ALEX_01: exactly 12-year-old boy, 150 cm tall, seven-head child proportion, slim preteen body, narrow shoulders, child-sized hands and limbs; Alex is exactly 94 percent of Bob's standing height. SCALE_BOB_01: exactly 14-year-old boy, 160 cm tall, seven-and-a-half-head young-teen proportion, lean young-teen body, narrow youthful shoulders, child-sized hands and limbs; Bob is exactly 106.7 percent of Alex's standing height. ENV_PARK_01: peaceful neighborhood park, late afternoon, clear pale-blue sky, dry weather, warm diffuse sunlight from camera-left, soft short shadows, completely dry asphalt path, green grass, fixed large oak tree, low flower bed, and wooden bench; no weather, lighting, shadow, ground, or landmark change. Delivery mode: on-camera lip sync. Bob remains visible front or three-quarter with his complete mouth unobstructed and naturally articulates every word in exact sync; Alex's mouth remains closed and still. Dialogue: Bob says, \"The big tree is ahead, Alex. Let us race there and have fun.\" Voice: 14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone. Emotion: soft, friendly excitement without shouting or rushing.",
+      "video_negative_prompt": "narration, voiceover, off-screen speech, disembodied voice, speaker off camera, closed speaker mouth, frozen mouth, mismatched lip movement, Alex lip movement, both mouths moving, subtitles, captions, closed captions, burned-in text, dialogue text, speech bubbles, lower thirds, title cards, words, letters, adult body, size drift, height change, giant child, tiny child, forced perspective, fisheye, rain, wet pavement, umbrella, changing weather, changing light, hard long shadows",
+      "negative_constraints": "adult body, adult proportions, broad shoulders, muscular torso, tall adult height, mature face, facial hair, angry challenge, yelling"
     },
     {
       "shot_id": "S03",
       "shot_number": 3,
       "duration_seconds": 8,
       "location_id": "park_path",
+      "environment_lock_id": "ENV_PARK_01",
       "cast": ["Actor 1", "Actor 2"],
       "story_function": "Alex chooses a controlled speed while Bob rides ahead.",
       "emotion": {
@@ -171,22 +207,27 @@
       "dialogue": {
         "speaker_actor_id": "Actor 1",
         "speaker": "Alex",
+        "delivery_mode": "on_camera_lip_sync",
         "voice_lock_id": "VOICE_ALEX_01",
         "start_second": 0.5,
         "end_second": 8.0,
         "line": "I will not hurry. I will ride slowly and watch the path.",
         "voice_instruction": "12-year-old boy; soft warm youthful male voice; mid-high pitch; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
-        "emotional_delivery": "Soft, thoughtful, and calm; pause after hurry."
+        "emotional_delivery": "Soft, thoughtful, and calm; pause after hurry.",
+        "lip_sync_instruction": "Alex remains visible in a stable three-quarter profile with his complete mouth unobstructed and naturally articulates every word in exact sync; Bob's mouth remains closed and still."
       },
-      "text_to_image_prompt": "Premium stylized 3D animated film still. Alex is exactly a 12-year-old boy with short child height, narrow child shoulders, slim preteen torso, youthful face, and child-sized limbs, riding his youth-size locked blue bicycle slowly with focused eyes, upright child posture, and relaxed shoulders. Bob, exactly 14 with youthful child proportions, rides slightly ahead. Side-tracking full-body composition, wide 16:9, no generated text, captions, subtitles, logo, or watermark.",
-      "video_audio_prompt": "Track gently beside Alex as he pedals steadily with relaxed child shoulders and scans the path. Bob rides slightly ahead and keeps his mouth closed. Dialogue: Alex says, \"I will not hurry. I will ride slowly and watch the path.\" Voice: 12-year-old boy; soft warm youthful male voice; mid-high pitch; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone. Emotion: soft, thoughtful, and calm; pause after hurry. Preserve saved identities, exact ages, child proportions, wardrobe, bicycles, and direction of travel. No extra speech or generated text.",
-      "negative_constraints": "adult body, adult proportions, broad shoulders, muscular torso, tall adult height, mature face, facial hair, Bob speaking, Alex accelerating, camera shake, generated subtitles"
+      "text_to_image_prompt": "Premium stylized 3D animated film still. SCALE_ALEX_01: exactly 12-year-old boy, 150 cm tall, seven-head child proportion, slim preteen body, narrow shoulders, child-sized hands and limbs; Alex is exactly 94 percent of Bob's standing height. SCALE_BOB_01: exactly 14-year-old boy, 160 cm tall, seven-and-a-half-head young-teen proportion, lean young-teen body, narrow youthful shoulders, child-sized hands and limbs; Bob is exactly 106.7 percent of Alex's standing height. ENV_PARK_01: peaceful neighborhood park, late afternoon, clear pale-blue sky, dry weather, warm diffuse sunlight from camera-left, soft short shadows, completely dry asphalt path, green grass, fixed large oak tree, low flower bed, and wooden bench; no weather, lighting, shadow, ground, or landmark change. Alex rides slowly while Bob remains slightly ahead. Stable side-view full-body composition, normal 50 mm-equivalent perspective.",
+      "image_negative_prompt": "adult body, adult proportions, size drift, height change, giant child, tiny child, forced perspective, foreground enlargement, rain, wet pavement, umbrella, changing light, generated text, subtitles, captions, logo, watermark",
+      "video_audio_prompt": "Track gently beside Alex with a normal 50 mm-equivalent perspective as he pedals steadily. SCALE_ALEX_01: exactly 12-year-old boy, 150 cm tall, seven-head child proportion, slim preteen body, narrow shoulders, child-sized hands and limbs; Alex is exactly 94 percent of Bob's standing height. SCALE_BOB_01: exactly 14-year-old boy, 160 cm tall, seven-and-a-half-head young-teen proportion, lean young-teen body, narrow youthful shoulders, child-sized hands and limbs; Bob is exactly 106.7 percent of Alex's standing height. ENV_PARK_01: peaceful neighborhood park, late afternoon, clear pale-blue sky, dry weather, warm diffuse sunlight from camera-left, soft short shadows, completely dry asphalt path, green grass, fixed large oak tree, low flower bed, and wooden bench; no weather, lighting, shadow, ground, or landmark change. Delivery mode: on-camera lip sync. Alex remains visible in a stable three-quarter profile with his complete mouth unobstructed and naturally articulates every word in exact sync; Bob's mouth remains closed and still. Dialogue: Alex says, \"I will not hurry. I will ride slowly and watch the path.\" Voice: 12-year-old boy; soft warm youthful male voice; mid-high pitch; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone. Emotion: soft, thoughtful, and calm; pause after hurry.",
+      "video_negative_prompt": "narration, voiceover, off-screen speech, disembodied voice, speaker off camera, closed speaker mouth, frozen mouth, mismatched lip movement, Bob lip movement, both mouths moving, subtitles, captions, closed captions, burned-in text, dialogue text, speech bubbles, lower thirds, title cards, words, letters, adult body, size drift, height change, giant child, tiny child, forced perspective, fisheye, rain, wet pavement, umbrella, changing weather, changing light, hard long shadows",
+      "negative_constraints": "adult body, adult proportions, broad shoulders, muscular torso, tall adult height, mature face, facial hair, Alex accelerating, camera shake"
     },
     {
       "shot_id": "S04",
       "shot_number": 4,
       "duration_seconds": 8,
       "location_id": "park_path",
+      "environment_lock_id": "ENV_PARK_01",
       "cast": ["Actor 2"],
       "story_function": "Bob sees the branch too late and has a mild non-graphic fall.",
       "emotion": {
@@ -199,22 +240,27 @@
       "dialogue": {
         "speaker_actor_id": "Actor 2",
         "speaker": "Bob",
+        "delivery_mode": "on_camera_lip_sync",
         "voice_lock_id": "VOICE_BOB_01",
         "start_second": 0.5,
         "end_second": 7.5,
         "line": "Oh no, there is a branch! I cannot stop in time.",
         "voice_instruction": "14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
-        "emotional_delivery": "Frightened and urgent but still soft; no screaming."
+        "emotional_delivery": "Frightened and urgent but still soft; no screaming.",
+        "lip_sync_instruction": "Bob remains visible in a stable three-quarter view with his complete mouth unobstructed and naturally articulates every word in exact sync before the mild off-camera fall."
       },
-      "text_to_image_prompt": "Premium stylized 3D animated film still. Bob is exactly a 14-year-old boy with young-teen child height, narrow youthful shoulders, slim young-teen torso, youthful face, and child-sized limbs in his locked red outfit and helmet, approaching the small branch on his youth-size red bicycle. His eyes are wide, brows raised, mouth slightly open, and child shoulders tense as both hands reach for the brakes. Safe family scene before a mild fall, wide 16:9, no generated text, captions, subtitles, blood, injury detail, logo, or watermark.",
-      "video_audio_prompt": "Bob rides toward the small branch. His expression changes from confident to frightened: eyes widen, brows rise sharply, mouth opens in a small gasp, child shoulders tense, and both hands squeeze the brakes. Dialogue: Bob says, \"Oh no, there is a branch! I cannot stop in time.\" Voice: 14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone. Emotion: frightened and urgent but still soft; no screaming. End with a mild stumble and imply the fall off camera. Preserve saved identity, exact age, youthful child proportions, outfit, bicycle, and branch. No extra speech or generated text.",
-      "negative_constraints": "adult body, adult proportions, broad shoulders, muscular torso, tall adult height, mature face, facial hair, graphic crash, blood, gore, broken bone, screaming, generated subtitles"
+      "text_to_image_prompt": "Premium stylized 3D animated film still. SCALE_BOB_01: exactly 14-year-old boy, 160 cm tall, seven-and-a-half-head young-teen proportion, lean young-teen body, narrow youthful shoulders, child-sized hands and limbs; Bob is exactly 106.7 percent of Alex's standing height. ENV_PARK_01: peaceful neighborhood park, late afternoon, clear pale-blue sky, dry weather, warm diffuse sunlight from camera-left, soft short shadows, completely dry asphalt path, green grass, fixed large oak tree, low flower bed, and wooden bench; no weather, lighting, shadow, ground, or landmark change. Bob approaches the branch on his youth-size red bicycle with wide eyes, raised brows, and tense child shoulders. Stable three-quarter full-body composition, normal 50 mm-equivalent perspective.",
+      "image_negative_prompt": "adult body, adult proportions, size drift, height change, giant child, tiny child, forced perspective, foreground enlargement, rain, wet pavement, umbrella, changing light, generated text, subtitles, captions, blood, injury detail, logo, watermark",
+      "video_audio_prompt": "Bob rides toward the branch in a stable normal 50 mm-equivalent three-quarter view. SCALE_BOB_01: exactly 14-year-old boy, 160 cm tall, seven-and-a-half-head young-teen proportion, lean young-teen body, narrow youthful shoulders, child-sized hands and limbs; Bob is exactly 106.7 percent of Alex's standing height. ENV_PARK_01: peaceful neighborhood park, late afternoon, clear pale-blue sky, dry weather, warm diffuse sunlight from camera-left, soft short shadows, completely dry asphalt path, green grass, fixed large oak tree, low flower bed, and wooden bench; no weather, lighting, shadow, ground, or landmark change. His eyes widen, brows rise, child shoulders tense, and both hands squeeze the brakes. Delivery mode: on-camera lip sync. Bob remains visible with his complete mouth unobstructed and naturally articulates every word in exact sync before the mild off-camera fall. Dialogue: Bob says, \"Oh no, there is a branch! I cannot stop in time.\" Voice: 14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone. Emotion: frightened and urgent but still soft; no screaming. End with a mild stumble and imply the fall off camera.",
+      "video_negative_prompt": "narration, voiceover, off-screen speech, disembodied voice, speaker off camera, closed speaker mouth, frozen mouth, mismatched lip movement, subtitles, captions, closed captions, burned-in text, dialogue text, speech bubbles, lower thirds, title cards, words, letters, adult body, size drift, height change, giant child, tiny child, forced perspective, fisheye, rain, wet pavement, umbrella, changing weather, changing light, hard long shadows, graphic crash, blood, gore, broken bone",
+      "negative_constraints": "adult body, adult proportions, broad shoulders, muscular torso, tall adult height, mature face, facial hair, graphic crash, blood, gore, broken bone, screaming"
     },
     {
       "shot_id": "S05",
       "shot_number": 5,
       "duration_seconds": 8,
       "location_id": "park_path",
+      "environment_lock_id": "ENV_PARK_01",
       "cast": ["Actor 1", "Actor 2"],
       "story_function": "Alex comforts Bob, who softly states the lesson.",
       "emotion": {
@@ -227,20 +273,24 @@
       "dialogue": {
         "speaker_actor_id": "Actor 2",
         "speaker": "Bob",
+        "delivery_mode": "on_camera_lip_sync",
         "voice_lock_id": "VOICE_BOB_01",
         "start_second": 0.5,
         "end_second": 8.0,
         "line": "My elbow hurts, Alex. I understand now. We must ride safely.",
         "voice_instruction": "14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
-        "emotional_delivery": "Begin with a soft tearful tremble, then sound relieved and sincere; no loud crying."
+        "emotional_delivery": "Begin with a soft tearful tremble, then sound relieved and sincere; no loud crying.",
+        "lip_sync_instruction": "Bob remains visible front or three-quarter with his complete mouth unobstructed and naturally articulates every word in exact sync; Alex's mouth remains closed and still."
       },
-      "text_to_image_prompt": "Premium stylized 3D animated family film still. Bob is exactly a 14-year-old boy with youthful young-teen proportions in his locked red outfit and helmet, sitting safely on grass beside the path and gently holding one elbow. He has watery eyes, one soft tear, pinched brows, and a small wince. Alex is exactly a 12-year-old boy with slim preteen child proportions in his locked blue outfit and helmet, kneeling nearby with concerned eyes and an offered hand. Both youth-size bicycles rest safely nearby. Wide 16:9, no generated text, captions, subtitles, blood, visible wound, logo, or watermark.",
-      "video_audio_prompt": "Hold a gentle full-body two-shot. Bob sits safely on the grass holding one elbow, with watery eyes, one soft tear, pinched brows, a small wince, and quiet childlike crying. Alex kneels nearby with concerned eyes and offers his hand, keeping his mouth closed. Bob breathes, looks at Alex, and becomes relieved. Dialogue: Bob says, \"My elbow hurts, Alex. I understand now. We must ride safely.\" Voice: 14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone. Emotion: begin with a soft tearful tremble, then sound relieved and sincere; no loud crying. Preserve both saved identities, exact ages, youthful child proportions, outfits, helmets, and bicycles. No extra speech or generated text.",
-      "negative_constraints": "adult body, adult proportions, broad shoulders, muscular torso, tall adult height, mature face, facial hair, Alex speaking, loud sobbing, screaming, blood, visible wound, gore, generated subtitles"
+      "text_to_image_prompt": "Premium stylized 3D animated family film still. SCALE_ALEX_01: exactly 12-year-old boy, 150 cm tall, seven-head child proportion, slim preteen body, narrow shoulders, child-sized hands and limbs; Alex is exactly 94 percent of Bob's standing height. SCALE_BOB_01: exactly 14-year-old boy, 160 cm tall, seven-and-a-half-head young-teen proportion, lean young-teen body, narrow youthful shoulders, child-sized hands and limbs; Bob is exactly 106.7 percent of Alex's standing height. ENV_PARK_01: peaceful neighborhood park, late afternoon, clear pale-blue sky, dry weather, warm diffuse sunlight from camera-left, soft short shadows, completely dry asphalt path, green grass, fixed large oak tree, low flower bed, and wooden bench; no weather, lighting, shadow, ground, or landmark change. Bob sits safely on the grass holding one elbow while Alex kneels nearby and offers a hand. Stable full-body two-shot, same ground plane, normal 50 mm-equivalent perspective.",
+      "image_negative_prompt": "adult body, adult proportions, size drift, height change, giant child, tiny child, forced perspective, foreground enlargement, rain, wet pavement, umbrella, changing light, generated text, subtitles, captions, blood, visible wound, logo, watermark",
+      "video_audio_prompt": "Hold a stable normal 50 mm-equivalent full-body two-shot. SCALE_ALEX_01: exactly 12-year-old boy, 150 cm tall, seven-head child proportion, slim preteen body, narrow shoulders, child-sized hands and limbs; Alex is exactly 94 percent of Bob's standing height. SCALE_BOB_01: exactly 14-year-old boy, 160 cm tall, seven-and-a-half-head young-teen proportion, lean young-teen body, narrow youthful shoulders, child-sized hands and limbs; Bob is exactly 106.7 percent of Alex's standing height. ENV_PARK_01: peaceful neighborhood park, late afternoon, clear pale-blue sky, dry weather, warm diffuse sunlight from camera-left, soft short shadows, completely dry asphalt path, green grass, fixed large oak tree, low flower bed, and wooden bench; no weather, lighting, shadow, ground, or landmark change. Bob sits on grass holding one elbow with watery eyes, one soft tear, pinched brows, and a small wince. Alex kneels nearby and offers his hand. Delivery mode: on-camera lip sync. Bob remains visible front or three-quarter with his complete mouth unobstructed and naturally articulates every word in exact sync; Alex's mouth remains closed and still. Dialogue: Bob says, \"My elbow hurts, Alex. I understand now. We must ride safely.\" Voice: 14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone. Emotion: begin with a soft tearful tremble, then sound relieved and sincere; no loud crying.",
+      "video_negative_prompt": "narration, voiceover, off-screen speech, disembodied voice, speaker off camera, closed speaker mouth, frozen mouth, mismatched lip movement, Alex lip movement, both mouths moving, subtitles, captions, closed captions, burned-in text, dialogue text, speech bubbles, lower thirds, title cards, words, letters, adult body, size drift, height change, giant child, tiny child, forced perspective, fisheye, rain, wet pavement, umbrella, changing weather, changing light, hard long shadows, loud sobbing, screaming, blood, visible wound, gore",
+      "negative_constraints": "adult body, adult proportions, broad shoulders, muscular torso, tall adult height, mature face, facial hair, loud sobbing, screaming, blood, visible wound, gore"
     }
   ],
   "voice_replacement_plan": {
-    "stage": "after_timeline_insertion_before_final_captioning",
+    "stage": "after_timeline_insertion_before_final_export",
     "method": "Right-click each timeline clip, select Voice Changer, choose the speaker's saved My AI Audio sample, and click Apply.",
     "mapping": {
       "S01": "VOICE_ALEX_01",
@@ -252,14 +302,13 @@
     "required_coverage": "5 of 5 clips"
   },
   "subtitle_policy": {
-    "required": true,
-    "primary_route": "VideoExpress Automatic Captions after all Voice Changer replacements",
-    "fallback_route": "Export voice-locked video, import through the VideoExpress VidSubtitle integration, generate and correct captions, then use that captioned output as final",
-    "burn_subtitles_during_ai_clip_generation": false,
-    "style": "Large readable white sentence-case text with dark outline or shadow, lower safe area, maximum two lines",
-    "content_source": "final voice-replaced timeline audio",
-    "coverage_requirement": "Every spoken clip and every dialogue line",
-    "verification": "Caption text and punctuation match each prompt-book dialogue line"
+    "enabled": false,
+    "automatic_captions_allowed": false,
+    "vidsubtitle_allowed": false,
+    "timeline_text_layers_allowed": false,
+    "positive_video_prompt_rule": "Do not mention subtitles, captions, or no text in the positive video prompt.",
+    "video_negative_prompt_terms": "subtitles, captions, closed captions, burned-in text, dialogue text, speech bubbles, lower thirds, title cards, words, letters",
+    "verification": "No subtitle, caption, title, or text-generation step and no text layer on the timeline."
   },
   "timeline_plan": {
     "track": 1,
@@ -268,7 +317,8 @@
     "first_auto_align_after_insertion": true,
     "voice_changer_after_first_alignment": true,
     "second_auto_align_after_voice_replacement": true,
-    "automatic_captions_after_final_alignment": true,
+    "automatic_captions_after_final_alignment": false,
+    "subtitle_and_text_tools_prohibited": true,
     "expected_duration_seconds": 40
   },
   "export_plan": {
@@ -276,7 +326,8 @@
     "quality": "High",
     "resolution": "FullHD 1080p",
     "format": "mp4",
-    "captions_required": true,
+    "captions_required": false,
+    "subtitle_free_export_required": true,
     "voice_replacement_coverage_required": "5 of 5 clips"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1.0",
+  "schema_version": "1.2.0",
   "is_example": true,
   "workflow": "videoexpress_slow_english_learning_video",
   "updated_at": "2026-09-02T12:00:00+06:00",
@@ -17,6 +17,9 @@
     "maximum_consistent_characters": 2,
     "reference_framing": "full-body or three-quarter full-length",
     "body_lock_required_in_every_shot": true,
+    "scale_lock_required_in_every_shot": true,
+    "normal_reference_lens_equivalent_mm": 50,
+    "relative_height_lock": "Alex is exactly 94 percent of Bob's standing height; Bob is exactly 106.7 percent of Alex's standing height",
     "body_negative_constraints": [
       "adult body",
       "adult proportions",
@@ -45,6 +48,9 @@
     "alex": {
       "status": "saved_to_my_ai_images",
       "asset_id": "example-alex-full-body-reference-id",
+      "front_full_body_asset_id": "example-alex-front-full-body-reference-id",
+      "three_quarter_full_body_asset_id": "example-alex-three-quarter-full-body-reference-id",
+      "scale_lock_id": "SCALE_ALEX_01",
       "framing": "full_body",
       "exact_age": 12,
       "child_body_lock_verified": true,
@@ -53,10 +59,28 @@
     "bob": {
       "status": "saved_to_my_ai_images",
       "asset_id": "example-bob-full-body-reference-id",
+      "front_full_body_asset_id": "example-bob-front-full-body-reference-id",
+      "three_quarter_full_body_asset_id": "example-bob-three-quarter-full-body-reference-id",
+      "scale_lock_id": "SCALE_BOB_01",
       "framing": "full_body",
       "exact_age": 14,
       "child_body_lock_verified": true,
       "public_gallery": false
+    },
+    "two_character_scale_lineup": {
+      "status": "saved_to_my_ai_images",
+      "asset_id": "example-alex-bob-scale-lineup-id",
+      "same_ground_plane": true,
+      "normal_lens_equivalent_mm": 50
+    }
+  },
+  "environment_locks": {
+    "ENV_PARK_01": {
+      "status": "locked",
+      "reference_asset_id": "example-park-environment-reference-id",
+      "exact_lock": "ENV_PARK_01: peaceful neighborhood park, late afternoon, clear pale-blue sky, dry weather, warm diffuse sunlight from camera-left, soft short shadows, completely dry asphalt path, green grass, fixed large oak tree, low flower bed, and wooden bench; no weather, lighting, shadow, ground, or landmark change",
+      "negative_prompt": "rain, drizzle, storm, dark clouds, wet pavement, puddles, umbrella, night, changing light direction, hard long shadows, missing oak tree, missing flower bed, missing wooden bench",
+      "shots": ["S01", "S02", "S03", "S04", "S05"]
     }
   },
   "voice_locks": {
@@ -87,6 +111,11 @@
       "speaker": "Alex",
       "dialogue": "What a beautiful day, Bob. Let us ride slowly and enjoy the park.",
       "emotion": "peaceful curiosity to warm happiness",
+      "delivery_mode": "on_camera_lip_sync",
+      "lip_sync_prompt_validated": true,
+      "narration_prohibited": true,
+      "environment_lock_id": "ENV_PARK_01",
+      "scale_lock_ids": ["SCALE_ALEX_01", "SCALE_BOB_01"],
       "voice_lock_id": "VOICE_ALEX_01",
       "reference_asset_ids": ["example-alex-full-body-reference-id", "example-bob-full-body-reference-id"],
       "image_job_id": "example-image-job-s01",
@@ -99,7 +128,7 @@
       "voice_changer_applied": false,
       "voice_sample_asset_id": "example-my-ai-audio-alex-01",
       "voice_changed_clip_id": null,
-      "caption_status": "pending",
+      "video_negative_prompt_recorded": true,
       "errors": []
     },
     {
@@ -108,6 +137,11 @@
       "speaker": "Bob",
       "dialogue": "The big tree is ahead, Alex. Let us race there and have fun.",
       "emotion": "playful excitement to confident eagerness",
+      "delivery_mode": "on_camera_lip_sync",
+      "lip_sync_prompt_validated": true,
+      "narration_prohibited": true,
+      "environment_lock_id": "ENV_PARK_01",
+      "scale_lock_ids": ["SCALE_ALEX_01", "SCALE_BOB_01"],
       "voice_lock_id": "VOICE_BOB_01",
       "reference_asset_ids": ["example-alex-full-body-reference-id", "example-bob-full-body-reference-id"],
       "image_job_id": "example-image-job-s02",
@@ -120,7 +154,7 @@
       "voice_changer_applied": false,
       "voice_sample_asset_id": "example-my-ai-audio-bob-01",
       "voice_changed_clip_id": null,
-      "caption_status": "pending",
+      "video_negative_prompt_recorded": true,
       "errors": []
     },
     {
@@ -129,6 +163,11 @@
       "speaker": "Alex",
       "dialogue": "I will not hurry. I will ride slowly and watch the path.",
       "emotion": "quiet focus to calm determination",
+      "delivery_mode": "on_camera_lip_sync",
+      "lip_sync_prompt_validated": true,
+      "narration_prohibited": true,
+      "environment_lock_id": "ENV_PARK_01",
+      "scale_lock_ids": ["SCALE_ALEX_01", "SCALE_BOB_01"],
       "voice_lock_id": "VOICE_ALEX_01",
       "reference_asset_ids": ["example-alex-full-body-reference-id", "example-bob-full-body-reference-id"],
       "image_job_id": "example-image-job-s03",
@@ -141,7 +180,7 @@
       "voice_changer_applied": false,
       "voice_sample_asset_id": "example-my-ai-audio-alex-01",
       "voice_changed_clip_id": null,
-      "caption_status": "pending",
+      "video_negative_prompt_recorded": true,
       "errors": []
     },
     {
@@ -150,6 +189,11 @@
       "speaker": "Bob",
       "dialogue": "Oh no, there is a branch! I cannot stop in time.",
       "emotion": "confident excitement to sudden fear and alarm",
+      "delivery_mode": "on_camera_lip_sync",
+      "lip_sync_prompt_validated": true,
+      "narration_prohibited": true,
+      "environment_lock_id": "ENV_PARK_01",
+      "scale_lock_ids": ["SCALE_BOB_01"],
       "voice_lock_id": "VOICE_BOB_01",
       "reference_asset_ids": ["example-bob-full-body-reference-id"],
       "image_job_id": "example-image-job-s04",
@@ -162,7 +206,7 @@
       "voice_changer_applied": false,
       "voice_sample_asset_id": "example-my-ai-audio-bob-01",
       "voice_changed_clip_id": null,
-      "caption_status": "pending",
+      "video_negative_prompt_recorded": true,
       "errors": []
     },
     {
@@ -171,6 +215,11 @@
       "speaker": "Bob",
       "dialogue": "My elbow hurts, Alex. I understand now. We must ride safely.",
       "emotion": "soft crying and embarrassment to relief and understanding",
+      "delivery_mode": "on_camera_lip_sync",
+      "lip_sync_prompt_validated": true,
+      "narration_prohibited": true,
+      "environment_lock_id": "ENV_PARK_01",
+      "scale_lock_ids": ["SCALE_ALEX_01", "SCALE_BOB_01"],
       "voice_lock_id": "VOICE_BOB_01",
       "reference_asset_ids": ["example-alex-full-body-reference-id", "example-bob-full-body-reference-id"],
       "image_job_id": "example-image-job-s05",
@@ -183,15 +232,17 @@
       "voice_changer_applied": false,
       "voice_sample_asset_id": "example-my-ai-audio-bob-01",
       "voice_changed_clip_id": null,
-      "caption_status": "pending",
+      "video_negative_prompt_recorded": true,
       "errors": []
     }
   ],
   "completed_steps": [
     "Validated the three intake answers",
-    "Created prompt_book.json with exact child-body, voice, emotion, dialogue, and caption policies",
+    "Created prompt_book.json with exact scale, voice, emotion, on-camera lip-sync, environment continuity, and no-subtitle policies",
     "Opened and retained settings and monitoring tabs",
     "Created and saved full-body Alex and Bob references",
+    "Created and saved front, three-quarter, and two-character scale-lineup references",
+    "Created and saved the environment reference and immutable environment lock",
     "Created and saved one canonical My AI Audio voice sample per character",
     "Submitted five shots without exceeding five active video jobs",
     "Verified S01-S03 completed by job ID"
@@ -202,10 +253,10 @@
     "Apply Auto Align Clips pass 1",
     "Apply the mapped saved voice sample to every clip with Voice Changer",
     "Apply Auto Align Clips pass 2 after voice replacement",
-    "Generate and correct Automatic Captions for every spoken clip",
+    "Verify no subtitle, caption, title, or text layer exists on the timeline",
     "Save the project",
-    "Export captioned High / FullHD / MP4",
-    "Verify the captioned movie appears in My Videos"
+    "Export subtitle-free High / FullHD / MP4",
+    "Verify the subtitle-free movie appears in My Videos"
   ],
   "timeline": {
     "status": "not_started",
@@ -215,17 +266,17 @@
     "auto_align_pass_1": false,
     "voice_replacement_expected_clips": 5,
     "voice_replacement_completed_clips": 0,
-    "auto_align_pass_2": false
+    "auto_align_pass_2": false,
+    "subtitle_caption_title_or_text_layers": 0
   },
   "subtitles": {
-    "required": true,
-    "status": "pending",
-    "primary_route": "videoexpress_automatic_captions",
-    "fallback_route": "videoexpress_to_vidsubtitle",
-    "style": "Large white sentence-case text, dark outline or shadow, lower safe area, maximum two lines",
-    "expected_captioned_clips": 5,
-    "actual_captioned_clips": 0,
-    "text_verified_against_prompt_book": false
+    "enabled": false,
+    "automatic_captions_allowed": false,
+    "vidsubtitle_allowed": false,
+    "timeline_text_layers_allowed": false,
+    "positive_prompt_contains_subtitle_terms": false,
+    "dedicated_video_negative_prompt_required": true,
+    "prohibited_output": "subtitles, captions, closed captions, burned-in dialogue, speech bubbles, lower thirds, title cards, words, letters"
   },
   "project_save": {
     "status": "pending",
@@ -237,7 +288,8 @@
     "quality": "High",
     "resolution": "FullHD 1080p",
     "format": "mp4",
-    "captions_required": true,
+    "captions_required": false,
+    "subtitle_free_export_required": true,
     "terminal_signal": null
   },
   "errors": [
@@ -248,5 +300,5 @@
       "resolved": true
     }
   ],
-  "resume_from": "Inspect S04 and S05 by saved video job IDs. When both finish, assemble S01-S05, run Auto Align pass 1, apply saved voices to all clips, run Auto Align pass 2, generate and verify captions, save, and export."
+  "resume_from": "Inspect S04 and S05 by saved video job IDs. When both finish, assemble S01-S05, run Auto Align pass 1, apply saved voices to all clips, run Auto Align pass 2, verify that no subtitle or text layer exists, save, and export."
 }
