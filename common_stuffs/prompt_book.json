@@ -1,0 +1,526 @@
+{
+  "schema_version": "1.0.0",
+  "book_type": "cinematic_t2i_i2v_prompt_book",
+  "project": {
+    "title": "Ride Slowly, Ride Safely",
+    "working_title": "Alex and Bob's Bicycle Race",
+    "logline": "When careful Alex refuses to match his older brother Bob's reckless speed, a minor accident teaches both siblings that safety matters more than winning.",
+    "purpose": "Slow English learning video for beginner English learners.",
+    "audience": "Beginner English learners, families, and children",
+    "language_level": "CEFR A2",
+    "language": "English",
+    "runtime_seconds": 75,
+    "aspect_ratio": "16:9",
+    "delivery_resolution": "1920x1080",
+    "delivery_fps": 24,
+    "genre": [
+      "family",
+      "educational",
+      "safety lesson"
+    ],
+    "content_rating": "Family-friendly; mild non-graphic bicycle fall"
+  },
+  "story": {
+    "idea": "Alex and Bob are siblings. They go cycling in a park. Alex is careful and rides slowly. Bob challenges Alex to a race and rides very fast while Alex continues at a safe pace. Bob fails to avoid a small fallen branch, loses control, and receives mild injuries. Alex stops and helps him. Bob realizes that riding safely is more important than winning.",
+    "theme": "Safety is more important than speed or pride.",
+    "moral": "Ride slowly, watch the path, and never let competition override safety.",
+    "story_beats": [
+      {
+        "beat": "setup",
+        "shots": [
+          "S01"
+        ],
+        "description": "The siblings begin a pleasant bicycle ride in the park."
+      },
+      {
+        "beat": "challenge",
+        "shots": [
+          "S02"
+        ],
+        "description": "Bob playfully challenges Alex to race to a large tree."
+      },
+      {
+        "beat": "contrast",
+        "shots": [
+          "S03",
+          "S04"
+        ],
+        "description": "Alex remains careful while Bob accelerates and pressures him."
+      },
+      {
+        "beat": "hazard",
+        "shots": [
+          "S05",
+          "S06"
+        ],
+        "description": "Alex notices a branch and slows; Bob notices too late and loses balance."
+      },
+      {
+        "beat": "care",
+        "shots": [
+          "S07",
+          "S08"
+        ],
+        "description": "Bob has a mild, non-graphic injury and Alex stops to help."
+      },
+      {
+        "beat": "realization",
+        "shots": [
+          "S09",
+          "S10"
+        ],
+        "description": "Bob admits his mistake, and the siblings choose to ride safely together."
+      }
+    ]
+  },
+  "creative_direction": {
+    "format": "Cinematic 3D animated short film",
+    "visual_style": "Premium stylized 3D realism with expressive but anatomically coherent characters, realistic material response, soft depth of field, and polished family-film rendering",
+    "tone": "Warm, emotional, educational, reassuring, and family-friendly",
+    "color_script": "Fresh greens and clear blue daylight for the ride; slightly cooler neutral tones at the accident; warm golden light for the final resolution",
+    "lighting": "Soft late-afternoon daylight with stable sun direction, gentle bounce light, readable faces, restrained highlights, and no harsh contrast",
+    "camera_language": "Stable, readable compositions for dialogue; smooth tracking for cycling; modest push-ins for emotional beats; one intentional camera move per shot; no frantic handheld motion",
+    "editing_language": "Clean continuity cuts, consistent screen direction, no jump cuts, no montage flashes, and no transition effects except natural motion-matched cuts",
+    "dialogue_direction": "Slow, clear neutral American English for beginner learners; natural child voices; simple pronunciation; distinct words; short pauses between phrases; no slang; no overlapping speech",
+    "music_direction": "Gentle optimistic orchestral-acoustic underscore, reduced during dialogue, briefly subdued after the fall, and warmly resolved at the end",
+    "sound_design": "Soft bicycle chain and tire sounds, light breeze, birds, leaves, a restrained brake squeak, and a non-graphic off-camera bicycle clatter"
+  },
+  "generation_contract": {
+    "reference_workflow": [
+      "Generate and approve one neutral portrait reference for each actor before generating shots.",
+      "Use the approved actor portraits as identity references in every shot containing that actor.",
+      "Use the park location bible and prop bible in every applicable generation.",
+      "Generate the text-to-image keyframe first, then animate only the described actions in the image-to-video prompt."
+    ],
+    "identity_lock": "Do not change age, face shape, skin tone, eye color, hairstyle, body type, wardrobe colors, helmet color, or bicycle color between shots.",
+    "wardrobe_lock": "Alex always wears the blue outfit and blue helmet. Bob always wears the red outfit and dark red helmet. Clothing remains clean until Bob's fall; after the fall, only subtle dust and the specified mild scrapes may appear.",
+    "prop_lock": "Alex always uses bicycle_alex_blue. Bob always uses bicycle_bob_red. The branch remains the same size, shape, and position in S05 and S06.",
+    "screen_direction_lock": "Before the fall, both boys travel screen-left to screen-right unless a frontal or rear tracking view is explicitly requested. Preserve their relative positions across cuts.",
+    "dialogue_lock": "Do not paraphrase, add, remove, or overlap spoken lines. Lip movement occurs only for the named speaker during the assigned dialogue window.",
+    "text_policy": "No captions, titles, letters, numbers, logos, labels, brand marks, signatures, or watermarks inside generated imagery.",
+    "safety_policy": "The fall is mild and non-graphic. Keep Bob's helmet secured. Do not show impact detail, blood, exposed wounds, broken bones, dangerous traffic, or prolonged distress.",
+    "global_negative_prompt": "identity drift, age change, face swap, hairstyle change, wardrobe change, helmet missing, helmet logo, bicycle color change, bicycle geometry mutation, extra limbs, extra fingers, fused hands, malformed hands, duplicated person, duplicated bicycle, floating bicycle, warped wheels, bent spokes, impossible anatomy, crossed eyes, asymmetrical pupils, frozen expression, unreadable face, extreme motion blur, camera shake, fisheye distortion, Dutch angle, low resolution, compression artifacts, flicker, temporal jitter, inconsistent lighting, inconsistent shadows, text, captions, subtitles, letters, numbers, logo, watermark, brand mark, blood, gore, open wound, broken bone, graphic impact, vehicle traffic"
+  },
+  "actor_mapping": {
+    "Actor 1": "Alex",
+    "Actor 2": "Bob"
+  },
+  "cast": {
+    "alex": {
+      "actor_id": "Actor 1",
+      "name": "Alex",
+      "role": "Younger sibling and careful cyclist",
+      "age": 12,
+      "relationship": "Bob's younger brother",
+      "appearance_lock": "Warm medium skin, oval face, large brown eyes, neat brows, small straight nose, soft mouth shape, natural teeth, short slightly wavy black hair, slim build, and subtle natural facial asymmetry",
+      "wardrobe_lock": "Bright cobalt-blue short-sleeve cycling jersey, dark navy cycling shorts, dark fingerless cycling gloves, gray athletic shoes, and a plain matte navy-blue safety helmet with no logo",
+      "bicycle_id": "bicycle_alex_blue",
+      "personality": "Careful, observant, patient, kind, and supportive",
+      "voice": "Young male voice; calm, gentle, slow, and clearly articulated neutral American English",
+      "portrait_prompt": "Approved character reference portrait for Alex, Actor 1: close-up three-quarter portrait of a 12-year-old boy with warm medium skin, oval face, large brown eyes, neat brows, small straight nose, soft mouth shape, natural teeth, short slightly wavy black hair, slim build, bright cobalt-blue short-sleeve cycling jersey, dark fingerless cycling gloves, and a plain matte navy-blue safety helmet with no logo. Gentle attentive expression, realistic skin texture, subtle facial asymmetry, premium stylized 3D realism, soft neutral studio lighting, shallow depth of field, centered identity-reference composition, clean pale gray background, 16:9, no text, no logo, no watermark.",
+      "portrait_negative_prompt": "older teenager, younger child, beard, facial hair, pale skin, different skin tone, blue eyes, long hair, straight rigid hair, red clothing, red helmet, missing helmet, logo, text, watermark, exaggerated cartoon proportions, photoreal live action, extra limbs, malformed hands"
+    },
+    "bob": {
+      "actor_id": "Actor 2",
+      "name": "Bob",
+      "role": "Older sibling and overconfident cyclist",
+      "age": 14,
+      "relationship": "Alex's older brother",
+      "appearance_lock": "Warm medium skin, slightly angular face, energetic dark brown eyes, thick expressive brows, straight nose, broad mouth shape, natural teeth, short tousled black hair, lean athletic build, and subtle natural facial asymmetry",
+      "wardrobe_lock": "Bright red short-sleeve cycling jersey, charcoal cycling shorts, dark fingerless cycling gloves, dark gray athletic shoes, and a plain matte dark-red safety helmet with no logo",
+      "bicycle_id": "bicycle_bob_red",
+      "personality": "Energetic, playful, competitive, impulsive, and capable of admitting mistakes",
+      "voice": "Young male voice, slightly deeper than Alex; energetic but slow and clearly articulated neutral American English",
+      "portrait_prompt": "Approved character reference portrait for Bob, Actor 2: close-up front-facing portrait of a 14-year-old boy with warm medium skin, slightly angular face, energetic dark brown eyes, thick expressive brows, straight nose, broad mouth shape, natural teeth, short tousled black hair, lean athletic build, bright red short-sleeve cycling jersey, dark fingerless cycling gloves, and a plain matte dark-red safety helmet with no logo. Confident cheerful expression, realistic skin texture, subtle facial asymmetry, premium stylized 3D realism, soft neutral studio lighting, shallow depth of field, centered identity-reference composition, clean pale gray background, 16:9, no text, no logo, no watermark.",
+      "portrait_negative_prompt": "adult man, young child, beard, facial hair, different skin tone, light eyes, long hair, neatly combed hair, blue clothing, blue helmet, missing helmet, logo, text, watermark, exaggerated cartoon proportions, photoreal live action, extra limbs, malformed hands"
+    }
+  },
+  "locations": {
+    "park_main_path": {
+      "description": "A peaceful, well-maintained neighborhood park with a broad smooth asphalt cycling path, lush green grass, mature deciduous trees, modest flower beds, occasional wooden benches, and no vehicle traffic",
+      "continuity_landmarks": [
+        "A large spreading oak tree visible near the distant end of the main path",
+        "A gentle right-hand bend halfway along the path",
+        "A low flower bed on the outside of the bend",
+        "A wooden bench beyond the bend"
+      ],
+      "time_of_day": "Late afternoon",
+      "weather": "Clear, dry, and calm with a light breeze",
+      "surface_condition": "Dry, clean asphalt except for one small fallen branch introduced in S05",
+      "negative_constraints": "No crowds, cars, motorcycles, road traffic, rain, wet pavement, signs with readable text, shops, skyscrapers, or location changes"
+    },
+    "park_recovery_edge": {
+      "description": "A soft grassy verge immediately beside the same park path, under tree shade, with the red bicycle resting safely nearby and the main path still visible",
+      "continuity_landmarks": [
+        "Same flower bed and wooden bench from the path bend",
+        "Same late-afternoon sun direction",
+        "Small fallen branch visible near the stopped bicycles"
+      ],
+      "time_of_day": "Late afternoon, gradually warming toward golden hour",
+      "weather": "Clear and dry",
+      "negative_constraints": "No hospital, ambulance, crowd, traffic, severe damage, or new location"
+    }
+  },
+  "props": {
+    "bicycle_alex_blue": {
+      "description": "Youth-size matte cobalt-blue bicycle with a straight silver handlebar, black grips, black saddle, silver spokes, black tires, two working hand brakes, and no branding",
+      "continuity": "Undamaged and clean in all shots"
+    },
+    "bicycle_bob_red": {
+      "description": "Slightly larger youth-size matte deep-red bicycle with a straight silver handlebar, black grips, black saddle, silver spokes, black tires, two working hand brakes, and no branding",
+      "continuity": "Clean in S01-S06; resting on its side with only a minor handlebar scuff in S07-S09; upright and walkable in S10"
+    },
+    "fallen_branch": {
+      "description": "One dry brown branch approximately 45 centimeters long with two small twigs and a few green leaves, lying diagonally near the outer edge of the path",
+      "continuity": "First visible in S05; same orientation and size in S06-S09; never becomes a sharp or graphic object"
+    },
+    "first_aid_bandage": {
+      "description": "Small plain beige adhesive bandage with no packaging text or logo",
+      "continuity": "Introduced by Alex in S08 and visible on Bob's elbow in S09-S10"
+    }
+  },
+  "shots": [
+    {
+      "shot_id": "S01",
+      "shot_number": 1,
+      "timecode": {
+        "start": "00:00:00.000",
+        "end": "00:00:06.000",
+        "duration_seconds": 6
+      },
+      "story_function": "Establish the siblings, bicycles, park, and warm relationship before the challenge.",
+      "location_id": "park_main_path",
+      "continuity_in": "Opening shot. Both bicycles are stationary and both helmets are secured.",
+      "continuity_out": "Bob notices the large oak tree down the path and prepares to suggest a race.",
+      "camera": {
+        "framing": "Stable waist-up two-shot with both handlebars visible",
+        "angle": "Eye level",
+        "lens": "50mm equivalent",
+        "movement": "Very slow 5 percent push-in",
+        "focus": "Both faces sharp; background gently softened"
+      },
+      "performance": "Alex smiles calmly and checks his brake lever. Bob smiles with playful energy, then looks toward the distant oak tree. Natural blinking and restrained gestures.",
+      "dialogue": [],
+      "text_to_image_prompt": "Cinematic 3D animated film still in premium stylized realism. Alex, Actor 1, the 12-year-old younger brother with warm medium skin, short slightly wavy black hair, cobalt-blue cycling jersey, navy shorts, dark gloves, gray shoes, and matte navy-blue helmet, stands with bicycle_alex_blue beside Bob, Actor 2, the 14-year-old older brother with warm medium skin, short tousled black hair, red cycling jersey, charcoal shorts, dark gloves, dark gray shoes, and matte dark-red helmet, standing with bicycle_bob_red. Stable eye-level waist-up two-shot on a broad asphalt path in a peaceful green park; both handlebars visible; both boys smiling before a friendly ride; large oak tree visible far down the path; soft late-afternoon daylight; gentle breeze in leaves; realistic materials; readable faces; shallow depth of field; clean 16:9 frame; no text, logo, or watermark.",
+      "image_to_video_prompt": "Use the approved S01 keyframe and locked actor references. 0.0-2.0s: Hold a stable eye-level waist-up two-shot; Alex calmly checks one brake lever while Bob rests both hands on his handlebars. 2.0-4.0s: Add a very slow push-in; leaves and clothing edges move gently in the breeze; both boys exchange a natural smile. 4.0-6.0s: Bob turns his eyes and chin toward the large oak tree in the distance and lifts one hand slightly as if forming an idea; Alex remains relaxed. Preserve faces, outfits, helmets, bicycle geometry, screen position, lighting, and lip stillness. No dialogue in this shot.",
+      "negative_prompt": "Use global_negative_prompt plus: racing already started, pointing dramatically, open mouths speaking, missing bicycle, cropped helmet, crowd, traffic, changing sun direction."
+    },
+    {
+      "shot_id": "S02",
+      "shot_number": 2,
+      "timecode": {
+        "start": "00:00:06.000",
+        "end": "00:00:14.000",
+        "duration_seconds": 8
+      },
+      "story_function": "Bob issues the race challenge; Alex remains amused but cautious.",
+      "location_id": "park_main_path",
+      "continuity_in": "Same starting position as S01. Bob is looking toward the distant oak tree.",
+      "continuity_out": "Bob begins riding first; Alex follows without accelerating aggressively.",
+      "camera": {
+        "framing": "Chest-up two-shot favoring Bob while keeping Alex readable",
+        "angle": "Eye level, slight three-quarter view",
+        "lens": "65mm equivalent",
+        "movement": "Locked-off",
+        "focus": "Bob sharp; Alex only slightly softer"
+      },
+      "performance": "Bob points toward the oak tree with a playful competitive grin. Alex gives a small amused smile but does not mirror Bob's intensity.",
+      "dialogue": [
+        {
+          "speaker_actor_id": "Actor 2",
+          "speaker": "Bob",
+          "start_second": 5.8,
+          "end_second": 8.0,
+          "line": "Race you to the big tree!",
+          "delivery": "Playful, confident, slow, and clearly articulated; short pause after 'you'"
+        }
+      ],
+      "text_to_image_prompt": "Cinematic 3D animated film still in premium stylized realism. Bob, Actor 2, wearing his locked red cycling outfit and matte dark-red helmet, is chest-up on bicycle_bob_red in the same leafy park, pointing toward the large oak tree with an excited competitive grin. Alex, Actor 1, in his locked blue cycling outfit and matte navy-blue helmet, remains beside him on bicycle_alex_blue with an amused but calm expression. Stable eye-level three-quarter two-shot, mouths fully visible, soft late-afternoon light, consistent sun direction, shallow depth of field, realistic skin and fabric, 16:9, no text, logo, or watermark.",
+      "image_to_video_prompt": "Use the approved S02 keyframe and locked actor references. 0.0-2.0s: Hold the stable chest-up two-shot; Bob grips the handlebar and glances at the oak tree. 2.0-4.0s: Bob raises his brows, gives a playful grin, and points toward the tree. 4.0-5.8s: Alex looks toward the tree, then back to Bob with a restrained amused smile. 5.8-8.0s: Only Bob speaks with accurate, restrained lip sync: 'Race you to the big tree!' Keep Alex's mouth closed and listening. Preserve identity, bicycles, park geography, and lighting; no camera movement.",
+      "negative_prompt": "Use global_negative_prompt plus: angry challenge, shouting, aggressive gesture, Alex speaking, both mouths moving, tree disappearing, bicycle movement before the end."
+    },
+    {
+      "shot_id": "S03",
+      "shot_number": 3,
+      "timecode": {
+        "start": "00:00:14.000",
+        "end": "00:00:21.000",
+        "duration_seconds": 7
+      },
+      "story_function": "Show Alex choosing a careful, controlled pace while Bob moves ahead.",
+      "location_id": "park_main_path",
+      "continuity_in": "Both boys leave the starting point moving screen-left to screen-right; Bob is half a bicycle length ahead.",
+      "continuity_out": "Bob increases the gap to approximately two bicycle lengths.",
+      "camera": {
+        "framing": "Waist-up side tracking shot favoring Alex",
+        "angle": "Eye level",
+        "lens": "50mm equivalent",
+        "movement": "Smooth parallel tracking at Alex's speed",
+        "focus": "Alex sharp; Bob readable ahead"
+      },
+      "performance": "Alex pedals evenly with relaxed shoulders, both hands controlled on the handlebars, and eyes scanning the path. Bob gradually becomes smaller ahead.",
+      "dialogue": [],
+      "text_to_image_prompt": "Cinematic 3D animated film still in premium stylized realism. Alex, Actor 1, in his locked blue cycling outfit and matte navy-blue helmet, rides bicycle_alex_blue slowly and safely along the park path, waist-up in a smooth side-tracking composition, relaxed shoulders, careful hands, focused brown eyes looking ahead. Bob, Actor 2, in his locked red outfit and dark-red helmet, rides bicycle_bob_red about half a bicycle length ahead but remains recognizable. Same large oak tree in the distance, same path and sun direction, gentle leaf movement, soft daylight, clean readable faces, moderate background motion blur only, 16:9, no text, logo, or watermark.",
+      "image_to_video_prompt": "Use the approved S03 keyframe and locked actor references. 0.0-2.0s: Smoothly track parallel with Alex as he pedals at a steady cadence; keep his face clear and bicycle geometry stable. 2.0-4.0s: Sunlight flickers gently through leaves; Alex checks the path ahead without turning his head away from travel. 4.0-7.0s: Bob gradually increases the gap from half a bicycle length to about two bicycle lengths while Alex maintains the same safe speed. Keep travel screen-left to screen-right. No dialogue and no dramatic camera shake.",
+      "negative_prompt": "Use global_negative_prompt plus: Alex speeding, Alex losing balance, reverse travel direction, Bob vanishing, excessive wheel blur, background smearing across faces."
+    },
+    {
+      "shot_id": "S04",
+      "shot_number": 4,
+      "timecode": {
+        "start": "00:00:21.000",
+        "end": "00:00:29.000",
+        "duration_seconds": 8
+      },
+      "story_function": "Show Bob riding too fast and pressuring Alex to imitate him.",
+      "location_id": "park_main_path",
+      "continuity_in": "Bob is approximately two bicycle lengths ahead of Alex, both moving screen-left to screen-right.",
+      "continuity_out": "Bob looks forward again and continues toward the bend; Alex remains safely behind.",
+      "camera": {
+        "framing": "Waist-up side-front tracking shot favoring Bob",
+        "angle": "Slightly low but natural",
+        "lens": "45mm equivalent",
+        "movement": "Smooth tracking matched to Bob",
+        "focus": "Bob sharp; Alex visible in background"
+      },
+      "performance": "Bob pedals rapidly with excited confidence, glances briefly toward Alex without twisting his body, then faces forward. Alex stays upright and controlled in the background.",
+      "dialogue": [
+        {
+          "speaker_actor_id": "Actor 2",
+          "speaker": "Bob",
+          "start_second": 5.7,
+          "end_second": 8.0,
+          "line": "Come on. You can go faster!",
+          "delivery": "Friendly teasing, slow and clear; full pause after 'Come on'"
+        }
+      ],
+      "text_to_image_prompt": "Cinematic 3D animated film still in premium stylized realism. Bob, Actor 2, in his locked red cycling outfit and matte dark-red helmet, rides bicycle_bob_red quickly through the same park, waist-up in a smooth side-front tracking composition, excited face large and clear, both hands on the handlebars. Alex, Actor 1, in his locked blue outfit and navy-blue helmet, remains two bicycle lengths behind at a careful pace. Trees and flowers show controlled horizontal motion blur while faces and bicycles remain sharp. Same path, landmarks, lighting, and travel direction, 16:9, no text, logo, or watermark.",
+      "image_to_video_prompt": "Use the approved S04 keyframe and locked actor references. 0.0-2.0s: Track smoothly with Bob as his pedaling cadence increases; keep his upper body stable and both hands on the handlebars. 2.0-4.0s: Bob glances briefly toward Alex with a confident smile while Alex remains visibly behind at a steady pace. 4.0-5.7s: Bob faces forward again; the right-hand bend begins to appear ahead. 5.7-8.0s: Only Bob speaks with clear lip sync: 'Come on. You can go faster!' Keep Alex's mouth closed. Preserve screen direction and avoid unsafe one-handed riding.",
+      "negative_prompt": "Use global_negative_prompt plus: Bob looking backward for too long, hands off handlebars, Alex accelerating, branch visible too early, angry expression, both boys speaking."
+    },
+    {
+      "shot_id": "S05",
+      "shot_number": 5,
+      "timecode": {
+        "start": "00:00:29.000",
+        "end": "00:00:36.000",
+        "duration_seconds": 7
+      },
+      "story_function": "Reveal the hazard through Alex's careful observation and establish why slow riding is safer.",
+      "location_id": "park_main_path",
+      "continuity_in": "Alex approaches the gentle right-hand bend behind Bob. The branch is first revealed near the outer edge of the path.",
+      "continuity_out": "Alex has reduced speed and steered safely toward the clear inner side of the path; Bob remains ahead on the branch's line.",
+      "camera": {
+        "framing": "Chest-up front three-quarter tracking shot on Alex with the branch readable in foreground depth",
+        "angle": "Eye level",
+        "lens": "55mm equivalent",
+        "movement": "Gentle backward tracking",
+        "focus": "Rack focus once from Alex's eyes to the branch, then back to Alex"
+      },
+      "performance": "Alex notices the hazard, widens his eyes slightly, squeezes both brake levers progressively, and shifts to the clear side without panic.",
+      "dialogue": [],
+      "text_to_image_prompt": "Cinematic 3D animated film still in premium stylized realism. Alex, Actor 1, in his locked blue cycling outfit and matte navy-blue helmet, rides bicycle_alex_blue carefully toward the same gentle right-hand bend. Chest-up front three-quarter view with both brake hands visible; his focused brown eyes notice fallen_branch lying diagonally near the outer edge of the path. Concerned but controlled expression, dry asphalt, low flower bed and wooden bench matching the location bible, soft late-afternoon light, stable bicycle geometry, shallow depth of field with the branch still identifiable, 16:9, no text, logo, or watermark.",
+      "image_to_video_prompt": "Use the approved S05 keyframe and locked references. 0.0-2.0s: Gently track backward in front of Alex as he pedals slowly; the fallen branch enters readable foreground depth near the outer edge of the bend. 2.0-4.0s: Perform one restrained rack focus from Alex's eyes to the branch and back; Alex's eyes widen slightly. 4.0-7.0s: Alex progressively squeezes both brake levers, reduces cadence, and steers smoothly toward the clear inner side of the path. Preserve identity, helmet, bicycle, branch geometry, and location. No dialogue.",
+      "negative_prompt": "Use global_negative_prompt plus: large log, sharp weapon-like branch, panic, skid, fall, branch changing position, Alex leaving the path, extreme rack focus, unreadable hazard."
+    },
+    {
+      "shot_id": "S06",
+      "shot_number": 6,
+      "timecode": {
+        "start": "00:00:36.000",
+        "end": "00:00:44.000",
+        "duration_seconds": 8
+      },
+      "story_function": "Bob notices the branch too late, brakes, and loses balance without showing graphic impact.",
+      "location_id": "park_main_path",
+      "continuity_in": "Bob enters the same bend at higher speed on a line toward the unchanged branch. Alex is safely behind and out of Bob's collision path.",
+      "continuity_out": "Bob exits frame toward the soft grassy verge; the actual ground impact is not shown.",
+      "camera": {
+        "framing": "Tight waist-up side-front shot of Bob with handlebars and front wheel edge visible",
+        "angle": "Eye level",
+        "lens": "55mm equivalent",
+        "movement": "Smooth tracking that stops as Bob loses balance",
+        "focus": "Bob's face and hands sharp"
+      },
+      "performance": "Bob's confidence changes to alarm. He squeezes both brakes, the front wheel turns slightly, and his upper body tilts toward the grassy verge. Keep motion readable and mild.",
+      "dialogue": [],
+      "text_to_image_prompt": "Cinematic 3D animated film still in premium stylized realism. Bob, Actor 2, in his locked red cycling outfit and securely fastened matte dark-red helmet, rides bicycle_bob_red quickly toward the same fallen_branch at the park bend. Tight waist-up side-front composition with hands, handlebars, and front wheel edge visible; his confident expression is changing to sudden alarm; dry path, same flower bed, bench, branch position, and sun direction as S05. Mild family-friendly tension, no impact, no injury yet, clean 16:9 frame, no text, logo, or watermark.",
+      "image_to_video_prompt": "Use the approved S06 keyframe and locked references. 0.0-2.0s: Track smoothly with Bob riding quickly toward the bend, helmet secured and both hands on the handlebars. 2.0-4.0s: Bob's eyes lock onto the unchanged fallen branch and his expression shifts from confidence to alarm. 4.0-6.0s: He squeezes both brakes; the front wheel turns slightly and the bicycle wobbles once. 6.0-8.0s: Bob tilts toward the soft grassy verge and moves out of frame; stop the camera before impact. Add a restrained brake squeak and a soft off-camera bicycle clatter at the very end. No blood, no graphic contact, no body deformation, no dialogue.",
+      "negative_prompt": "Use global_negative_prompt plus: visible body impact, flying over handlebars, helmet coming off, head strike, blood, severe crash, multiple wobbles, broken bicycle, branch moving, Alex colliding with Bob."
+    },
+    {
+      "shot_id": "S07",
+      "shot_number": 7,
+      "timecode": {
+        "start": "00:00:44.000",
+        "end": "00:00:51.000",
+        "duration_seconds": 7
+      },
+      "story_function": "Show the mild consequence and give the action time to settle.",
+      "location_id": "park_recovery_edge",
+      "continuity_in": "Immediately after the implied fall. Bob is seated upright on the soft grass, helmet secured. His red bicycle rests nearby with a minor handlebar scuff.",
+      "continuity_out": "Bob remains seated and does not attempt to stand. Alex is approaching safely from the path.",
+      "camera": {
+        "framing": "Stable chest-up medium close-up of Bob with part of the bicycle visible",
+        "angle": "Eye level from a respectful distance",
+        "lens": "70mm equivalent",
+        "movement": "Locked-off",
+        "focus": "Bob sharp; background calm and soft"
+      },
+      "performance": "Bob takes a steady breath, touches near—not directly on—the mild elbow scrape, winces briefly, then looks embarrassed rather than frightened.",
+      "dialogue": [],
+      "text_to_image_prompt": "Cinematic 3D animated film still in premium stylized realism. Bob, Actor 2, remains in his locked red cycling outfit with matte dark-red helmet securely fastened, seated upright on the soft grassy verge beside the same park path after a mild fall. A tiny superficial scrape is visible on one cheek and one elbow, with no blood. bicycle_bob_red rests nearby with only a minor handlebar scuff; fallen_branch remains visible near the path. Stable respectful chest-up composition, surprised and uncomfortable but alert expression, subdued soft daylight, same landmarks and sun direction, family-friendly, 16:9, no text, logo, or watermark.",
+      "image_to_video_prompt": "Use the approved S07 keyframe and locked references. 0.0-2.0s: Hold a stable chest-up shot of Bob seated upright on the grass, blinking and taking one steady breath; bicycle_bob_red remains still nearby. 2.0-4.0s: Bob carefully touches near his sore elbow and gives one brief mild wince. 4.0-7.0s: He lowers his hand, looks at the path with an embarrassed expression, and continues breathing normally as a few leaves settle. Keep injuries tiny and non-graphic; keep helmet secured; no dialogue and no attempt to stand.",
+      "negative_prompt": "Use global_negative_prompt plus: blood, open wound, swollen face, severe pain, crying intensely, unconsciousness, broken bicycle, broken helmet, standing up, medical emergency, crowd gathering."
+    },
+    {
+      "shot_id": "S08",
+      "shot_number": 8,
+      "timecode": {
+        "start": "00:00:51.000",
+        "end": "00:00:59.000",
+        "duration_seconds": 8
+      },
+      "story_function": "Alex stops, checks Bob's condition, and begins calm first aid.",
+      "location_id": "park_recovery_edge",
+      "continuity_in": "Bob remains seated with helmet secured. Alex has stopped bicycle_alex_blue safely off the path and approaches from Bob's front-left.",
+      "continuity_out": "Alex has taken out a small plain bandage. Bob remains seated and attentive.",
+      "camera": {
+        "framing": "Stable waist-up two-shot with both faces and Bob's elbow visible",
+        "angle": "Eye level at the seated boys' height",
+        "lens": "60mm equivalent",
+        "movement": "Slow 5 percent push-in",
+        "focus": "Both faces sharp"
+      },
+      "performance": "Alex crouches calmly, checks Bob's face and elbow without pulling him, then shows the small bandage. Bob looks relieved and listens.",
+      "dialogue": [
+        {
+          "speaker_actor_id": "Actor 1",
+          "speaker": "Alex",
+          "start_second": 5.4,
+          "end_second": 8.0,
+          "line": "Are you okay? Do not stand yet.",
+          "delivery": "Concerned but calm, slow and clear; short pause after 'okay'"
+        }
+      ],
+      "text_to_image_prompt": "Cinematic 3D animated film still in premium stylized realism. Alex, Actor 1, in his locked blue cycling outfit and matte navy-blue helmet, crouches calmly beside seated Bob, Actor 2, who remains in his locked red cycling outfit and secured dark-red helmet with tiny non-graphic cheek and elbow scrapes. Alex holds a small plain beige adhesive bandage in one hand; bicycle_alex_blue is parked safely off the path and bicycle_bob_red rests nearby. Stable eye-level waist-up two-shot, both faces and Bob's elbow readable, Alex worried but composed, Bob relieved, soft late-afternoon light, same park landmarks, 16:9, no text, logo, or watermark.",
+      "image_to_video_prompt": "Use the approved S08 keyframe and locked references. 0.0-2.0s: Hold a stable waist-up two-shot as Alex crouches at Bob's front-left and makes calm eye contact; do not pull or lift Bob. 2.0-4.0s: Alex briefly checks Bob's cheek and elbow visually, then takes out a small plain beige bandage. 4.0-5.4s: Bob looks up with relief while Alex holds the bandage ready; add a very slow push-in. 5.4-8.0s: Only Alex speaks with restrained accurate lip sync: 'Are you okay? Do not stand yet.' Bob's mouth stays closed as he listens. Keep injuries mild and all identities and props stable.",
+      "negative_prompt": "Use global_negative_prompt plus: Alex dragging Bob, forceful medical treatment, standing Bob up, severe wound, both mouths moving, branded first-aid packaging, extra bandages, bicycles changing position."
+    },
+    {
+      "shot_id": "S09",
+      "shot_number": 9,
+      "timecode": {
+        "start": "00:00:59.000",
+        "end": "00:01:07.000",
+        "duration_seconds": 8
+      },
+      "story_function": "Bob acknowledges the mistake and accepts the safety lesson.",
+      "location_id": "park_recovery_edge",
+      "continuity_in": "Same seated positions as S08. The small beige bandage is now applied to Bob's elbow; the tiny cheek scrape remains visible.",
+      "continuity_out": "Bob feels steady enough to walk but does not resume riding. Alex prepares to help him walk the bicycles.",
+      "camera": {
+        "framing": "Chest-up two-shot favoring Bob",
+        "angle": "Eye level",
+        "lens": "75mm equivalent",
+        "movement": "Locked-off",
+        "focus": "Bob sharp; Alex fully readable"
+      },
+      "performance": "Bob gives a small embarrassed smile, looks briefly toward his bicycle, then returns eye contact to Alex. Alex listens without scolding.",
+      "dialogue": [
+        {
+          "speaker_actor_id": "Actor 2",
+          "speaker": "Bob",
+          "start_second": 5.0,
+          "end_second": 8.0,
+          "line": "I am okay. I should have gone slower.",
+          "delivery": "Grateful and reflective, slow and clear; slight pause after 'okay'"
+        }
+      ],
+      "text_to_image_prompt": "Cinematic 3D animated film still in premium stylized realism. Bob, Actor 2, in his locked red cycling outfit and secured matte dark-red helmet, is chest-up beside Alex, Actor 1, in his locked blue cycling outfit and navy-blue helmet. Bob remains seated at the park verge with a tiny cheek scrape and a small plain beige bandage on his elbow, wearing an embarrassed but grateful expression. Alex listens attentively without scolding. Stable eye-level two-shot favoring Bob, same bicycles, branch, landmarks, and late-afternoon light, mouths visible, 16:9, no text, logo, or watermark.",
+      "image_to_video_prompt": "Use the approved S09 keyframe and locked references. 0.0-2.0s: Hold the chest-up two-shot; Bob looks toward bicycle_bob_red with mild embarrassment while Alex remains attentive. 2.0-4.0s: Bob gives a small grateful smile and returns eye contact to Alex. 4.0-5.0s: Alex gives one reassuring nod with his mouth closed. 5.0-8.0s: Only Bob speaks with accurate restrained lip sync: 'I am okay. I should have gone slower.' Keep Alex's mouth closed. Preserve the elbow bandage, tiny cheek scrape, helmets, bicycles, and park continuity.",
+      "negative_prompt": "Use global_negative_prompt plus: Bob fully healed, bandage disappearing, Alex scolding, laughter at injury, both mouths moving, Bob standing during dialogue, new location, sunset jump."
+    },
+    {
+      "shot_id": "S10",
+      "shot_number": 10,
+      "timecode": {
+        "start": "00:01:07.000",
+        "end": "00:01:15.000",
+        "duration_seconds": 8
+      },
+      "story_function": "Resolve the story with mutual care and a clear spoken safety lesson.",
+      "location_id": "park_main_path",
+      "continuity_in": "A short moment later. Both boys are steady and walking, not riding. Bob's elbow bandage and tiny cheek scrape remain visible; both bicycles are walkable.",
+      "continuity_out": "End frame: the siblings walk safely side by side toward warm light, with the bicycles between them and no further racing.",
+      "camera": {
+        "framing": "Waist-up side-front two-shot with both bicycles readable",
+        "angle": "Eye level",
+        "lens": "50mm equivalent",
+        "movement": "Slow backward dolly matching their walking speed",
+        "focus": "Both faces sharp; background softly glowing"
+      },
+      "performance": "Bob walks carefully and looks grateful. Alex smiles supportively. Both keep one hand on their own bicycle. Their pace is slow and synchronized.",
+      "dialogue": [
+        {
+          "speaker_actor_id": "Actor 1",
+          "speaker": "Alex",
+          "start_second": 5.0,
+          "end_second": 8.0,
+          "line": "Next time, we ride slowly and safely together.",
+          "delivery": "Warm, reassuring, slow, and clearly articulated"
+        }
+      ],
+      "text_to_image_prompt": "Cinematic 3D animated film still in premium stylized realism. Alex, Actor 1, wearing his locked blue cycling outfit and matte navy-blue helmet, and Bob, Actor 2, wearing his locked red cycling outfit and matte dark-red helmet, walk slowly side by side through the same peaceful park while each guides his own bicycle. Bob has the same tiny cheek scrape and plain beige elbow bandage; bicycle_bob_red shows only the same minor handlebar scuff; Alex smiles supportively and Bob looks grateful. Stable eye-level waist-up side-front two-shot, warm late-afternoon light slightly more golden but with consistent sun direction, soft glowing background, helmets remain on, 16:9, no text, logo, or watermark.",
+      "image_to_video_prompt": "Use the approved S10 keyframe and locked references. 0.0-2.0s: Slowly dolly backward as Alex and Bob walk side by side at a synchronized safe pace, each holding his own bicycle with one hand. 2.0-4.0s: Bob glances gratefully at Alex; Alex returns a supportive smile; warm light moves gently through leaves. 4.0-5.0s: Both face forward and continue walking, never mounting the bicycles. 5.0-8.0s: Only Alex speaks with accurate restrained lip sync: 'Next time, we ride slowly and safely together.' Bob listens and nods once with his mouth closed. End on a calm balanced two-shot. Preserve injuries, bandage, bicycle scuff, wardrobe, helmets, park geography, and sun direction.",
+      "negative_prompt": "Use global_negative_prompt plus: riding bicycles again, running, sunset time jump, bandage disappearing, scrape disappearing, Bob limping severely, both mouths moving, end title, on-screen moral text."
+    }
+  ],
+  "audio_plan": {
+    "dialogue_mix": "Dialogue centered, dry and intelligible, approximately 4-6 dB above music, with no overlapping lines.",
+    "ambience": "Continuous low park ambience: gentle breeze, distant birds, soft tire sound, and subtle bicycle chain movement.",
+    "music_arc": [
+      {
+        "time": "00:00-00:29",
+        "direction": "Light, playful acoustic-orchestral theme at low volume."
+      },
+      {
+        "time": "00:29-00:44",
+        "direction": "Subtle tension pulse enters; remain gentle and family-friendly."
+      },
+      {
+        "time": "00:44-00:59",
+        "direction": "Music softens and thins after the implied fall."
+      },
+      {
+        "time": "00:59-01:15",
+        "direction": "Warm resolution theme returns quietly under dialogue."
+      }
+    ],
+    "sfx_constraints": "No loud impact, screaming, siren, traffic, or frightening crash sound."
+  },
+  "quality_control": {
+    "pre_generation_checks": [
+      "Approve both actor portraits at the same render style and color-management settings.",
+      "Approve one park reference frame showing the path, oak tree, bend, flower bed, and bench.",
+      "Approve both bicycle reference images and the branch reference before shot generation.",
+      "Confirm all dialogue lines fit naturally inside their assigned windows at A2 speaking pace."
+    ],
+    "per_shot_checks": [
+      "Identity, age, hairstyle, skin tone, wardrobe, helmet, and bicycle match the locked references.",
+      "Time of day, sun direction, path geography, branch position, and screen direction match adjacent shots.",
+      "Only the named speaker moves their lips during dialogue.",
+      "Hands remain anatomically correct and attached to stable handlebars.",
+      "Wheel geometry, bicycle scale, and rider proportions remain coherent across frames.",
+      "No generated text, logos, labels, captions, or watermarks appear."
+    ],
+    "final_sequence_checks": [
+      "Shot durations total exactly 75 seconds and timecodes are contiguous.",
+      "Bob's fall remains implied, mild, and non-graphic.",
+      "The cheek scrape and elbow bandage persist from their introduction through the final shot.",
+      "The story clearly contrasts Alex's careful pace with Bob's unsafe speed.",
+      "The final spoken line communicates the safety lesson without additional narration or on-screen text.",
+      "Dialogue is slow, clear, correctly pronounced, and fully intelligible over music."
+    ]
+  }
+}
