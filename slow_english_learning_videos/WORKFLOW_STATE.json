@@ -1,0 +1,196 @@
+{
+  "schema_version": "1.0.0",
+  "is_example": true,
+  "workflow": "videoexpress_slow_english_learning_video",
+  "updated_at": "2026-09-02T12:00:00+06:00",
+  "status": "monitoring_and_refilling",
+  "storage_policy": "Example only: create live run files in the agent's current authorized workspace or designated output directory, and record the actual locations in the live state.",
+  "inputs": {
+    "idea": "Two siblings learn that safe cycling matters more than winning a race.",
+    "ratio": "Landscape 16:9",
+    "duration_seconds": 40,
+    "learner_level": "CEFR A2",
+    "learner_age_range": "8-13",
+    "tone": "Warm, family-friendly, educational"
+  },
+  "character_policy": {
+    "maximum_consistent_characters": 2,
+    "reason": "VideoExpress character consistency works best with no more than two recurring characters",
+    "consistent_characters": [
+      "Alex",
+      "Bob"
+    ]
+  },
+  "workspace": {
+    "account_label": "Example All Access Account",
+    "account_verified": true,
+    "settings_tab_id": "example-settings-tab-id",
+    "monitoring_tab_id": "example-monitoring-tab-id",
+    "settings_tab_open": true,
+    "monitoring_tab_open": true
+  },
+  "privacy": {
+    "public_gallery_required_state": false,
+    "verification_method": "Explicitly uncheck and read the live checked property before every Create Image and Create Video submission",
+    "violations": []
+  },
+  "references": {
+    "alex": {
+      "status": "saved_to_my_ai_images",
+      "asset_id": "example-alex-reference-id",
+      "public_gallery": false
+    },
+    "bob": {
+      "status": "saved_to_my_ai_images",
+      "asset_id": "example-bob-reference-id",
+      "public_gallery": false
+    }
+  },
+  "queue": {
+    "maximum_active_video_jobs": 5,
+    "active_video_jobs": 2,
+    "completed_video_jobs": 3,
+    "free_slots": 3,
+    "next_shots_to_submit": [
+      "S04",
+      "S05"
+    ]
+  },
+  "shots": [
+    {
+      "shot_id": "S01",
+      "duration_seconds": 8,
+      "speaker": "Alex",
+      "dialogue": "What a beautiful day. Let us ride carefully.",
+      "image_jobs": [
+        "example-image-job-s01-a",
+        "example-image-job-s01-b"
+      ],
+      "selected_keyframe_id": "example-image-job-s01-a",
+      "video_job_id": "example-video-job-s01",
+      "public_gallery": false,
+      "video_only_no_sound": false,
+      "status": "completed_waiting_timeline",
+      "timeline_added": false,
+      "errors": []
+    },
+    {
+      "shot_id": "S02",
+      "duration_seconds": 8,
+      "speaker": "Bob",
+      "dialogue": "Race you to the big tree!",
+      "image_jobs": [
+        "example-image-job-s02-a",
+        "example-image-job-s02-b"
+      ],
+      "selected_keyframe_id": "example-image-job-s02-a",
+      "video_job_id": "example-video-job-s02",
+      "public_gallery": false,
+      "video_only_no_sound": false,
+      "status": "completed_waiting_timeline",
+      "timeline_added": false,
+      "errors": []
+    },
+    {
+      "shot_id": "S03",
+      "duration_seconds": 8,
+      "speaker": "Alex",
+      "dialogue": "I will ride slowly and watch the path.",
+      "image_jobs": [
+        "example-image-job-s03-a",
+        "example-image-job-s03-b"
+      ],
+      "selected_keyframe_id": "example-image-job-s03-a",
+      "video_job_id": "example-video-job-s03",
+      "public_gallery": false,
+      "video_only_no_sound": false,
+      "status": "completed_waiting_timeline",
+      "timeline_added": false,
+      "errors": []
+    },
+    {
+      "shot_id": "S04",
+      "duration_seconds": 8,
+      "speaker": "Alex",
+      "dialogue": "There is a branch ahead. I will slow down.",
+      "image_jobs": [
+        "example-image-job-s04-a",
+        "example-image-job-s04-b"
+      ],
+      "selected_keyframe_id": "example-image-job-s04-a",
+      "video_job_id": "example-video-job-s04",
+      "public_gallery": false,
+      "video_only_no_sound": false,
+      "status": "generating_55_percent",
+      "timeline_added": false,
+      "errors": []
+    },
+    {
+      "shot_id": "S05",
+      "duration_seconds": 8,
+      "speaker": "Alex",
+      "dialogue": "Next time, we ride slowly and safely together.",
+      "image_jobs": [
+        "example-image-job-s05-a",
+        "example-image-job-s05-b"
+      ],
+      "selected_keyframe_id": "example-image-job-s05-b",
+      "video_job_id": "example-video-job-s05",
+      "public_gallery": false,
+      "video_only_no_sound": false,
+      "status": "generating_20_percent",
+      "timeline_added": false,
+      "errors": []
+    }
+  ],
+  "completed_steps": [
+    "Validated the three intake answers",
+    "Created prompt_book.json",
+    "Opened and retained settings and monitoring tabs",
+    "Created and saved Alex and Bob references",
+    "Submitted five shots without exceeding five active video jobs",
+    "Verified S01-S03 completed by job ID"
+  ],
+  "pending_steps": [
+    "Continue monitoring S04-S05",
+    "Add S01-S05 to track 1 in exact order",
+    "Apply Auto Align Clips",
+    "Save the project",
+    "Export High / FullHD / MP4",
+    "Verify the movie appears in My Videos"
+  ],
+  "timeline": {
+    "status": "not_started",
+    "expected_clip_order": [
+      "S01",
+      "S02",
+      "S03",
+      "S04",
+      "S05"
+    ],
+    "actual_clip_order": [],
+    "track": 1,
+    "auto_align_applied": false
+  },
+  "project_save": {
+    "status": "pending",
+    "name": "Ride Slowly, Ride Safely"
+  },
+  "export": {
+    "status": "pending",
+    "name": "Ride Slowly, Ride Safely",
+    "quality": "High",
+    "resolution": "FullHD 1080p",
+    "format": "mp4",
+    "terminal_signal": null
+  },
+  "errors": [
+    {
+      "phase": "Example transient picker failure",
+      "error": "The reference picker initially returned zero folders.",
+      "recovery": "Reopened the picker, re-queried it, and restored My AI Images without resubmitting a job.",
+      "resolved": true
+    }
+  ],
+  "resume_from": "Inspect S04 and S05 by their saved video job IDs. When both are complete, assemble S01-S05 on track 1 in exact order."
+}

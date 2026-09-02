@@ -1,0 +1,251 @@
+{
+  "schema_version": "1.0.0",
+  "is_example": true,
+  "book_type": "videoexpress_slow_english_prompt_book",
+  "project": {
+    "title": "Ride Slowly, Ride Safely",
+    "logline": "Two siblings learn that safe cycling matters more than winning a race.",
+    "purpose": "Slow-English learning video for children",
+    "learner_level": "CEFR A2",
+    "learner_age_range": "8-13",
+    "language": "English",
+    "accent": "Neutral American English",
+    "runtime_seconds": 40,
+    "aspect_ratio": "16:9",
+    "resolution": "1920x1080",
+    "genre": [
+      "family",
+      "educational",
+      "safety lesson"
+    ],
+    "tone": "Warm, clear, reassuring, and family-friendly"
+  },
+  "story": {
+    "idea": "Alex and Bob are brothers cycling in a park. Bob wants to race, but Alex rides carefully. Alex notices a branch, slows down, and helps Bob understand why safety matters.",
+    "theme": "Safety is more important than speed.",
+    "moral": "Ride slowly, watch the path, and help each other.",
+    "beats": [
+      {
+        "beat": "setup",
+        "shots": [
+          "S01"
+        ]
+      },
+      {
+        "beat": "challenge",
+        "shots": [
+          "S02"
+        ]
+      },
+      {
+        "beat": "careful_choice",
+        "shots": [
+          "S03"
+        ]
+      },
+      {
+        "beat": "hazard",
+        "shots": [
+          "S04"
+        ]
+      },
+      {
+        "beat": "resolution",
+        "shots": [
+          "S05"
+        ]
+      }
+    ]
+  },
+  "generation_policy": {
+    "visual_style": "Premium stylized 3D animated family film",
+    "image_type": "3d",
+    "automatic_image_prompt_enhancement": false,
+    "automatic_video_prompt_enhancement": false,
+    "public_gallery": false,
+    "video_only_no_sound": false,
+    "dialogue_required_in_every_clip": true,
+    "maximum_consistent_characters": 2,
+    "consistent_character_note": "VideoExpress works best with no more than two locked recurring characters.",
+    "dialogue_format": "Quotation marks appear only around the exact sentence to be spoken. Voice and performance instructions are unquoted.",
+    "maximum_active_video_jobs": 5,
+    "acceptance_policy": "Accept the first successfully completed take unless VideoExpress reports an explicit failure.",
+    "global_negative_prompt": "identity drift, age change, face swap, wardrobe change, helmet missing, bicycle color change, extra limbs, malformed hands, warped wheels, camera shake, extreme motion blur, text, captions, subtitles, logo, watermark, brand name, traffic, crowd, blood, gore, graphic injury"
+  },
+  "actor_mapping": {
+    "Actor 1": "Alex",
+    "Actor 2": "Bob"
+  },
+  "cast": {
+    "alex": {
+      "actor_id": "Actor 1",
+      "name": "Alex",
+      "age": 12,
+      "role": "Careful younger brother",
+      "appearance_lock": "Warm medium skin, oval face, large brown eyes, short slightly wavy black hair, slim build",
+      "wardrobe_lock": "Cobalt-blue cycling jersey, navy shorts, dark gloves, gray shoes, plain matte navy-blue helmet",
+      "bicycle_lock": "Youth-size matte cobalt-blue bicycle with straight silver handlebar and no branding",
+      "voice": "Young male, calm, gentle, slow, and clearly articulated neutral American English",
+      "portrait_prompt": "Approved character reference portrait for Alex, Actor 1. Close-up three-quarter portrait of a 12-year-old boy with warm medium skin, oval face, large brown eyes, short slightly wavy black hair, slim build, cobalt-blue cycling jersey, dark gloves, and plain matte navy-blue helmet. Gentle attentive expression, premium stylized 3D realism, soft neutral studio lighting, centered identity-reference composition, pale gray background, wide 16:9, no text, logo, or watermark."
+    },
+    "bob": {
+      "actor_id": "Actor 2",
+      "name": "Bob",
+      "age": 14,
+      "role": "Energetic older brother",
+      "appearance_lock": "Warm medium skin, slightly angular face, dark brown eyes, short tousled black hair, lean build",
+      "wardrobe_lock": "Bright red cycling jersey, charcoal shorts, dark gloves, dark gray shoes, plain matte dark-red helmet",
+      "bicycle_lock": "Youth-size matte deep-red bicycle with straight silver handlebar and no branding",
+      "voice": "Young male, slightly deeper than Alex, energetic, slow, and clearly articulated neutral American English",
+      "portrait_prompt": "Approved character reference portrait for Bob, Actor 2. Close-up front-facing portrait of a 14-year-old boy with warm medium skin, slightly angular face, dark brown eyes, short tousled black hair, lean build, bright red cycling jersey, dark gloves, and plain matte dark-red helmet. Confident cheerful expression, premium stylized 3D realism, soft neutral studio lighting, centered identity-reference composition, pale gray background, wide 16:9, no text, logo, or watermark."
+    }
+  },
+  "locations": {
+    "park_path": {
+      "description": "A peaceful neighborhood park with a broad dry asphalt cycling path, green grass, mature trees, flowers, wooden benches, and no traffic or crowds",
+      "landmarks": [
+        "Large oak tree at the far end of the path",
+        "Gentle right-hand bend",
+        "Low flower bed",
+        "Wooden bench"
+      ],
+      "time_of_day": "Late afternoon",
+      "weather": "Clear and dry with a light breeze"
+    }
+  },
+  "props": {
+    "fallen_branch": {
+      "description": "One small dry brown branch with two twigs, lying diagonally near the outer edge of the path",
+      "continuity": "Introduced in S04 and unchanged afterward"
+    }
+  },
+  "shots": [
+    {
+      "shot_id": "S01",
+      "shot_number": 1,
+      "duration_seconds": 8,
+      "location_id": "park_path",
+      "cast": [
+        "Actor 1",
+        "Actor 2"
+      ],
+      "story_function": "Introduce the brothers, bicycles, park, and careful-riding theme.",
+      "dialogue": {
+        "speaker_actor_id": "Actor 1",
+        "speaker": "Alex",
+        "start_second": 4.5,
+        "end_second": 8.0,
+        "line": "What a beautiful day. Let us ride carefully.",
+        "voice_instruction": "Young male, warm, cheerful, slow, and clear neutral American English; pause briefly after day"
+      },
+      "text_to_image_prompt": "Cinematic premium stylized 3D animated film still. Alex in his locked blue cycling outfit and navy-blue helmet stands with his blue bicycle beside Bob in his locked red cycling outfit and dark-red helmet with his red bicycle. Stable eye-level waist-up two-shot on a broad park path, both handlebars visible, large oak tree in the distance, soft late-afternoon light, readable faces and mouths, wide 16:9, no text, logo, or watermark.",
+      "video_audio_prompt": "[0-2] seconds: Hold a stable eye-level waist-up two-shot as Alex checks one brake lever and Bob rests both hands on his handlebars. [2-4.5] seconds: Add a very slow push-in while leaves move gently and both boys smile. [4.5-8] seconds: Alex speaks while Bob listens with his mouth closed and then glances toward the oak tree. Dialogue: Alex says, \"What a beautiful day. Let us ride carefully.\" Voice: young male, warm, cheerful, slow, and clear neutral American English, with a short pause after day. Use restrained accurate lip sync for Alex only. Add gentle park ambience and subtle bicycle-chain sounds. Preserve identities, wardrobe, helmets, bicycles, geography, and lighting. No extra speech or subtitles.",
+      "negative_constraints": "Bob speaking, both mouths moving, racing already started, missing bicycle, traffic, crowd, generated text"
+    },
+    {
+      "shot_id": "S02",
+      "shot_number": 2,
+      "duration_seconds": 8,
+      "location_id": "park_path",
+      "cast": [
+        "Actor 1",
+        "Actor 2"
+      ],
+      "story_function": "Bob issues a playful race challenge.",
+      "dialogue": {
+        "speaker_actor_id": "Actor 2",
+        "speaker": "Bob",
+        "start_second": 5.5,
+        "end_second": 8.0,
+        "line": "Race you to the big tree!",
+        "voice_instruction": "Young male, playful, confident, slow, and clear neutral American English"
+      },
+      "text_to_image_prompt": "Cinematic premium stylized 3D animated film still. Bob in his locked red cycling outfit and dark-red helmet points toward the large oak tree with an excited grin while seated on his red bicycle. Alex in his locked blue outfit and navy-blue helmet remains beside him on his blue bicycle with a calm amused expression. Stable eye-level chest-up two-shot, both mouths visible, soft late-afternoon light, wide 16:9, no text, logo, or watermark.",
+      "video_audio_prompt": "[0-2] seconds: Hold the stable chest-up two-shot as Bob grips the handlebar and glances at the oak tree. [2-4] seconds: Bob raises his brows, smiles, and points toward the tree. [4-5.5] seconds: Alex looks toward the tree and then back to Bob. [5.5-8] seconds: Bob speaks while Alex listens with his mouth closed. Dialogue: Bob says, \"Race you to the big tree!\" Voice: young male, playful, confident, slow, and clear neutral American English. Use restrained accurate lip sync for Bob only. Add park ambience and subtle bicycle sounds. Preserve identities, bicycles, geography, and lighting. No extra speech or subtitles.",
+      "negative_constraints": "Alex speaking, both mouths moving, angry challenge, unsafe gesture, traffic, generated text"
+    },
+    {
+      "shot_id": "S03",
+      "shot_number": 3,
+      "duration_seconds": 8,
+      "location_id": "park_path",
+      "cast": [
+        "Actor 1",
+        "Actor 2"
+      ],
+      "story_function": "Alex chooses a controlled speed while Bob moves ahead.",
+      "dialogue": {
+        "speaker_actor_id": "Actor 1",
+        "speaker": "Alex",
+        "start_second": 4.5,
+        "end_second": 8.0,
+        "line": "I will ride slowly and watch the path.",
+        "voice_instruction": "Young male, calm, thoughtful, slow, and clear neutral American English"
+      },
+      "text_to_image_prompt": "Cinematic premium stylized 3D animated film still. Alex in his locked blue outfit and navy-blue helmet rides his blue bicycle slowly along the park path with relaxed shoulders and focused eyes. Bob in red rides slightly ahead but remains recognizable. Smooth side-tracking composition, faces and bicycles sharp, gentle background motion, wide 16:9, no text, logo, or watermark.",
+      "video_audio_prompt": "[0-2] seconds: Track parallel with Alex as he pedals at a steady cadence. [2-4.5] seconds: Sunlight flickers through leaves while Alex scans the path. [4.5-8] seconds: Alex speaks while Bob keeps his mouth closed and gradually moves farther ahead. Dialogue: Alex says, \"I will ride slowly and watch the path.\" Voice: young male, calm, thoughtful, slow, and clear neutral American English. Use restrained accurate lip sync for Alex only. Add quiet park, tire, and chain sounds. Keep travel screen-left to screen-right. No extra speech or subtitles.",
+      "negative_constraints": "Bob speaking, Alex accelerating, camera shake, warped bicycle, traffic, generated text"
+    },
+    {
+      "shot_id": "S04",
+      "shot_number": 4,
+      "duration_seconds": 8,
+      "location_id": "park_path",
+      "cast": [
+        "Actor 1"
+      ],
+      "story_function": "Alex notices a small branch and safely slows down.",
+      "dialogue": {
+        "speaker_actor_id": "Actor 1",
+        "speaker": "Alex",
+        "start_second": 4.0,
+        "end_second": 8.0,
+        "line": "There is a branch ahead. I will slow down.",
+        "voice_instruction": "Young male, alert but controlled, slow, and clear neutral American English; pause after ahead"
+      },
+      "text_to_image_prompt": "Cinematic premium stylized 3D animated film still. Alex in his locked blue outfit and navy-blue helmet rides his blue bicycle carefully toward the park bend. Both hands are visible on the brake levers as he notices one small dry branch near the outer edge of the path. Concerned but controlled expression, flower bed and bench visible, wide 16:9, no text, logo, or watermark.",
+      "video_audio_prompt": "[0-2] seconds: Track backward gently as Alex pedals slowly and the small branch enters the foreground. [2-4] seconds: Use one restrained rack focus from Alex's eyes to the branch and back. [4-8] seconds: Alex speaks while squeezing both brakes, reducing speed, and steering toward the clear inner side. Dialogue: Alex says, \"There is a branch ahead. I will slow down.\" Voice: young male, alert but controlled, slow, and clear neutral American English, with a short pause after ahead. Use restrained accurate lip sync for Alex. Add park, tire, chain, and gentle brake sounds. Preserve identity, bicycle, branch position, geography, and lighting. No extra speech or subtitles.",
+      "negative_constraints": "panic, skid, fall, large log, branch changing position, traffic, generated text"
+    },
+    {
+      "shot_id": "S05",
+      "shot_number": 5,
+      "duration_seconds": 8,
+      "location_id": "park_path",
+      "cast": [
+        "Actor 1",
+        "Actor 2"
+      ],
+      "story_function": "Resolve the lesson with both brothers walking safely together.",
+      "dialogue": {
+        "speaker_actor_id": "Actor 1",
+        "speaker": "Alex",
+        "start_second": 4.5,
+        "end_second": 8.0,
+        "line": "Next time, we ride slowly and safely together.",
+        "voice_instruction": "Young male, warm, reassuring, slow, and clear neutral American English"
+      },
+      "text_to_image_prompt": "Cinematic premium stylized 3D animated film still. Full-body side-front view of Alex in blue and Bob in red clearly walking on their own feet along the peaceful park path. Alex pushes his empty blue bicycle on his outer left and Bob pushes his empty red bicycle on his outer right. Both saddles are visibly empty and both boys' shoes touch the path. Warm golden late-afternoon light, no traffic or crowds, wide 16:9, no text, logo, or watermark.",
+      "video_audio_prompt": "[0-2] seconds: Dolly backward slowly as Alex and Bob walk side by side, each pushing his own bicycle. [2-4.5] seconds: Bob looks gratefully at Alex and Alex smiles. [4.5-8] seconds: Alex speaks while Bob listens with his mouth closed and nods once. Dialogue: Alex says, \"Next time, we ride slowly and safely together.\" Voice: young male, warm, reassuring, slow, and clear neutral American English. Use restrained accurate lip sync for Alex only. Add gentle park, tire, and chain sounds. Keep both saddles empty and never let either boy mount a bicycle. No extra speech or subtitles.",
+      "negative_constraints": "riding bicycles, feet on pedals, Bob speaking, both mouths moving, traffic, crowd, generated text"
+    }
+  ],
+  "timeline_plan": {
+    "track": 1,
+    "clip_order": [
+      "S01",
+      "S02",
+      "S03",
+      "S04",
+      "S05"
+    ],
+    "auto_align_after_insertion": true,
+    "expected_duration_seconds": 40
+  },
+  "export_plan": {
+    "filename": "Ride Slowly, Ride Safely",
+    "quality": "High",
+    "resolution": "FullHD 1080p",
+    "format": "mp4"
+  }
+}
