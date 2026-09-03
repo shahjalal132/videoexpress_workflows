@@ -122,8 +122,9 @@ Build `prompt_book.json` before opening generation controls.
 3. Use soft, slow, neutral American English unless the user requests another accent. Use 90 spoken words per minute as the conservative script-sizing rate.
 4. Use short sentences, common words, gentle delivery, no slang, and no overlapping speech. Prefer one speaking actor per clip because later voice replacement is simpler, but allow two speaking actors when both visibly converse in the same clip.
 5. Actor field numbers are **shot-local Lip Sync fields**, not permanent character identities:
-   - if only one character is visible, that visible character is `Actor 1` for that shot and `Actor 2` is absent;
-   - if two characters are visible, explicitly define `Actor 1` and `Actor 2` in the video prompt by name, position, clothing, and appearance;
+   - if exactly one character speaks, that speaking character is always `Actor 1` for that shot—even when two characters are visible and the speaker stands on the right; any silent visible listener is `Actor 2`;
+   - if only one character is visible, that visible speaking character is `Actor 1` and `Actor 2` is absent;
+   - if two characters both speak, explicitly define speaking-order `Actor 1` and `Actor 2` in the video prompt by name, position, clothing, and appearance;
    - a character may therefore be Actor 1 in one shot and Actor 2 in another. Record the mapping for every shot.
 6. Every deliverable shot must contain these separate fields:
    - `image_prompt`
@@ -145,29 +146,29 @@ Build `prompt_book.json` before opening generation controls.
 8. The `video_prompt` identifies Actor 1 and Actor 2 by position, appearance, and clothing; describes actions, reactions, camera movement, environment motion, and which actor visibly speaks. It contains no exact spoken sentence and no quotation marks.
 9. The actor-script fields contain only the exact words to be spoken. Do not paste `Actor 1 says`, quotation marks, voice directions, emotion directions, timing notes, or camera directions into an actor-script field.
 10. Populate actor-script fields according to the shot:
-   - one visible or speaking actor: put the line in **Actor 1 Script** and leave **Actor 2 Script** empty;
-   - two visible actors with only one speaker: put the line only in that actor's mapped field and leave the listener's field empty;
+   - exactly one speaker, whether one or two characters are visible: map the speaker to `Actor 1`, put the line only in **Actor 1 Script**, and leave **Actor 2 Script** empty;
    - two visible actors who both speak sequentially: put each actor's exact line in the matching field. Never duplicate the same line in both fields.
-11. Actor numbering must match the selected image and video prompt exactly. Example: `Actor 1 is the girl on the left wearing yellow. Actor 2 is the mother on the right wearing blue.` Do not move a line to the other field merely to work around a form or counter error.
-12. Reserve two seconds of every clip for natural lead-in and reaction. Calculate:
+11. **Actor 2 Script is optional and prohibited for a single-speaker shot.** Populate Actor 2 Script only when a second visible character also speaks in that same clip. Never place the sole line in Actor 2 Script.
+12. Actor numbering must match the selected image and video prompt exactly. For a single-speaker shot, assign Actor 1 by speaking role, not by left/right position or permanent identity. Example: if Leo on the right speaks while Mia on the left listens, write `Actor 1 is Leo on the right. Actor 2 is Mia on the left. Actor 1 speaks; Actor 2 listens silently`, place Leo's words in Actor 1 Script, and leave Actor 2 Script empty.
+13. Reserve two seconds of every clip for natural lead-in and reaction. Calculate:
    - `script_duration_seconds = generation_duration_seconds - 2`
    - `maximum_script_words = floor(90 × script_duration_seconds ÷ 60)`
    - Example: a 10-second clip provides an 8-second script window and a maximum of 12 slow-English words.
-13. Enforce both observed character limits before typing:
+14. Enforce both observed character limits before typing:
    - `actor_1_script_characters <= 100`
    - `actor_2_script_characters <= 100`
    - `combined_script_characters = Actor 1 characters + Actor 2 characters`
    - `combined_script_characters <= 100`
    The combined limit is mandatory because two duplicated 51-character lines produce 102 characters and VideoExpress rejects the submission.
-14. The combined word count of both actor scripts must fit the single clip's calculated speaking window. For a 10-second clip, both scripts together—not each separately—must total at most 12 slow-English words.
-15. Use native typing or another input method that fires normal input events. After entry, verify the live character counter equals the locally calculated combined character count and is greater than zero. Visible text alone is not proof that VideoExpress registered it.
-16. If the dialog shows **Please enter the prompts** while text is visibly present or the live counter remains zero, keep the same actor mapping, clear the affected fields, and re-enter the same text through native typing. Do not swap actor fields and do not create a mapping override.
-17. If VideoExpress reports that actor scripts exceed 100 characters, inspect both fields for unintended duplication, clear the duplicate, recalculate both field counts and the combined count, and shorten or split the dialogue if still necessary.
-18. Prefer 10-second clips. For a shorter clip, recalculate instead of forcing a long sentence. Simplify or split any script that exceeds the word or character limit.
-19. Ensure planned shot durations add up to the requested runtime. A final tolerance of one second is acceptable only if the application constrains duration.
-20. Every character needs a locked exact age, child body proportions, appearance, clothing palette, character ID, and character-reference prompt. Do not store one permanent Actor 1/Actor 2 number in the cast record.
-21. For every child, create one immutable `scale_lock` and repeat it verbatim in every image and video prompt: exact age; approximate height in centimeters; height relative to the other character; head-to-body ratio; narrow child shoulders; slim preteen or young-teen torso; youthful face; child-sized hands, arms, and legs; no adult musculature; no facial hair; no tall adult proportions.
-22. Every recurring location, weather state, lighting state, ground condition, shadow condition, landmark, and prop needs one immutable environment lock.
+15. The combined word count of both actor scripts must fit the single clip's calculated speaking window. For a 10-second clip, both scripts together—not each separately—must total at most 12 slow-English words.
+16. Use native typing or another input method that fires normal input events. After entry, verify the live character counter equals the locally calculated combined character count and is greater than zero. Visible text alone is not proof that VideoExpress registered it.
+17. If the dialog shows **Please enter the prompts** while text is visibly present or the live counter remains zero, first enforce the speaker-first invariant. For one speaker, Actor 1 Script must contain the line and Actor 2 Script must be empty. Then clear and re-enter through native typing. Do not move a valid Actor 1 line into Actor 2 as a workaround.
+18. If VideoExpress reports that actor scripts exceed 100 characters, inspect both fields for unintended duplication, clear the duplicate, recalculate both field counts and the combined count, and shorten or split the dialogue if still necessary.
+19. Prefer 10-second clips. For a shorter clip, recalculate instead of forcing a long sentence. Simplify or split any script that exceeds the word or character limit.
+20. Ensure planned shot durations add up to the requested runtime. A final tolerance of one second is acceptable only if the application constrains duration.
+21. Every character needs a locked exact age, child body proportions, appearance, clothing palette, character ID, and character-reference prompt. Do not store one permanent Actor 1/Actor 2 number in the cast record.
+22. For every child, create one immutable `scale_lock` and repeat it verbatim in every image and video prompt: exact age; approximate height in centimeters; height relative to the other character; head-to-body ratio; narrow child shoulders; slim preteen or young-teen torso; youthful face; child-sized hands, arms, and legs; no adult musculature; no facial hair; no tall adult proportions.
+23. Every recurring location, weather state, lighting state, ground condition, shadow condition, landmark, and prop needs one immutable environment lock.
 23. Every emotion block must specify `emotion_start`, `emotion_change`, `facial_expression`, `body_language`, and `voice_emotion`. Put visible performance directions in the video prompt, not the actor-script field.
 24. Subtitles and captions are disabled for the entire workflow. Do not use Automatic Captions, VidSubtitle, title overlays, or burned-in dialogue text.
 25. Keep family stories safe. Injuries, conflict, or danger must remain mild, non-graphic, and age-appropriate.
@@ -185,13 +186,14 @@ Image prompt:
 [Describe the still scene, actor positions and clothing, props, expressions, composition, style, scale lock, and environment lock. No dialogue.]
 
 Video prompt:
-Actor 1 is [identity, position, clothing]. Actor 2 is [identity, position, clothing]. [Describe action, camera movement, environmental motion, and reactions.] Actor [1 or 2] speaks naturally with a clearly visible unobstructed mouth while the other actor listens silently with a closed mouth.
+For one speaker: Actor 1 is [speaking identity, any position, clothing]. Actor 2 is [silent listener identity, any position, clothing; omit if absent]. [Describe action, camera movement, and environment.] Actor 1 speaks naturally with a clearly visible unobstructed mouth. Actor 2 listens silently with a closed mouth.
+For two speakers: Actor 1 is [first speaking identity, position, clothing]. Actor 2 is [second speaking identity, position, clothing]. [Describe sequential speaking order, reactions, camera movement, and environment.]
 
 Actor 1 script:
 [Exact spoken words only, or leave empty.]
 
 Actor 2 script:
-[Exact spoken words only, or leave empty.]
+[Leave empty for every single-speaker shot. Use only when Actor 2 also speaks.]
 ```
 
 ## VIDEOEXPRESS PRIVACY — MANDATORY
@@ -297,17 +299,17 @@ For each shot in `prompt_book.json`:
 13. Click **Create Video** to open the **Create Lipsync Audio** dialog.
 14. Paste only `video_prompt` into the **Video Prompt** field. It must define Actor 1 and Actor 2 and their positions, clothing, actions, reactions, camera behavior, environment movement, and which actor speaks. It must not contain the spoken sentence.
 15. Resolve and record `shot_actor_map` before entering scripts:
-    - one visible character: map that character to `Actor 1`, fill **Actor 1 Script**, and leave **Actor 2 Script** empty;
-    - two visible characters with one speaker: fill only the field mapped to the speaking character;
+    - exactly one speaker, regardless of how many characters are visible or where the speaker stands: map the speaker to `Actor 1`, map any silent listener to `Actor 2`, fill only **Actor 1 Script**, and leave **Actor 2 Script** empty;
     - two visible characters who both speak: fill both fields with their matching sequential lines.
+    - if the prepared prompt maps the only speaker to Actor 2, stop before typing, swap the shot-local actor labels in `shot_actor_map`, rewrite the Actor labels in the video prompt without changing physical positions, and revalidate. This correction is mandatory and is not a user-facing blocker.
 16. Do not paste quotation marks, speaker labels, voice instructions, emotional directions, or timing instructions into either actor-script field.
 17. Calculate per-field character counts, combined character count, and combined word count before entry. Verify each field is at most 100 characters, the combined total is at most 100 characters, and the combined word count fits `maximum_script_words`.
 18. Fill or preserve the dedicated video negative prompt where the interface exposes it. Keep subtitle terms out of the positive Video Prompt.
 19. Set the exact generation duration. Read the live control value.
 20. Enter each required actor script through native typing. Verify the live counter is greater than zero and exactly matches the calculated combined character count.
-21. Confirm Lip Sync HD remains checked, Narration remains unchecked, public-gallery sharing remains unchecked, the required actor fields are populated according to `shot_actor_map`, and no unintended duplicate text exists.
+21. Confirm Lip Sync HD remains checked, Narration remains unchecked, public-gallery sharing remains unchecked, and no unintended duplicate text exists. For exactly one speaker, assert all four conditions: `speaking_actor_ids == ["Actor 1"]`, `actor_1_script` is nonempty, `actor_2_script == ""`, and Actor 1 in the video prompt names the speaking character. Do not submit if any assertion fails.
 22. Click **Create** in the Lip Sync Audio dialog and record the returned video job ID, shot-local actor mapping, both script texts, per-field counts, combined word/character counts, live-counter value, and privacy state.
-23. If **Please enter the prompts** appears with visible text or counter zero, retype natively into the same mapped fields. If the 100-character error appears, clear duplication or shorten/split; never change actor mapping as a workaround.
+23. If **Please enter the prompts** appears with visible text or counter zero, enforce the speaker-first invariant and retype natively. If a sole line is in Actor 2, remap that speaker to Actor 1, rewrite the video-prompt labels, move the sole line to Actor 1 Script, clear Actor 2 Script, and revalidate. If the 100-character error appears, clear duplication or shorten/split.
 24. Move immediately to the next planned shot while queue capacity remains. Continue until five video jobs are active before opening the monitoring tab.
 
 ## MINIMAL VALIDATION — SIGNALS, NOT PREVIEWS

@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.5.0",
+  "schema_version": "2.6.0",
   "is_example": true,
   "workflow": "videoexpress_slow_english_lipsync_hd_v2",
   "updated_at": "2026-09-02T12:00:00+06:00",
@@ -47,6 +47,10 @@
     "one_speaking_actor_per_clip": "preferred_but_two_sequential_speakers_allowed",
     "actor_field_mapping_scope": "shot_local",
     "single_visible_character_maps_to_actor_1": true,
+    "single_speaker_always_maps_to_actor_1": true,
+    "single_speaker_actor_2_script_prohibited": true,
+    "actor_2_script_allowed_only_when_both_actors_speak": true,
+    "actor_numbering_basis_for_single_speaker": "speaking_role_not_position_or_permanent_identity",
     "actor_1_script_character_limit": 100,
     "actor_2_script_character_limit": 100,
     "combined_script_character_limit": 100,
@@ -79,7 +83,7 @@
       },
       "S02": {
         "character_id": "CHAR_BOB",
-        "actor_field": "Actor 2",
+        "actor_field": "Actor 1",
         "voice_lock_id": "VOICE_BOB_01",
         "save_order": 2
       }
@@ -149,6 +153,13 @@
     "actor_1_max_characters": 100,
     "actor_2_max_characters": 100,
     "combined_max_characters": 100,
+    "single_speaker_required_fields": {
+      "speaking_actor_ids": ["Actor 1"],
+      "actor_1_script": "nonempty",
+      "actor_2_script": "empty",
+      "video_prompt_actor_1": "must name the speaking character"
+    },
+    "single_speaker_actor_2_recovery": "Before submission, remap the sole speaker to Actor 1, map any silent listener to Actor 2, rewrite Actor labels in the video prompt without changing physical positions, move the line to Actor 1 Script, clear Actor 2 Script, and revalidate.",
     "zero_counter_recovery": "Clear and retype the same scripts natively into the same mapped fields; never swap actor fields.",
     "over_100_recovery": "Inspect both fields for duplication, clear unintended duplicate text, recalculate, and shorten or split if still over 100."
   },
@@ -196,16 +207,16 @@
       "generation_duration_seconds": 10,
       "script_duration_seconds": 8,
       "maximum_script_words": 12,
-      "shot_actor_map": { "Actor 1": "CHAR_ALEX", "Actor 2": "CHAR_BOB" },
-      "speaking_actor_ids": ["Actor 2"],
+      "shot_actor_map": { "Actor 1": "CHAR_BOB", "Actor 2": "CHAR_ALEX" },
+      "speaking_actor_ids": ["Actor 1"],
       "speaking_character_ids": ["CHAR_BOB"],
-      "speaking_order": ["Actor 2"],
-      "actor_1_script": "",
-      "actor_2_script": "The big tree is ahead, Alex. I want to race there.",
+      "speaking_order": ["Actor 1"],
+      "actor_1_script": "The big tree is ahead, Alex. I want to race there.",
+      "actor_2_script": "",
       "actual_script_words": 11,
       "actual_script_characters": 50,
-      "actor_1_script_characters": 0,
-      "actor_2_script_characters": 50,
+      "actor_1_script_characters": 50,
+      "actor_2_script_characters": 0,
       "combined_script_characters": 50,
       "live_character_counter": 50,
       "native_typing_verified": true,
@@ -354,7 +365,7 @@
       "character_id": "CHAR_BOB",
       "planned_source_shot_id": "S02",
       "planned_source_video_job_id": "example-video-job-s02",
-      "source_actor_field": "Actor 2",
+      "source_actor_field": "Actor 1",
       "save_order": 2,
       "source_shot_id": null,
       "source_video_job_id": null,
@@ -422,6 +433,12 @@
       "phase": "Example timeline insertion control recovery",
       "error": "Windows interaction stopped because it could not confidently verify the browser URL; no timeline change was made.",
       "recovery": "Treated the warning as nonterminal, reacquired the saved VideoExpress settings tab, reopened My AI Videos, re-identified the next missing clip by video_job_id, and used the page-native right-click Add to Timeline command before continuing the remaining shots.",
+      "resolved": true
+    },
+    {
+      "phase": "Example single-speaker actor-field normalization",
+      "error": "The only speaking character was mapped to Actor 2 and the sole line was entered in Actor 2 Script, causing Please enter the prompts.",
+      "recovery": "Before resubmission, remapped the speaking character to Actor 1 without changing physical position, remapped the silent listener to Actor 2, rewrote the video-prompt Actor labels, moved the line to Actor 1 Script, cleared Actor 2 Script, and verified the live counter.",
       "resolved": true
     }
   ],

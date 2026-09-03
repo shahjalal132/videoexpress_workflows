@@ -1,5 +1,5 @@
 {
-  "schema_version": "2.3.0",
+  "schema_version": "2.4.0",
   "is_example": true,
   "book_type": "videoexpress_slow_english_lipsync_hd_prompt_book",
   "project": {
@@ -48,6 +48,15 @@
     "both_actor_script_fields_may_be_filled": "yes_when_both_mapped_actors_speak_sequentially",
     "actor_field_mapping_scope": "shot_local",
     "single_visible_character_rule": "Map the sole visible character to Actor 1 regardless of that character's mapping in other shots.",
+    "single_speaker_rule": "For exactly one speaker, always map the speaking character to Actor 1 regardless of position or number of visible characters; put the sole line in Actor 1 Script and leave Actor 2 Script empty.",
+    "actor_2_script_usage_rule": "Actor 2 Script is optional and may be populated only when a second visible character also speaks in the same clip.",
+    "single_speaker_actor_2_script_prohibited": true,
+    "pre_submit_single_speaker_assertions": [
+      "speaking_actor_ids equals [Actor 1]",
+      "actor_1_script is nonempty",
+      "actor_2_script is empty",
+      "Actor 1 in video_prompt names the speaking character"
+    ],
     "actor_1_script_character_limit": 100,
     "actor_2_script_character_limit": 100,
     "combined_actor_scripts_character_limit": 100,
@@ -134,28 +143,28 @@
       "generation_duration_seconds": 10,
       "script_duration_seconds": 8,
       "maximum_script_words": 12,
-      "shot_actor_map": { "Actor 1": "CHAR_ALEX", "Actor 2": "CHAR_BOB" },
-      "speaking_actor_ids": ["Actor 2"],
+      "shot_actor_map": { "Actor 1": "CHAR_BOB", "Actor 2": "CHAR_ALEX" },
+      "speaking_actor_ids": ["Actor 1"],
       "speaking_character_ids": ["CHAR_BOB"],
-      "speaking_order": ["Actor 2"],
+      "speaking_order": ["Actor 1"],
       "canonical_voice_source": true,
       "canonical_voice_source_order": 2,
       "canonical_voice_lock_id": "VOICE_BOB_01",
-      "canonical_voice_source_requirement": "Only CHAR_BOB speaks; no overlapping, background, or second-character speech.",
+      "canonical_voice_source_requirement": "Only CHAR_BOB speaks as Actor 1; Actor 2 remains silent; no overlapping, background, or second-character speech.",
       "lip_sync_hd_video": true,
       "narration_video": false,
       "public_gallery": false,
       "selected_scene_image_id": "example-generated-scene-image-s02",
       "scene_image_saved_to_my_ai_images": false,
-      "actor_1_script": "",
-      "actor_2_script": "The big tree is ahead, Alex. I want to race there.",
+      "actor_1_script": "The big tree is ahead, Alex. I want to race there.",
+      "actor_2_script": "",
       "actual_script_words": 11,
-      "actor_1_script_characters": 0,
-      "actor_2_script_characters": 50,
+      "actor_1_script_characters": 50,
+      "actor_2_script_characters": 0,
       "combined_script_characters": 50,
-      "image_prompt": "Premium stylized 3D animated film still. Actor 1 is Alex on the left in his locked blue cycling outfit. Actor 2 is Bob on the right in his locked red cycling outfit, pointing toward the oak tree with a playful smile. Both remain beside youth-size bicycles on the same ground plane. SCALE_ALEX_01: exactly 12-year-old boy, 150 cm tall, seven-head child proportion, slim preteen body, narrow shoulders, child-sized hands and limbs; Alex is exactly 94 percent of Bob's standing height. SCALE_BOB_01: exactly 14-year-old boy, 160 cm tall, seven-and-a-half-head young-teen proportion, lean young-teen body, narrow youthful shoulders, child-sized hands and limbs; Bob is exactly 106.7 percent of Alex's standing height. ENV_PARK_01: peaceful neighborhood park, late afternoon, clear pale-blue sky, dry weather, warm diffuse sunlight from camera-left, soft short shadows, completely dry asphalt path, green grass, fixed large oak tree, low flower bed, and wooden bench; no weather, lighting, shadow, ground, or landmark change. Stable normal 50 mm-equivalent full-body two-shot.",
-      "video_prompt": "Actor 1 is Alex on the left in the blue cycling outfit and navy helmet. Actor 2 is Bob on the right in the red cycling outfit and dark-red helmet. Actor 2 points toward the oak tree, turns toward Actor 1, and speaks naturally with his complete mouth visible and unobstructed. Actor 1 listens silently with a calm expression and keeps his mouth closed and still. Use a stable normal 50 mm-equivalent two-shot. SCALE_ALEX_01: exactly 12-year-old boy, 150 cm tall, seven-head child proportion, slim preteen body, narrow shoulders, child-sized hands and limbs; Alex is exactly 94 percent of Bob's standing height. SCALE_BOB_01: exactly 14-year-old boy, 160 cm tall, seven-and-a-half-head young-teen proportion, lean young-teen body, narrow youthful shoulders, child-sized hands and limbs; Bob is exactly 106.7 percent of Alex's standing height. ENV_PARK_01: peaceful neighborhood park, late afternoon, clear pale-blue sky, dry weather, warm diffuse sunlight from camera-left, soft short shadows, completely dry asphalt path, green grass, fixed large oak tree, low flower bed, and wooden bench; no weather, lighting, shadow, ground, or landmark change.",
-      "video_negative_prompt": "narration, voiceover, off-screen speech, disembodied voice, Actor 2 off camera, closed speaking mouth, frozen mouth, mismatched lip movement, Actor 1 lip movement, both mouths moving, subtitles, captions, burned-in text, title cards, words, letters, size drift, height change, forced perspective, rain, wet pavement, changing weather"
+      "image_prompt": "Premium stylized 3D animated film still. Actor 1 is Bob on the right in his locked red cycling outfit, pointing toward the oak tree with a playful smile. Actor 2 is Alex on the left in his locked blue cycling outfit. Both remain beside youth-size bicycles on the same ground plane. SCALE_ALEX_01: exactly 12-year-old boy, 150 cm tall, seven-head child proportion, slim preteen body, narrow shoulders, child-sized hands and limbs; Alex is exactly 94 percent of Bob's standing height. SCALE_BOB_01: exactly 14-year-old boy, 160 cm tall, seven-and-a-half-head young-teen proportion, lean young-teen body, narrow youthful shoulders, child-sized hands and limbs; Bob is exactly 106.7 percent of Alex's standing height. ENV_PARK_01: peaceful neighborhood park, late afternoon, clear pale-blue sky, dry weather, warm diffuse sunlight from camera-left, soft short shadows, completely dry asphalt path, green grass, fixed large oak tree, low flower bed, and wooden bench; no weather, lighting, shadow, ground, or landmark change. Stable normal 50 mm-equivalent full-body two-shot.",
+      "video_prompt": "Actor 1 is Bob on the right in the red cycling outfit and dark-red helmet. Actor 2 is Alex on the left in the blue cycling outfit and navy helmet. Actor 1 points toward the oak tree, turns toward Actor 2, and speaks naturally with his complete mouth visible and unobstructed. Actor 2 listens silently with a calm expression and keeps his mouth closed and still. Use a stable normal 50 mm-equivalent two-shot. SCALE_ALEX_01: exactly 12-year-old boy, 150 cm tall, seven-head child proportion, slim preteen body, narrow shoulders, child-sized hands and limbs; Alex is exactly 94 percent of Bob's standing height. SCALE_BOB_01: exactly 14-year-old boy, 160 cm tall, seven-and-a-half-head young-teen proportion, lean young-teen body, narrow youthful shoulders, child-sized hands and limbs; Bob is exactly 106.7 percent of Alex's standing height. ENV_PARK_01: peaceful neighborhood park, late afternoon, clear pale-blue sky, dry weather, warm diffuse sunlight from camera-left, soft short shadows, completely dry asphalt path, green grass, fixed large oak tree, low flower bed, and wooden bench; no weather, lighting, shadow, ground, or landmark change.",
+      "video_negative_prompt": "narration, voiceover, off-screen speech, disembodied voice, Actor 1 off camera, closed speaking mouth, frozen mouth, mismatched lip movement, Actor 2 lip movement, both mouths moving, subtitles, captions, burned-in text, title cards, words, letters, size drift, height change, forced perspective, rain, wet pavement, changing weather"
     },
     {
       "shot_id": "S03",
@@ -257,7 +266,7 @@
       "CHAR_BOB": {
         "voice_lock_id": "VOICE_BOB_01",
         "source_shot_id": "S02",
-        "source_actor_field": "Actor 2",
+        "source_actor_field": "Actor 1",
         "save_order": 2
       }
     },
