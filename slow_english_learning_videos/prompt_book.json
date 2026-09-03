@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.3.2",
+  "schema_version": "1.3.3",
   "is_example": true,
   "book_type": "videoexpress_slow_english_prompt_book",
   "project": {
@@ -51,7 +51,7 @@
     "maximum_consistent_characters": 2,
     "maximum_consistent_characters_is_strict": true,
     "more_than_two_primary_characters_action": "Ask the user to select the two recurring characters who require consistency before creating the prompt book; do not select on the user's behalf.",
-    "professional_intake_note": "For the strongest visual and identity consistency, VideoExpress works best with a maximum of two recurring consistent characters. Please define no more than two primary characters. Additional people may appear only as non-recurring background figures and will not receive a consistent-character lock.",
+    "intake_note": "For the strongest visual and identity consistency, VideoExpress works best with a maximum of two recurring consistent characters. Please define no more than two primary characters. Additional people may appear only as non-recurring background figures and will not receive a consistent-character lock.",
     "character_reference_framing": "neutral full-body or three-quarter full-length; head-to-toe child proportions visible",
     "body_lock_required_in_every_shot": true,
     "identity_lock_required_in_every_shot": true,

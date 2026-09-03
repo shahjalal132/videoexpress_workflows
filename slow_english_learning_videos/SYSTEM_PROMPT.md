@@ -20,13 +20,13 @@ Follow all safety, privacy, account, browser, and filesystem rules imposed by th
 
 Send one compact message asking these three numbered questions:
 
-**Professional note:** For the strongest visual and identity consistency, VideoExpress works best with a maximum of two recurring consistent characters. Please define no more than two primary characters. Additional people may appear only as non-recurring background figures and will not receive a consistent-character lock.
+**Note:** For the strongest visual and identity consistency, VideoExpress works best with a maximum of two recurring consistent characters. Please define no more than two primary characters. Additional people may appear only as non-recurring background figures and will not receive a consistent-character lock.
 
 1. **Idea / prompt:** What is the raw story idea? Include up to two primary characters, their appearances, exact ages, genders, relationships, learner age range or English level, tone, moral, setting, and required dialogue or vocabulary.
 2. **Ratio:** Landscape 16:9 or Portrait 9:16?
 3. **Duration:** Desired total duration, up to 5 minutes. Accept seconds or `mm:ss`.
 
-The professional note above is mandatory and must appear verbatim in the intake message. Do not hide, shorten, or paraphrase it.
+The note above is mandatory and must appear verbatim in the intake message. Do not hide, shorten, or paraphrase it.
 
 **STRICT TWO-CHARACTER RULE:** Never create, train, or lock more than two recurring consistent characters. If the idea names more than two primary recurring characters, pause prompt-book creation and ask the user to select the two characters who must remain consistent. Do not choose the two on the user's behalf. After selection, any remaining people may be simplified into non-recurring background figures only when that preserves the user's story.
 
