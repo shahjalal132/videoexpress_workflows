@@ -20,9 +20,15 @@ Follow all safety, privacy, account, browser, and filesystem rules imposed by th
 
 Send one compact message asking these three numbered questions:
 
-1. **Idea / prompt:** What is the raw story idea? Include the required characters, character appearances, ages, relationships, learner age range or English level, tone, moral, setting, and required dialogue or vocabulary. **Note: use a maximum of 2 consistent recurring characters; VideoExpress works best with 2 characters.**
+**Professional note:** For the strongest visual and identity consistency, VideoExpress works best with a maximum of two recurring consistent characters. Please define no more than two primary characters. Additional people may appear only as non-recurring background figures and will not receive a consistent-character lock.
+
+1. **Idea / prompt:** What is the raw story idea? Include up to two primary characters, their appearances, exact ages, genders, relationships, learner age range or English level, tone, moral, setting, and required dialogue or vocabulary.
 2. **Ratio:** Landscape 16:9 or Portrait 9:16?
 3. **Duration:** Desired total duration, up to 5 minutes. Accept seconds or `mm:ss`.
+
+The professional note above is mandatory and must appear verbatim in the intake message. Do not hide, shorten, or paraphrase it.
+
+**STRICT TWO-CHARACTER RULE:** Never create, train, or lock more than two recurring consistent characters. If the idea names more than two primary recurring characters, pause prompt-book creation and ask the user to select the two characters who must remain consistent. Do not choose the two on the user's behalf. After selection, any remaining people may be simplified into non-recurring background figures only when that preserves the user's story.
 
 Do not add permission questions. If an answer is unclear or invalid, ask one compact intake-correction question only for the invalid field. A duration above 5 minutes must be reduced to 5 minutes or less before generation.
 
@@ -106,18 +112,30 @@ Build `prompt_book.json` before opening generation controls.
 8. Never wrap voice descriptions, camera directions, sound effects, or timing instructions in quotation marks.
 9. Plan shots between 3 and 10 seconds because VideoExpress manual shot duration supports that range. Prefer 8–10 seconds for beginner dialogue.
 10. Ensure planned shot durations add up to the requested runtime. A final tolerance of one second is acceptable only if the application constrains duration.
-11. Give each 8–10 second clip roughly 10–15 simple spoken words. Allow natural short pauses, but use enough dialogue to teach useful slow English.
-12. Every character needs a locked exact age, child body proportions, appearance, clothing palette, canonical voice specification, saved voice-sample asset, and character-reference prompt.
-13. For every child, create one immutable `scale_lock` and repeat it verbatim in every image and video prompt: exact age; approximate height in centimeters; height relative to the other character; head-to-body ratio; narrow child shoulders; slim preteen or young-teen torso; youthful face; child-sized hands, arms, and legs; no adult musculature; no facial hair; no tall adult proportions. Never use vague size words such as only “small,” “young,” or “slim.”
-14. Every recurring location, weather state, lighting state, ground condition, shadow condition, landmark, and prop needs one immutable environment lock.
-15. Every shot needs a unique `shot_id`, exact duration, cast list, dialogue object, emotion block, environment lock ID, text-to-image prompt, positive video/audio prompt, dedicated video negative prompt, and negative constraints.
-16. Every emotion block must specify `emotion_start`, `emotion_change`, `facial_expression`, `body_language`, and `voice_emotion`. Direct brows, eyes, mouth, posture, and movement explicitly in the video prompt.
-17. Subtitles and captions are disabled for the entire workflow. Do not use Automatic Captions, VidSubtitle, title overlays, or burned-in dialogue text.
-18. Keep family stories safe. Injuries, conflict, or danger must remain mild, non-graphic, and age-appropriate. A fall may show alarm, tears, soft crying, wincing, embarrassment, and relief, but never gore or prolonged distress.
-19. Use no more than 2 consistent recurring characters in a project. If the raw idea contains more people, keep at most 2 as locked consistent characters and simplify, combine, omit, or treat the others as non-recurring background roles without changing the story's essential meaning.
-20. Every dialogue clip must use `delivery_mode: on_camera_lip_sync`. The named speaker must be visible in the frame, face front or three-quarter toward camera, keep the full mouth unobstructed, and visibly articulate the exact quoted line word by word. The listener keeps a closed, still mouth.
-21. Narration is prohibited unless the user explicitly requests narration. Put `narration, voiceover, off-screen speech, disembodied voice, speaker off camera, closed speaker mouth, frozen mouth, mismatched lip movement, listener lip movement` in every dialogue clip's dedicated video negative prompt.
-22. Never put the words `subtitle`, `caption`, or `no text` inside the positive video/action prompt. Put `subtitles, captions, closed captions, burned-in text, dialogue text, speech bubbles, lower thirds, title cards, words, letters` only in the dedicated video negative-prompt field.
+11. Every clip must pass the dialogue timing gate before submission. Compute `speech_window_seconds = min(duration_seconds - 2, duration_seconds * 0.8)` and `maximum_dialogue_words = floor(90 * speech_window_seconds / 60)`. For a 10-second clip, the spoken line must finish by second 7–8, use at most 10–12 simple words, and leave 2–3 seconds for a natural lead-in and reaction. Shorten or split any line that does not fit; never speed up the locked slow voice.
+12. Every dialogue object must record `speaker_character_id`, `dialogue_start_second`, `dialogue_end_second`, `speech_window_seconds`, `maximum_dialogue_words`, and `actual_dialogue_words`. The same character ID must own the quoted line, visible speaking face, reference asset, voice lock, and Voice Changer sample.
+13. Every character needs a locked exact age, gender presentation, child body proportions, appearance, clothing palette, canonical voice specification, saved voice-sample asset, and character-reference prompt.
+14. For every child, create one immutable `scale_lock` and repeat it verbatim in every image and video prompt: exact age; approximate height in centimeters; height relative to the other character; head-to-body ratio; narrow child shoulders; slim preteen or young-teen torso; youthful face; child-sized hands, arms, and legs; no adult musculature; no facial hair; no tall adult proportions. Never use vague size words such as only “small,” “young,” or “slim.”
+15. Every recurring location, weather state, lighting state, ground condition, shadow condition, landmark, and prop needs one immutable environment lock.
+16. Every shot needs a unique `shot_id`, exact duration, cast list, dialogue object, emotion block, environment lock ID, text-to-image prompt, positive video/audio prompt, dedicated video negative prompt, and negative constraints.
+17. Every emotion block must specify `emotion_start`, `emotion_change`, `facial_expression`, `body_language`, and `voice_emotion`. Direct brows, eyes, mouth, posture, and movement explicitly in the video prompt.
+18. Subtitles and captions are disabled for the entire workflow. Do not use Automatic Captions, VidSubtitle, title overlays, or burned-in dialogue text.
+19. Keep family stories safe. Injuries, conflict, or danger must remain mild, non-graphic, and age-appropriate. A fall may show alarm, tears, soft crying, wincing, embarrassment, and relief, but never gore or prolonged distress.
+20. Use no more than 2 consistent recurring characters in a project. If the raw idea contains more people, keep at most 2 as locked consistent characters and simplify, combine, omit, or treat the others as non-recurring background roles without changing the story's essential meaning.
+21. Every dialogue clip must use `delivery_mode: on_camera_lip_sync`. The named speaker must be visible in the frame, face front or three-quarter toward camera, keep the full mouth unobstructed, and visibly articulate the exact quoted line word by word. The listener keeps a closed, still mouth.
+22. Narration is prohibited unless the user explicitly requests narration. Put `narration, voiceover, off-screen speech, disembodied voice, speaker off camera, closed speaker mouth, frozen mouth, mismatched lip movement, listener lip movement` in every dialogue clip's dedicated video negative prompt.
+23. Never put the words `subtitle`, `caption`, or `no text` inside the positive video/action prompt. Put `subtitles, captions, closed captions, burned-in text, dialogue text, speech bubbles, lower thirds, title cards, words, letters` only in the dedicated video negative-prompt field.
+
+## STRICT CHARACTER IDENTITY AND GENDER LOCK
+
+1. Assign each recurring character one immutable `character_id` and one immutable consistent-character slot before creating any reference: for example, `SLOT_A = Mia, girl` and `SLOT_B = Leo, boy`. A name, gender presentation, face, hairstyle, body, outfit, reference asset, actor order, and slot may never be exchanged.
+2. Store one exact `identity_lock` per character containing character ID, slot, name, exact age, gender presentation, facial geometry, eyes, skin tone, hairstyle, body proportions, wardrobe, accessories, and reference asset IDs. Repeat that lock verbatim in every matching image and video prompt.
+3. Every shot must include a `cast_identity_map` that maps Actor 1 and Actor 2 to their character IDs and slots. Select references by recorded asset ID, never by thumbnail position or memory.
+4. State the identity mapping positively in each prompt: `Actor 1 is always Mia, the same girl in SLOT_A. Actor 2 is always Leo, the same boy in SLOT_B. Never swap their identities, genders, faces, hair, outfits, or actor slots.` Adapt names and genders to the actual cast without changing the structure.
+5. Put these concepts in every image and video negative prompt: `gender swap, boy becoming girl, girl becoming boy, sex change, identity swap, face swap, name swap, actor-slot swap, mixed facial features, hairstyle swap, wardrobe swap, duplicate character, merged characters, age drift, body-size drift`.
+6. Before generating a shot, verify that each visible recurring character has the correct slot and reference asset. If this mapping is uncertain, do not submit until the recorded asset IDs are reconciled.
+7. After image generation, check only structural identity: character count, boy/girl mapping, faces, hair, outfit colors, age/body scale, and Actor 1/Actor 2 positions. A wrong-gender, wrong-character, swapped, duplicated, or merged result is an explicit structural failure: reject it and regenerate the same image before creating video.
+8. After video generation, use available start/end thumbnails or completion frames to confirm that the same identities remain. If the application visibly reports a swap or morph, reject that shot and regenerate it; never add a known identity failure to the timeline.
 
 ## VIDEOEXPRESS PRIVACY — MANDATORY
 
@@ -169,6 +187,8 @@ Image/keyframe jobs and video jobs must be recorded separately. Never resubmit m
 10. Create both a neutral full-body front reference and a neutral full-body three-quarter reference for each character when the interface permits two references. Both must use the same exact scale lock, outfit, colors, and style.
 11. Create a neutral two-character scale-lineup image when two characters recur. Place them on the same ground plane, standing upright, with the taller character's exact height and the shorter character's exact relative height. Record its asset ID and use it as the size-comparison source when drafting every two-character shot.
 12. Lock camera interpretation: use a normal 50 mm-equivalent perspective for reference and dialogue shots; prohibit fisheye, forced perspective, miniature effect, giant effect, foreground enlargement, and scale distortion.
+13. Lock the character order once. The first character always uses `SLOT_A` and the same actor/reference mapping; the second always uses `SLOT_B`. Never change slot order between references, prompts, or shots.
+14. Use a maximum of two consistent-character reference assets in a shot. When two characters appear, verify both saved asset IDs before submission.
 
 If the account changes and references are absent, treat it as a workspace mismatch. Do not silently rebuild in a different workspace unless the user explicitly directs a restart in that account.
 
@@ -187,13 +207,15 @@ If the account changes and references are absent, treat it as a workspace mismat
 Generated clip voices can drift even when visual identity remains consistent. Do not treat a repeated prose description alone as a reliable voice lock.
 
 1. Before generating deliverable shots, create or select one clean canonical voice sample for each recurring character and save it to **My AI Audio**. Use only a voice the user is entitled to use.
-2. Give each sample a stable `voice_lock_id`, saved audio asset ID, character name, exact age, pitch, pace, accent, articulation, warmth, and prohibited traits.
-3. Repeat the exact voice-lock instruction verbatim in every matching clip prompt. Never paraphrase it from shot to shot.
-4. Use a clearly different but still youthful sample for the second character. Neither child may have a deep, mature, or adult voice.
-5. After the generated clips are placed on the timeline, right-click each clip, choose **Voice Changer**, choose the speaker's saved sample from **My AI Audio**, and click **Apply**.
-6. Record `voice_changer_applied`, the source voice-sample asset ID, and the resulting replacement clip or job ID for every shot.
-7. One speaker per clip is mandatory so each clip maps cleanly to one saved voice.
-8. Run **Auto Align Clips** again after all voice replacements because the replacement may alter clip endpoints.
+2. Give each sample a stable `voice_lock_id`, saved audio asset ID, character ID, character name, exact age, gender, pitch range, vocal weight/timbre, pace, accent, articulation, warmth, energy, and prohibited traits.
+3. Treat `voice_lock_id + voice_sample_asset_id + character_id` as an immutable tuple. Never reuse, swap, rename, or remap any part of that tuple.
+4. Repeat the exact voice-lock instruction verbatim in every matching clip prompt. Never paraphrase it from shot to shot. The voice instruction must include the speaker's exact age and gender and must prohibit the other character's pitch/timbre.
+5. Use a clearly different but still youthful sample for the second character. Neither child may have a deep, mature, or adult voice, and a boy's sample may never be assigned to a girl or a girl's sample to a boy.
+6. After the generated clips are placed on the timeline, right-click every clip, choose **Voice Changer**, select the speaker's saved sample from **My AI Audio** by recorded asset ID/name, and click **Apply**. Do this even when the generated voice sounds close.
+7. Record `voice_changer_applied`, `speaker_character_id`, `voice_lock_id`, source voice-sample asset ID, resulting replacement clip/job ID, and `voice_match_verified` for every shot.
+8. One speaker per clip is mandatory so each clip maps cleanly to one saved voice. If two characters must speak, split the exchange into two consecutive clips.
+9. Verify perceived gender, age band, pitch, timbre, accent, pace, and articulation after replacement. On mismatch, reapply the same saved sample once; if it still fails, regenerate/reapply without changing the lock or sample. Never accept a known wrong-character voice.
+10. Run **Auto Align Clips** again after all voice replacements because the replacement may alter clip endpoints.
 
 ## SHOT-GENERATION WORKFLOW
 
@@ -211,12 +233,13 @@ For each shot in `prompt_book.json`:
 10. Fill the positive video/audio prompt. Only the spoken sentence is quoted. Copy the exact scale lock and environment lock verbatim.
 11. For dialogue, write an explicit on-camera lip-sync block: identify the visible speaker, require front or three-quarter face, unobstructed mouth, natural jaw and lip articulation synchronized to every word, and keep every listener's mouth closed and still. Do not describe the line as narration, voiceover, thoughts, or off-screen speech.
 12. Copy the speaker's canonical voice-lock instruction verbatim, then add the shot-specific emotional delivery as a separate unquoted instruction.
-13. Fill the dedicated video negative-prompt field with the shot's saved `video_negative_prompt`. Keep subtitle/caption terms out of the positive prompt.
-14. Explicitly uncheck **Video Only (No Sound)**.
-15. Enable manual video length and set the exact planned duration. Read the live slider value, not the static HTML attribute.
-16. Recheck public-gallery sharing is `false`.
-17. Submit **Create Video** and record the returned video job ID.
-18. Move to the next available shot without waiting when queue capacity remains.
+13. Run the dialogue timing gate. Count the words, verify the line fits the computed slow-speech window, and confirm that a 10-second clip finishes speaking by second 7–8. Shorten or split the line before submission if it fails.
+14. Fill the dedicated video negative-prompt field with the shot's saved `video_negative_prompt`, including the identity/gender-swap terms. Keep subtitle/caption terms out of the positive prompt.
+15. Explicitly uncheck **Video Only (No Sound)**.
+16. Enable manual video length and set the exact planned duration. Read the live slider value, not the static HTML attribute.
+17. Recheck public-gallery sharing is `false`.
+18. Submit **Create Video** and record the returned video job ID.
+19. Move to the next available shot without waiting when queue capacity remains.
 
 ## MINIMAL VALIDATION — SIGNALS, NOT PREVIEWS
 
@@ -232,11 +255,12 @@ Perform only these inexpensive validations:
 4. **Privacy:** public-gallery state was read as `false` before submission.
 5. **Persistence:** the saved project title or project record exists.
 6. **Terminal signal:** the exported movie appears in My Videos or the app displays its completed export record.
-7. **Character locks:** each shot references the expected front/three-quarter child assets and repeats the exact scale lock, including height and relative-height ratio.
+7. **Character locks:** each shot references the expected front/three-quarter child assets, preserves the immutable Actor/slot/name/gender mapping, and repeats the exact identity and scale locks. Wrong gender, identity swaps, duplicate/merged characters, and body-scale drift are structural failures, not cosmetic imperfections.
 8. **Environment locks:** every shot maps to the correct environment reference and repeats the exact weather, light, shadows, ground, landmarks, and prop-state lock.
 9. **Lip-sync structure:** every dialogue prompt records `delivery_mode: on_camera_lip_sync`, a visible speaker, unobstructed mouth, exact quoted line, listener mouth closed, and narration/voiceover prohibitions in the negative field.
-10. **Voice locks:** every timeline clip records the expected saved voice sample and a successful Voice Changer replacement.
+10. **Voice locks:** every timeline clip records the same immutable character/voice/sample tuple, a successful Voice Changer replacement, and a passed gender/age/pitch/timbre/accent match check.
 11. **No-subtitle structure:** subtitle and caption generation steps are absent, and every video job records the dedicated negative prompt used.
+12. **Dialogue timing:** every clip has exactly one speaker and one quoted line; its word count is within the computed slow-speech maximum, and a 10-second clip finishes speaking by second 7–8.
 
 Never repeat a validation that already passed unless a later action could have changed it.
 
@@ -314,7 +338,7 @@ Use clear machine-readable values such as:
 - `complete_exported`
 - `blocked_<reason>`
 
-Each shot should independently track image jobs, selected keyframe, video job, duration, privacy state, completion, timeline insertion, and errors.
+Each shot should independently track image jobs, selected keyframe, video job, duration, privacy state, completion, timeline insertion, errors, speaker character ID, dialogue timing calculation, immutable character-slot mapping, reference asset IDs, structural identity check, voice tuple, Voice Changer result, and voice-match verification.
 
 ## FINAL REPORT
 

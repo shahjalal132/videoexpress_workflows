@@ -1,25 +1,47 @@
 {
-  "schema_version": "1.2.0",
+  "schema_version": "1.3.1",
   "is_example": true,
   "workflow": "videoexpress_slow_english_learning_video",
-  "updated_at": "2026-09-02T12:00:00+06:00",
+  "updated_at": "2026-09-03T12:00:00+06:00",
   "status": "monitoring_and_refilling",
   "storage_policy": "Example only: create live run files in the current authorized workspace or designated output directory and record actual locations in live state.",
   "inputs": {
     "idea": "Two young siblings learn that safe cycling matters more than winning a race.",
     "ratio": "Landscape 16:9",
-    "duration_seconds": 40,
+    "duration_seconds": 50,
     "learner_level": "CEFR A2",
     "learner_age_range": "8-13",
     "tone": "Warm, soft, family-friendly, educational"
   },
   "character_policy": {
     "maximum_consistent_characters": 2,
+    "maximum_is_strict": true,
+    "professional_intake_note_shown": true,
+    "more_than_two_primary_characters_action": "Pause before prompt-book creation and ask the user to select the two recurring characters who require consistency.",
+    "immutable_character_slots": {
+      "SLOT_A": { "character_id": "CHAR_ALEX", "actor_id": "Actor 1", "name": "Alex", "gender_lock": "boy" },
+      "SLOT_B": { "character_id": "CHAR_BOB", "actor_id": "Actor 2", "name": "Bob", "gender_lock": "boy" }
+    },
+    "slot_swap_allowed": false,
+    "reference_selection_by_asset_id_required": true,
+    "identity_lock_required_in_every_image_and_video_prompt": true,
+    "wrong_gender_identity_or_slot_action": "reject and regenerate the same shot before timeline insertion",
     "reference_framing": "full-body or three-quarter full-length",
     "body_lock_required_in_every_shot": true,
     "scale_lock_required_in_every_shot": true,
     "normal_reference_lens_equivalent_mm": 50,
     "relative_height_lock": "Alex is exactly 94 percent of Bob's standing height; Bob is exactly 106.7 percent of Alex's standing height",
+    "identity_negative_constraints": [
+      "gender swap",
+      "boy becoming girl",
+      "girl becoming boy",
+      "identity or face swap",
+      "name or actor-slot swap",
+      "mixed facial features",
+      "hairstyle or wardrobe swap",
+      "duplicate or merged characters",
+      "age or body-size drift"
+    ],
     "body_negative_constraints": [
       "adult body",
       "adult proportions",
@@ -30,6 +52,17 @@
       "beard or facial hair"
     ],
     "consistent_characters": ["Alex", "Bob"]
+  },
+  "dialogue_timing_policy": {
+    "dialogue_required_in_every_clip": true,
+    "one_speaker_per_clip": true,
+    "slow_english_rate_wpm": 90,
+    "speech_window_formula": "min(duration_seconds - 2, duration_seconds * 0.8)",
+    "maximum_dialogue_words_formula": "floor(90 * speech_window_seconds / 60)",
+    "ten_second_finish_window_seconds": "7-8",
+    "ten_second_maximum_words": 12,
+    "overflow_action": "shorten or split the line; never increase speaking speed",
+    "pre_submit_gate_required": true
   },
   "workspace": {
     "account_label": "Example All Access Account",
@@ -85,17 +118,28 @@
   },
   "voice_locks": {
     "VOICE_ALEX_01": {
+      "character_id": "CHAR_ALEX",
       "character": "Alex",
       "status": "saved_to_my_ai_audio",
       "voice_sample_asset_id": "example-my-ai-audio-alex-01",
-      "exact_instruction": "12-year-old boy; soft warm youthful male voice; mid-high pitch; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone"
+      "exact_instruction": "12-year-old boy; soft warm youthful male voice; mid-high pitch; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
+      "immutable_tuple_verified": true
     },
     "VOICE_BOB_01": {
+      "character_id": "CHAR_BOB",
       "character": "Bob",
       "status": "saved_to_my_ai_audio",
       "voice_sample_asset_id": "example-my-ai-audio-bob-01",
-      "exact_instruction": "14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone"
+      "exact_instruction": "14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
+      "immutable_tuple_verified": true
     }
+  },
+  "voice_consistency_policy": {
+    "voice_lock_must_be_repeated_verbatim": true,
+    "voice_changer_required_for_every_clip": true,
+    "sample_selection_rule": "Select by voice_sample_asset_id or exact saved name, never by list position.",
+    "verification_dimensions": ["gender", "age band", "pitch", "timbre", "accent", "pace", "articulation"],
+    "mismatch_action": "Reapply the same sample once; if still wrong, regenerate or reapply without changing the immutable tuple."
   },
   "queue": {
     "maximum_active_video_jobs": 5,
@@ -107,9 +151,13 @@
   "shots": [
     {
       "shot_id": "S01",
-      "duration_seconds": 8,
+      "duration_seconds": 10,
+      "speaker_character_id": "CHAR_ALEX",
       "speaker": "Alex",
-      "dialogue": "What a beautiful day, Bob. Let us ride slowly and enjoy the park.",
+      "dialogue": "What a lovely day, Bob. Let us ride slowly together.",
+      "dialogue_timing": { "start_second": 0.5, "end_second": 8.0, "speech_window_seconds": 8.0, "maximum_dialogue_words": 12, "actual_dialogue_words": 10, "gate_passed": true },
+      "character_slot_map": { "Actor 1": "CHAR_ALEX/SLOT_A/boy", "Actor 2": "CHAR_BOB/SLOT_B/boy" },
+      "structural_identity_gate": { "correct_gender_mapping": true, "identity_swap_detected": false, "duplicate_or_merge_detected": false, "passed": true },
       "emotion": "peaceful curiosity to warm happiness",
       "delivery_mode": "on_camera_lip_sync",
       "lip_sync_prompt_validated": true,
@@ -128,14 +176,19 @@
       "voice_changer_applied": false,
       "voice_sample_asset_id": "example-my-ai-audio-alex-01",
       "voice_changed_clip_id": null,
+      "voice_match_verified": false,
       "video_negative_prompt_recorded": true,
       "errors": []
     },
     {
       "shot_id": "S02",
-      "duration_seconds": 8,
+      "duration_seconds": 10,
+      "speaker_character_id": "CHAR_BOB",
       "speaker": "Bob",
-      "dialogue": "The big tree is ahead, Alex. Let us race there and have fun.",
+      "dialogue": "The big tree is ahead, Alex. Let us race there.",
+      "dialogue_timing": { "start_second": 0.5, "end_second": 8.0, "speech_window_seconds": 8.0, "maximum_dialogue_words": 12, "actual_dialogue_words": 10, "gate_passed": true },
+      "character_slot_map": { "Actor 1": "CHAR_ALEX/SLOT_A/boy", "Actor 2": "CHAR_BOB/SLOT_B/boy" },
+      "structural_identity_gate": { "correct_gender_mapping": true, "identity_swap_detected": false, "duplicate_or_merge_detected": false, "passed": true },
       "emotion": "playful excitement to confident eagerness",
       "delivery_mode": "on_camera_lip_sync",
       "lip_sync_prompt_validated": true,
@@ -154,14 +207,19 @@
       "voice_changer_applied": false,
       "voice_sample_asset_id": "example-my-ai-audio-bob-01",
       "voice_changed_clip_id": null,
+      "voice_match_verified": false,
       "video_negative_prompt_recorded": true,
       "errors": []
     },
     {
       "shot_id": "S03",
-      "duration_seconds": 8,
+      "duration_seconds": 10,
+      "speaker_character_id": "CHAR_ALEX",
       "speaker": "Alex",
       "dialogue": "I will not hurry. I will ride slowly and watch the path.",
+      "dialogue_timing": { "start_second": 0.5, "end_second": 8.0, "speech_window_seconds": 8.0, "maximum_dialogue_words": 12, "actual_dialogue_words": 11, "gate_passed": true },
+      "character_slot_map": { "Actor 1": "CHAR_ALEX/SLOT_A/boy", "Actor 2": "CHAR_BOB/SLOT_B/boy" },
+      "structural_identity_gate": { "correct_gender_mapping": true, "identity_swap_detected": false, "duplicate_or_merge_detected": false, "passed": true },
       "emotion": "quiet focus to calm determination",
       "delivery_mode": "on_camera_lip_sync",
       "lip_sync_prompt_validated": true,
@@ -180,14 +238,19 @@
       "voice_changer_applied": false,
       "voice_sample_asset_id": "example-my-ai-audio-alex-01",
       "voice_changed_clip_id": null,
+      "voice_match_verified": false,
       "video_negative_prompt_recorded": true,
       "errors": []
     },
     {
       "shot_id": "S04",
-      "duration_seconds": 8,
+      "duration_seconds": 10,
+      "speaker_character_id": "CHAR_BOB",
       "speaker": "Bob",
       "dialogue": "Oh no, there is a branch! I cannot stop in time.",
+      "dialogue_timing": { "start_second": 0.5, "end_second": 7.5, "speech_window_seconds": 8.0, "maximum_dialogue_words": 12, "actual_dialogue_words": 11, "gate_passed": true },
+      "character_slot_map": { "Actor 2": "CHAR_BOB/SLOT_B/boy" },
+      "structural_identity_gate": { "correct_gender_mapping": true, "identity_swap_detected": false, "duplicate_or_merge_detected": false, "passed": true },
       "emotion": "confident excitement to sudden fear and alarm",
       "delivery_mode": "on_camera_lip_sync",
       "lip_sync_prompt_validated": true,
@@ -206,14 +269,19 @@
       "voice_changer_applied": false,
       "voice_sample_asset_id": "example-my-ai-audio-bob-01",
       "voice_changed_clip_id": null,
+      "voice_match_verified": false,
       "video_negative_prompt_recorded": true,
       "errors": []
     },
     {
       "shot_id": "S05",
-      "duration_seconds": 8,
+      "duration_seconds": 10,
+      "speaker_character_id": "CHAR_BOB",
       "speaker": "Bob",
       "dialogue": "My elbow hurts, Alex. I understand now. We must ride safely.",
+      "dialogue_timing": { "start_second": 0.5, "end_second": 8.0, "speech_window_seconds": 8.0, "maximum_dialogue_words": 12, "actual_dialogue_words": 11, "gate_passed": true },
+      "character_slot_map": { "Actor 1": "CHAR_ALEX/SLOT_A/boy", "Actor 2": "CHAR_BOB/SLOT_B/boy" },
+      "structural_identity_gate": { "correct_gender_mapping": true, "identity_swap_detected": false, "duplicate_or_merge_detected": false, "passed": true },
       "emotion": "soft crying and embarrassment to relief and understanding",
       "delivery_mode": "on_camera_lip_sync",
       "lip_sync_prompt_validated": true,
@@ -232,13 +300,15 @@
       "voice_changer_applied": false,
       "voice_sample_asset_id": "example-my-ai-audio-bob-01",
       "voice_changed_clip_id": null,
+      "voice_match_verified": false,
       "video_negative_prompt_recorded": true,
       "errors": []
     }
   ],
   "completed_steps": [
     "Validated the three intake answers",
-    "Created prompt_book.json with exact scale, voice, emotion, on-camera lip-sync, environment continuity, and no-subtitle policies",
+    "Created prompt_book.json with exact identity/gender slots, dialogue timing, scale, voice, emotion, on-camera lip-sync, environment continuity, and no-subtitle policies",
+    "Validated every 10-second example line at 90 WPM to finish by second 7-8 with no more than 12 words",
     "Opened and retained settings and monitoring tabs",
     "Created and saved full-body Alex and Bob references",
     "Created and saved front, three-quarter, and two-character scale-lineup references",
@@ -251,7 +321,7 @@
     "Continue monitoring S04-S05",
     "Add S01-S05 to track 1 in exact order",
     "Apply Auto Align Clips pass 1",
-    "Apply the mapped saved voice sample to every clip with Voice Changer",
+    "Apply the mapped saved voice sample to every clip with Voice Changer and verify gender, age band, pitch, timbre, accent, pace, and articulation",
     "Apply Auto Align Clips pass 2 after voice replacement",
     "Verify no subtitle, caption, title, or text layer exists on the timeline",
     "Save the project",
@@ -263,6 +333,7 @@
     "expected_clip_order": ["S01", "S02", "S03", "S04", "S05"],
     "actual_clip_order": [],
     "track": 1,
+    "expected_duration_seconds": 50,
     "auto_align_pass_1": false,
     "voice_replacement_expected_clips": 5,
     "voice_replacement_completed_clips": 0,
@@ -300,5 +371,5 @@
       "resolved": true
     }
   ],
-  "resume_from": "Inspect S04 and S05 by saved video job IDs. When both finish, assemble S01-S05, run Auto Align pass 1, apply saved voices to all clips, run Auto Align pass 2, verify that no subtitle or text layer exists, save, and export."
+  "resume_from": "Inspect S04 and S05 by saved video job IDs. Reject any structural identity/gender/slot failure. When both pass, assemble S01-S05, run Auto Align pass 1, apply the immutable mapped voice sample to all clips, verify every voice match, run Auto Align pass 2, verify that no subtitle or text layer exists, save, and export."
 }
