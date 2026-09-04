@@ -38,8 +38,8 @@
     "one_speaker_per_clip": true,
     "one_quoted_dialogue_line_per_clip": true,
     "speech_rate_wpm": 90,
-    "speech_window_formula": "min(duration_seconds - 2, duration_seconds * 0.8)",
-    "maximum_dialogue_words_formula": "floor(90 * speech_window_seconds / 60)",
+    "speech_window_formula": "duration_seconds - 2 (duration is derived from the line: duration_seconds = clamp(ceil(actual_dialogue_words / 1.5 + 2), 3, 10))",
+    "maximum_dialogue_words_formula": "12 (fixed; a longer line is split into two clips); speech_seconds = actual_dialogue_words / 1.5",
     "ten_second_dialogue_finish_window_seconds": "7-8",
     "ten_second_dialogue_target_words": "10-12",
     "reserved_lead_in_and_reaction_seconds": "2-3",
@@ -87,7 +87,7 @@
     "dead_air_acceptance_gate": ["first spoken word begins no later than 0.8 seconds", "no internal silent gap exceeds 0.35 seconds", "the line is complete by second 8", "no non-speaking action delays the first word"],
     "dead_air_failure_action": "Reject and regenerate the same clip with the identical timing block; do not accept a clip that requires manual removal of initial or internal dead air.",
     "required_dialogue_fields": ["speaker_character_id", "dialogue_start_second", "dialogue_end_second", "speech_window_seconds", "maximum_dialogue_words", "actual_dialogue_words"],
-    "pre_submit_checks": ["actual_dialogue_words <= maximum_dialogue_words", "dialogue_end_second <= duration_seconds - 2", "the quoted line appears exactly once", "speaker character, face, reference, voice lock, and audio sample all share the same character_id"]
+    "pre_submit_checks": ["actual_dialogue_words <= 12 and duration_seconds == clamp(ceil(actual_dialogue_words / 1.5 + 2), 3, 10)", "dialogue_end_second <= duration_seconds - 2", "the quoted line appears exactly once", "speaker character, face, reference, voice lock, and audio sample all share the same character_id"]
   },
   "character_identity_policy": {
     "maximum_consistent_characters": 2,
