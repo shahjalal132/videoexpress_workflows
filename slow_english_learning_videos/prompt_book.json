@@ -58,10 +58,7 @@
     "immutable_character_slot_mapping_required": true,
     "positive_prompt_compilation_rule": "Prepend the exact identity_lock for every visible recurring character to both image and video prompts.",
     "negative_prompt_compilation_rule": "Prepend generation_policy.global_negative_prompt to every shot-specific image and video negative prompt.",
-    "wrong_gender_or_identity_result_action": "reject and regenerate the same shot before video or timeline insertion",
-    "voice_sample_required_per_character": true,
-    "voice_changer_required_per_timeline_clip": true,
-    "dialogue_delivery_mode": "on_camera_lip_sync",
+    "wrong_gender_or_identity_result_action": "reject and regenerate the same shot before video or timeline insertion",    "dialogue_delivery_mode": "on_camera_lip_sync",
     "narration_allowed": false,
     "subtitles_enabled": false,
     "environment_lock_required_in_every_shot": true,
@@ -104,11 +101,8 @@
   },
   "voice_consistency_policy": {
     "canonical_sample_required_per_character": true,
-    "immutable_tuple": "character_id + voice_lock_id + voice_sample_asset_id",
-    "voice_lock_must_be_repeated_verbatim": true,
-    "voice_changer_required_for_every_clip": true,
-    "select_voice_sample_by_asset_id_or_exact_name": true,
-    "verification_dimensions": ["gender", "age band", "pitch", "timbre", "accent", "pace", "articulation"],
+    "immutable_tuple": "character_id + voice_lock_id",
+    "voice_lock_must_be_repeated_verbatim": true,    "verification_dimensions": ["gender", "age band", "pitch", "timbre", "accent", "pace", "articulation"],
     "mismatch_action": "Reapply the same saved sample once; if still wrong, regenerate or reapply without changing the character voice tuple."
   },
   "actor_mapping": {
@@ -131,9 +125,7 @@
       "identity_lock": "CHAR_ALEX in SLOT_A is always Alex, the same 12-year-old boy with warm medium skin, oval youthful face, large brown eyes, and short slightly wavy black hair; never female, never a girl, never Bob, and never swapped with SLOT_B",
       "wardrobe_lock": "Cobalt-blue cycling jersey, navy shorts, dark gloves, gray shoes, plain matte navy-blue helmet",
       "bicycle_lock": "Youth-size matte cobalt-blue bicycle with straight silver handlebar and no branding",
-      "voice_lock_id": "VOICE_ALEX_01",
-      "voice_sample_asset_id": "example-my-ai-audio-alex-01",
-      "voice_lock": "12-year-old boy; soft warm youthful male voice; mid-high pitch; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
+      "voice_lock_id": "VOICE_ALEX_01",      "voice_lock": "12-year-old boy; soft warm youthful male voice; mid-high pitch; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
       "reference_asset_id": "example-alex-full-body-reference-id",
       "reference_assets": {
         "front_full_body": "example-alex-front-full-body-reference-id",
@@ -156,9 +148,7 @@
       "identity_lock": "CHAR_BOB in SLOT_B is always Bob, the same 14-year-old boy with warm medium skin, slightly angular youthful face, dark brown eyes, and short tousled black hair; never female, never a girl, never Alex, and never swapped with SLOT_A",
       "wardrobe_lock": "Bright red cycling jersey, charcoal shorts, dark gloves, dark gray shoes, plain matte dark-red helmet",
       "bicycle_lock": "Youth-size matte deep-red bicycle with straight silver handlebar and no branding",
-      "voice_lock_id": "VOICE_BOB_01",
-      "voice_sample_asset_id": "example-my-ai-audio-bob-01",
-      "voice_lock": "14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
+      "voice_lock_id": "VOICE_BOB_01",      "voice_lock": "14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
       "reference_asset_id": "example-bob-full-body-reference-id",
       "reference_assets": {
         "front_full_body": "example-bob-front-full-body-reference-id",
@@ -385,21 +375,10 @@
       "negative_constraints": "adult body, adult proportions, broad shoulders, muscular torso, tall adult height, mature face, facial hair, loud sobbing, screaming, blood, visible wound, gore"
     }
   ],
-  "voice_replacement_plan": {
-    "stage": "after_timeline_insertion_before_final_export",
-    "method": "Right-click each timeline clip, select Voice Changer, choose the speaker's saved My AI Audio sample, and click Apply.",
-    "selection_rule": "Select by exact recorded voice_sample_asset_id or exact saved name; never choose by list position.",
-    "immutable_mapping_rule": "The speaker_character_id, voice_lock_id, and voice_sample_asset_id tuple must never change.",
-    "verification_required": ["gender", "age band", "pitch", "timbre", "accent", "pace", "articulation"],
-    "mismatch_action": "Reapply the same saved sample once, then regenerate or reapply if still wrong; never switch to another character's sample.",
-    "mapping": {
-      "S01": "VOICE_ALEX_01",
-      "S02": "VOICE_BOB_01",
-      "S03": "VOICE_ALEX_01",
-      "S04": "VOICE_BOB_01",
-      "S05": "VOICE_BOB_01"
-    },
-    "required_coverage": "5 of 5 clips"
+  "voice_policy": {
+    "stage": "prompt_only",
+    "method": "No voice samples are created and Voice Changer is never applied; the verbatim voice_lock text inside each video prompt controls the voice.",
+    "immutable_mapping_rule": "The speaker_character_id and voice_lock_id pair must never change."
   },
   "subtitle_policy": {
     "enabled": false,
@@ -413,11 +392,8 @@
   "timeline_plan": {
     "track": 1,
     "clip_order": ["S01", "S02", "S03", "S04", "S05"],
-    "auto_align_passes": 2,
-    "first_auto_align_after_insertion": true,
-    "voice_changer_after_first_alignment": true,
-    "second_auto_align_after_voice_replacement": true,
-    "automatic_captions_after_final_alignment": false,
+    "auto_align_passes": 1,
+    "first_auto_align_after_insertion": true,    "automatic_captions_after_final_alignment": false,
     "subtitle_and_text_tools_prohibited": true,
     "expected_duration_seconds": 50
   },

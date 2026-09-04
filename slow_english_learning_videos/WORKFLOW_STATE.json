@@ -120,26 +120,22 @@
     "VOICE_ALEX_01": {
       "character_id": "CHAR_ALEX",
       "character": "Alex",
-      "status": "saved_to_my_ai_audio",
-      "voice_sample_asset_id": "example-my-ai-audio-alex-01",
+      "status": "prompt_only_lock",
       "exact_instruction": "12-year-old boy; soft warm youthful male voice; mid-high pitch; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
-      "immutable_tuple_verified": true
+      "voice_lock_repeated_verbatim": true
     },
     "VOICE_BOB_01": {
       "character_id": "CHAR_BOB",
       "character": "Bob",
-      "status": "saved_to_my_ai_audio",
-      "voice_sample_asset_id": "example-my-ai-audio-bob-01",
+      "status": "prompt_only_lock",
       "exact_instruction": "14-year-old boy; soft friendly youthful male voice; medium pitch slightly lower than Alex; gentle breath; 90-100 words per minute; neutral American English; clear consonants; no adult or deep tone",
-      "immutable_tuple_verified": true
+      "voice_lock_repeated_verbatim": true
     }
   },
   "voice_consistency_policy": {
     "voice_lock_must_be_repeated_verbatim": true,
-    "voice_changer_required_for_every_clip": true,
-    "sample_selection_rule": "Select by voice_sample_asset_id or exact saved name, never by list position.",
     "verification_dimensions": ["gender", "age band", "pitch", "timbre", "accent", "pace", "articulation"],
-    "mismatch_action": "Reapply the same sample once; if still wrong, regenerate or reapply without changing the immutable tuple."
+    "mismatch_action": "Regenerate the clip with the identical voice lock; never change the lock text."
   },
   "queue": {
     "maximum_active_video_jobs": 5,
@@ -173,10 +169,6 @@
       "video_only_no_sound": false,
       "status": "completed_waiting_timeline",
       "timeline_added": false,
-      "voice_changer_applied": false,
-      "voice_sample_asset_id": "example-my-ai-audio-alex-01",
-      "voice_changed_clip_id": null,
-      "voice_match_verified": false,
       "video_negative_prompt_recorded": true,
       "errors": []
     },
@@ -204,10 +196,6 @@
       "video_only_no_sound": false,
       "status": "completed_waiting_timeline",
       "timeline_added": false,
-      "voice_changer_applied": false,
-      "voice_sample_asset_id": "example-my-ai-audio-bob-01",
-      "voice_changed_clip_id": null,
-      "voice_match_verified": false,
       "video_negative_prompt_recorded": true,
       "errors": []
     },
@@ -235,10 +223,6 @@
       "video_only_no_sound": false,
       "status": "completed_waiting_timeline",
       "timeline_added": false,
-      "voice_changer_applied": false,
-      "voice_sample_asset_id": "example-my-ai-audio-alex-01",
-      "voice_changed_clip_id": null,
-      "voice_match_verified": false,
       "video_negative_prompt_recorded": true,
       "errors": []
     },
@@ -266,10 +250,6 @@
       "video_only_no_sound": false,
       "status": "generating_55_percent",
       "timeline_added": false,
-      "voice_changer_applied": false,
-      "voice_sample_asset_id": "example-my-ai-audio-bob-01",
-      "voice_changed_clip_id": null,
-      "voice_match_verified": false,
       "video_negative_prompt_recorded": true,
       "errors": []
     },
@@ -297,10 +277,6 @@
       "video_only_no_sound": false,
       "status": "generating_20_percent",
       "timeline_added": false,
-      "voice_changer_applied": false,
-      "voice_sample_asset_id": "example-my-ai-audio-bob-01",
-      "voice_changed_clip_id": null,
-      "voice_match_verified": false,
       "video_negative_prompt_recorded": true,
       "errors": []
     }
@@ -313,16 +289,13 @@
     "Created and saved full-body Alex and Bob references",
     "Created and saved front, three-quarter, and two-character scale-lineup references",
     "Created and saved the environment reference and immutable environment lock",
-    "Created and saved one canonical My AI Audio voice sample per character",
     "Submitted five shots without exceeding five active video jobs",
     "Verified S01-S03 completed by job ID"
   ],
   "pending_steps": [
     "Continue monitoring S04-S05",
     "Add S01-S05 to track 1 in exact order",
-    "Apply Auto Align Clips pass 1",
-    "Apply the mapped saved voice sample to every clip with Voice Changer and verify gender, age band, pitch, timbre, accent, pace, and articulation",
-    "Apply Auto Align Clips pass 2 after voice replacement",
+    "Apply Auto Align Clips",
     "Verify no subtitle, caption, title, or text layer exists on the timeline",
     "Save the project",
     "Export subtitle-free High / FullHD / MP4",
@@ -334,10 +307,7 @@
     "actual_clip_order": [],
     "track": 1,
     "expected_duration_seconds": 50,
-    "auto_align_pass_1": false,
-    "voice_replacement_expected_clips": 5,
-    "voice_replacement_completed_clips": 0,
-    "auto_align_pass_2": false,
+    "auto_align_applied": false,
     "subtitle_caption_title_or_text_layers": 0
   },
   "subtitles": {

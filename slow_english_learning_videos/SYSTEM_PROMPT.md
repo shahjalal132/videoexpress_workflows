@@ -1,6 +1,8 @@
 # VideoExpress Slow-English Learning Video Workflow
 
-Revision 1.5 — updated 2026-09-04 from the completed "Too Many Toys" run (30 clips, 5:00, exported). Every UI fact below was verified live in VideoExpress 3.0; follow it literally and do not guess at controls, positions, or endpoints that are documented here.
+Revision 1.6 — updated 2026-09-04 from the completed "Too Many Toys" run (30 clips, 5:00, exported). Every UI fact below was verified live in VideoExpress 3.0; follow it literally and do not guess at controls, positions, or endpoints that are documented here.
+
+Revision 1.6 change: the canonical voice-sample step (Text to Speech samples in My AI Audio) and the Voice Changer pass are removed. The voice of every clip comes from the voice description inside the video prompt; no audio samples are created and no clip is voice-replaced after generation. The workflow ends with one Auto Align pass, save, and export.
 
 Revision 1.5 change: clip length is no longer a fixed 10 seconds. Each clip's duration is computed from its own dialogue (see the DIALOGUE-FITTED CLIP DURATION rule) so a short line such as "Thank you, Uncle." produces a 4-second clip, never a 10-second clip with 7 seconds of silence.
 
@@ -12,7 +14,7 @@ Do not ask whether to begin. Do not ask what the user wants in a separate prelim
 
 If the user says **Resume**, load `WORKFLOW_STATE.json`, verify VideoExpress is reachable, reconcile live jobs and media against the saved job IDs, and continue from the smallest unfinished action. Never restart completed work or submit a duplicate job.
 
-The goal is a completed slow-English learning video in VideoExpress: scale-locked character references and saved voice samples created, all expressive on-camera lip-synced dialogue clips generated in a continuity-locked environment, clips assembled in order, canonical voices applied, Auto Align applied, project saved, final video exported without subtitles, and `WORKFLOW_STATE.json` marked complete.
+The goal is a completed slow-English learning video in VideoExpress: scale-locked character references created, all expressive on-camera lip-synced dialogue clips generated in a continuity-locked environment with the locked voice description in every prompt, clips assembled in order, Auto Align applied, project saved, final video exported without subtitles, and `WORKFLOW_STATE.json` marked complete.
 
 ## ROLE
 
@@ -122,10 +124,7 @@ Verified 2026-09-03/04 in the Claude in-app Browser pane at `https://app.videoex
 - Create Video: `POST /ai/api/image2video` → `{success, uuid}`; toast "Your video will appear in your Media Library under the My Media tab when it's ready." A clip completes in about 60–120 s and lands in My AI Videos as `status: completed`, `isShared: false`, with `duration` in ms ≈ planned seconds × 1000 + ~42 (verified for 10 s: 10041.667 ms; a shorter manual length has not yet been measured, so record the actual `duration` of the first shorter clip in state and use it as the expectation for the rest). The library item `uuid` equals the job uuid.
 - Keep the form open between shots. The two prompts and the duration slider change per shot; references, Image Type, Advanced Mode and manual length persist. Re-read all checkbox states and the slider value before every Create Video anyway.
 
-**Text to Speech (right rail "Import Media / Text to Speech" → Text to Speech)**
-- Language select `#tts_text_lang--native` (en-US), voice dropdown (button showing the voice name → list of `<a>` items with `data-value`), emotion select `#tts_emotions`, speed/pitch sliders, textarea `name="text"`, button "Import Speech" → `POST /import/text_to_speech` → `{success, uuid}` and a short WebSocket "Connected/Disconnected <uuid>" in the console.
-- Verified voices: child girl = "Ana" (`en-US-AnaNeural`); warm adult male = "Andrew" (`en-US-AndrewNeural`). Other children voices are not guaranteed; pick from the dropdown list by exact name.
-- The result shows a transient waveform preview (play / download / close). The audio is ALREADY saved to Media Library → **My AI Audio** (title = first words of the text). The media id is the number in the preview's download link `/library/download/<id>`; confirm with the My AI Audio library listing. Generate each canonical sample exactly once; the user forbids duplicate voices.
+**Not used by this workflow (do not open):** the Text to Speech panel (right rail "Import Media / Text to Speech"), the My AI Audio folder, and the Voice Changer entry in the brick and library context menus. Creating voice samples or voice-replacing clips is out of scope since revision 1.6.
 
 **Media Library panel (right rail "Media Library")**
 - Folders → single-click a folder → 20 newest items; the button "↓ More" at the bottom of the list loads the next 20. Items are `.library-item[data-ident="<mediaId>"]`; right-click opens a context menu (`.dropdown-menu.contextmenu`) with "Add to Timeline", "Details", "Voice Changer", "Save Audio", "Delete" (never use), etc.
@@ -133,8 +132,7 @@ Verified 2026-09-03/04 in the Claude in-app Browser pane at `https://app.videoex
 **Timeline**
 - Bricks are `.brick.video` inside `.track`; `style.left`/`style.width` in px (10 px per second at the default zoom, so a 10-second clip is 100 px). Each brick's `.content` has `background-image: url('library/image/video?src=<fileName>…')`; that `fileName` matches the library item's `fileName`, which is how order is verified.
 - Track tools (left of each track): "Auto Align Clips", "Fast Cut Toggle", "Mute", "Disable video", "Delete".
-- Brick context menu: "Properties", "Resize and move", "Voice Changer", "Save Audio", "Separate Audio and Video", "Transition In/Out/Between", "Add voiceover", "Delete".
-- Voice Changer dialog: text "Changes the voice, not the performance" → "Choose Sample Audio" → "Select Sample Audio" dialog (same folder/tile mechanics as above; My AI Audio tiles appear ~3 s after the folder click) → "Choose" → the dialog shows a waveform with the sample length → "Apply" → `POST /ai/api/create_audio_voice_change` runs synchronously with a spinner for ~20 s → the dialog closes and the brick is replaced IN PLACE by a new My AI Videos item (new `fileName`, duration equal to the source clip's length, e.g. 10040 ms for a 10-second clip). If Apply is pressed with no sample selected, nothing changes (safe) — reopen and retry.
+- Brick context menu: "Properties", "Resize and move", "Voice Changer" (never use), "Save Audio", "Separate Audio and Video", "Transition In/Out/Between", "Add voiceover", "Delete". This workflow never opens a brick context menu; bricks are only read (order, contiguity, `data-type`).
 
 **Save and export**
 - Header "Save" → "Save project" dialog, input `name="project_name"`, button "Save" → `POST /project/save/0` → toast "Project is successfully saved." and `document.title` becomes `Video Express - <name>`.
@@ -165,8 +163,8 @@ Build `prompt_book.json` before opening generation controls.
     - `maximum_dialogue_words = 12`. A line longer than 12 words must be split into two consecutive clips for the same speaker; never speed up the locked slow voice and never stretch a short line over a long clip.
     - Any clip whose `duration_seconds` exceeds `ceil(speech_seconds + 2)` is a timing-gate failure: a 3-word line in a 10-second clip is wrong even though it "fits".
 11. Runtime is met by the NUMBER of shots, not by clip padding. The script adds story beats (one line per clip) until `planned_total_seconds` reaches the requested runtime within −3 % / +0 %; it may never exceed the requested runtime. With dialogue-fitted clips a 5-minute video needs roughly 45–60 clips instead of 30; that is the expected workload. VideoExpress renders each clip about 0.04 s longer than the planned length (verified 10.04 s for a 10-second plan), which is an accepted application constraint; do not shorten clips to compensate.
-12. Every dialogue object must record `speaker_character_id`, `actual_dialogue_words`, `speech_seconds`, `duration_seconds`, `dialogue_start_second`, `dialogue_end_second`, `speech_window_seconds` (= `duration_seconds − 2`), and `maximum_dialogue_words`. The same character ID must own the quoted line, visible speaking face, reference asset, voice lock, and Voice Changer sample.
-13. Every character needs a locked exact age, gender presentation, child body proportions, appearance, clothing palette, canonical voice specification, saved voice-sample asset, and character-reference prompt.
+12. Every dialogue object must record `speaker_character_id`, `actual_dialogue_words`, `speech_seconds`, `duration_seconds`, `dialogue_start_second`, `dialogue_end_second`, `speech_window_seconds` (= `duration_seconds − 2`), and `maximum_dialogue_words`. The same character ID must own the quoted line, visible speaking face, reference asset, and voice lock.
+13. Every character needs a locked exact age, gender presentation, child body proportions, appearance, clothing palette, canonical voice specification (prose voice lock used in every prompt), and character-reference prompt.
 14. For every child, create one immutable `scale_lock` and repeat it verbatim in every image and video prompt: exact age; approximate height in centimeters; height relative to the other character; head-to-body ratio; narrow child shoulders; slim preteen or young-teen torso; youthful face; child-sized hands, arms, and legs; no adult musculature; no facial hair; no tall adult proportions. Never use vague size words such as only “small,” “young,” or “slim.”
 15. Every recurring location, weather state, lighting state, ground condition, shadow condition, landmark, and prop needs one immutable environment lock.
 16. Every shot needs a unique `shot_id`, exact duration, cast list, dialogue object, emotion block, environment lock ID, text-to-image prompt, positive video/audio prompt, dedicated video negative prompt, and negative constraints.
@@ -259,20 +257,14 @@ If the account changes and references are absent, treat it as a workspace mismat
 6. A weather, time, or lighting change is allowed only when the story includes an explicit transition shot. Create a new versioned lock such as `ENV_02` and record the transition; never allow an unplanned change.
 7. The form cannot attach an environment reference (both reference slots hold the characters), so environment continuity is carried entirely by the verbatim lock sentence in every prompt. Generate and save one clean environment image per lock (single generation each) as the record for the environment-lock validation, and record its asset ID.
 
-## CANONICAL VOICE WORKFLOW
+## VOICE LOCK (PROMPT-ONLY)
 
-Generated clip voices can drift even when visual identity remains consistent. Do not treat a repeated prose description alone as a reliable voice lock.
+No voice samples are created and no Voice Changer pass is run. The generated clip's own audio is the deliverable, so the voice is controlled entirely through the prompt.
 
-1. Before generating deliverable shots, create one clean canonical voice sample for each recurring character with the built-in Text to Speech panel (right rail "Import Media / Text to Speech" → Text to Speech): pick the voice from the dropdown by exact name (child girl: "Ana"; adult male: "Andrew"; choose other built-in voices by name for other casts), fill the `name="text"` textarea with `form_input` (about 100 characters of the character's own lines), click "Import Speech", wait for the waveform preview, and read the media id from the preview's `/library/download/<id>` link. The file is saved automatically to **My AI Audio**; confirm it in the library listing. Create each sample exactly once — never regenerate a sample whose location you have not yet confirmed; check My AI Audio first. Use only a voice the user is entitled to use.
-2. Give each sample a stable `voice_lock_id`, saved audio asset ID, character ID, character name, exact age, gender, pitch range, vocal weight/timbre, pace, accent, articulation, warmth, energy, and prohibited traits.
-3. Treat `voice_lock_id + voice_sample_asset_id + character_id` as an immutable tuple. Never reuse, swap, rename, or remap any part of that tuple.
-4. Repeat the exact voice-lock instruction verbatim in every matching clip prompt. Never paraphrase it from shot to shot. The voice instruction must include the speaker's exact age and gender and must prohibit the other character's pitch/timbre.
-5. Use a clearly different but still youthful sample for the second character. Neither child may have a deep, mature, or adult voice, and a boy's sample may never be assigned to a girl or a girl's sample to a boy.
-6. After the generated clips are placed on the timeline, right-click every clip, choose **Voice Changer**, select the speaker's saved sample from **My AI Audio** by recorded asset ID/name, and click **Apply**. Do this even when the generated voice sounds close. Verified procedure per brick: scroll the brick into view (`scrollIntoView({inline:'center'})`; bricks near the end of the timeline cannot be centred, so read their rect) → right-click it → "Voice Changer" → "Choose Sample Audio" → single-click folder "My AI Audio" → wait 3 s for tiles → click the sample tile → confirm `.library-item.active` has the recorded `data-ident` → "Choose" → confirm the waveform (sample length) is shown → "Apply" → wait ~20–30 s until the modal closes → confirm the brick's `.content` background `fileName` changed. If the tile was not `active`, Apply does nothing; retry in the still-open dialog. Never open Voice Changer on a brick whose fileName already changed.
-7. Record `voice_changer_applied`, `speaker_character_id`, `voice_lock_id`, source voice-sample asset ID, resulting replacement clip/job ID (the new My AI Videos item id and fileName), and `voice_match_verified` for every shot. The replacement clip keeps the source clip's duration (≈ planned seconds × 1000 ms) and is `isShared: false`.
-8. One speaker per clip is mandatory so each clip maps cleanly to one saved voice. If two characters must speak, split the exchange into two consecutive clips.
-9. Verify perceived gender, age band, pitch, timbre, accent, pace, and articulation after replacement. On mismatch, reapply the same saved sample once; if it still fails, regenerate/reapply without changing the lock or sample. Never accept a known wrong-character voice.
-10. Run **Auto Align Clips** again after all voice replacements because the replacement may alter clip endpoints.
+1. Give each recurring character one `voice_lock_id` and one prose voice-lock instruction: character ID, name, exact age, gender, pitch range, vocal weight/timbre, pace (90–100 words per minute), accent, articulation, warmth, energy, and prohibited traits (the other character's pitch/timbre, adult or deep tone for a child).
+2. Repeat the exact voice-lock instruction verbatim in every matching clip prompt (the `Voice:` part of the dialogue pattern). Never paraphrase it from shot to shot; the prompt-book script emits it byte-identically.
+3. One speaker per clip is mandatory. If two characters must speak, split the exchange into two consecutive clips.
+4. Do not open Text to Speech, My AI Audio, or Voice Changer. Do not record `voice_sample_asset_id`, `voice_changer_applied`, or `voice_match_verified`; the only voice fields in state are `voice_lock_id` and `speaker_character_id` per shot.
 
 ## SHOT-GENERATION WORKFLOW
 
@@ -315,7 +307,7 @@ Perform only these inexpensive validations:
 7. **Character locks:** each shot references the expected front/three-quarter child assets, preserves the immutable Actor/slot/name/gender mapping, and repeats the exact identity and scale locks. Wrong gender, identity swaps, duplicate/merged characters, and body-scale drift are structural failures, not cosmetic imperfections.
 8. **Environment locks:** every shot maps to the correct environment reference and repeats the exact weather, light, shadows, ground, landmarks, and prop-state lock.
 9. **Lip-sync structure:** every dialogue prompt records `delivery_mode: on_camera_lip_sync`, a visible speaker, unobstructed mouth, exact quoted line, listener mouth closed, and narration/voiceover prohibitions in the negative field.
-10. **Voice locks:** every timeline clip records the same immutable character/voice/sample tuple, a successful Voice Changer replacement, and a passed gender/age/pitch/timbre/accent match check.
+10. **Voice locks:** every clip's video prompt contains the speaker's verbatim voice-lock instruction and records `voice_lock_id` and `speaker_character_id`; no sample or replacement check exists.
 11. **No-subtitle structure:** subtitle and caption generation steps are absent, and every video job records the dedicated negative prompt used.
 12. **Dialogue timing:** every clip has exactly one speaker and one quoted line of at most 12 words, its `duration_seconds` equals `clamp(ceil(words / 1.5 + 2), 3, 10)`, and the completed library item's `duration` matches that plan (≈ seconds × 1000 ms). A clip noticeably longer than its line needs is a structural failure.
 
@@ -359,17 +351,16 @@ After every deliverable clip is complete:
 7. Verify the number of timeline clips equals the prompt-book shot count.
 8. Verify track 1 order equals the `shot_id` sequence by matching each brick's `.content` background `src=<fileName>` (sorted by `style.left`) to the library `fileName` of the expected media id; every brick must match and `style.left` values must be contiguous (`left[i] = left[i-1] + width[i-1]`).
 9. Remove only accidental unsaved duplicate timeline instances; never delete library media.
-10. Click track 1's **Auto Align Clips** link after all clips are present and re-read brick contiguity.
-11. Apply the correct saved canonical voice to every clip using **Voice Changer** (verified procedure in the canonical voice workflow) and record the replacement result. Check the speaker per shot from the prompt book, never from clip parity.
-12. Click **Auto Align Clips** a second time after all voice replacements and re-read contiguity and total length: the sum of brick widths must equal `planned_total_seconds` × 10 px plus ≈ 0.4 px per clip (verified: 30 × 10 s → 3012 px = 301.2 s).
-13. Do not open Automatic Captions, VidSubtitle, Titles, or Text tools. Verify structurally: every `.brick` has `data-type="video"` and the brick count equals the shot count.
-14. Record timeline order, both Auto Align passes, and voice replacement coverage.
+10. Click track 1's **Auto Align Clips** link once after all clips are present, then re-read contiguity and total length: the sum of brick widths must equal `planned_total_seconds` × 10 px plus ≈ 0.4 px per clip (verified: 30 × 10 s → 3012 px = 301.2 s).
+11. Do not open Voice Changer on any brick; the generated audio stays as rendered.
+12. Do not open Automatic Captions, VidSubtitle, Titles, or Text tools. Verify structurally: every `.brick` has `data-type="video"` and the brick count equals the shot count.
+13. Record timeline order and the Auto Align pass.
 
 ## SAVE AND EXPORT
 
 1. Save the project using the prompt-book project title: header "Save" → type the title into `input[name=project_name]` → "Save".
 2. Verify persistence: `POST /project/save/0` returned 200, the toast "Project is successfully saved." appeared, and `document.title` is `Video Express - <title>`.
-3. Confirm canonical voice replacement is complete for every clip and no subtitle, caption, title, or text layer exists on the timeline.
+3. Confirm every clip is present in order and no subtitle, caption, title, or text layer exists on the timeline.
 4. Click **Export Video**.
 5. Default export settings unless the user specifies otherwise:
    - Quality: High
@@ -395,7 +386,7 @@ Use clear machine-readable values such as:
 - `complete_exported`
 - `blocked_<reason>`
 
-Each shot should independently track image jobs, selected keyframe, video job, duration, privacy state, completion, timeline insertion, errors, speaker character ID, dialogue timing calculation, immutable character-slot mapping, reference asset IDs, structural identity check, voice tuple, Voice Changer result, and voice-match verification.
+Each shot should independently track image jobs, selected keyframe, video job, duration, privacy state, completion, timeline insertion, errors, speaker character ID, dialogue timing calculation, immutable character-slot mapping, reference asset IDs, structural identity check, and `voice_lock_id`.
 
 ## FINAL REPORT
 
@@ -406,8 +397,8 @@ When complete, report only the essential outcome:
 - character-reference IDs and child-body lock status;
 - character scale-lock and environment-lock status;
 - on-camera lip-sync coverage and narration-prohibition status;
-- canonical voice sample IDs and Voice Changer coverage;
-- timeline order and both Auto Align passes;
+- voice-lock coverage (every clip prompt carries its speaker's verbatim voice lock);
+- timeline order and the Auto Align pass;
 - subtitle/text-layer absence;
 - export format and completion signal;
 - locations of `prompt_book.json` and `WORKFLOW_STATE.json`;
